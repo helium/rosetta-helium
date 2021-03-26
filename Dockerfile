@@ -52,31 +52,34 @@ RUN source $HOME/.cargo/env
 FROM golang-builder as rosetta-builder
 
 # Use native remote build context to build in any directory
-COPY . src 
+COPY . src
 RUN cd src \
   && go get -d ./... \
-  && go build \
-  && mv ./rosetta-helium /app/rosetta-helium \
-  && rm -rf src 
+  && go build -o rosetta-helium
+
+RUN ls -lha src
+
+RUN mv src/rosetta-helium /app/rosetta-helium \
+  && rm -rf src
 
 # ## Build Final Image
-# FROM ubuntu:18.04
+FROM ubuntu:18.04
 
-# RUN mkdir -p /app \
-#   && chown -R nobody:nogroup /app \
-#   && mkdir -p /data \
-#   && chown -R nobody:nogroup /data
+RUN mkdir -p /app \
+  && chown -R nobody:nogroup /app \
+  && mkdir -p /data \
+  && chown -R nobody:nogroup /data
 
-# WORKDIR /app
+WORKDIR /app
 
-# # Copy binary from geth-builder
+# Copy binary from geth-builder
 # COPY --from=geth-builder /app/geth /app/geth
 
-# # Copy binary from rosetta-builder
+# Copy binary from rosetta-builder
 # COPY --from=rosetta-builder /app/ethereum /app/ethereum
-# COPY --from=rosetta-builder /app/rosetta-ethereum /app/rosetta-ethereum
+COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
 
-# # Set permissions for everything added to /app
-# RUN chmod -R 755 /app/*
+# Set permissions for everything added to /app
+RUN chmod -R 755 /app/*
 
-# CMD ["/app/rosetta-ethereum", "run"]
+CMD ["/app/rosetta-helium"]
