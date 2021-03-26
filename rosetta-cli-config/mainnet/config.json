@@ -1,0 +1,18 @@
+{
+  "network": {
+   "blockchain": "Helium",
+   "network": "Mainnet"
+  },
+  "online_url": "http://localhost:8080",
+  "data_directory": "/Users/steven.yuan/Downloads/helium-data",
+  "http_timeout": 100,
+  "tip_delay": 300,
+  "max_retries": 10,
+  "max_sync_concurrency": 2,
+  "data": {
+    "historical_balance_enabled": false,
+    "reconciliation_disabled": true,
+    "inactive_discrepency_search_disabled": true,
+    "balance_tracking_disabled": true
+  }
+ }
