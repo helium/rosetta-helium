@@ -56,7 +56,7 @@ COPY . src
 RUN cd src \
   && go get -d ./... \
   && go build \
-  && mv rosetta-helium /app/rosetta-helium \
+  && mv ./rosetta-helium /app/rosetta-helium \
   && rm -rf src 
 
 # ## Build Final Image
