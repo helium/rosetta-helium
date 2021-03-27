@@ -39,13 +39,12 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 FROM golang-builder as rosetta-builder
 
 # Use native remote build context to build in any directory
-COPY . src
-RUN cd src \
-  && go get -d ./... \
+COPY . rosetta-helium-builder
+RUN cd rosetta-helium-builder \
   && go build -o rosetta-helium
 
-RUN mv src/rosetta-helium /app/rosetta-helium \
-  && rm -rf src
+RUN mv rosetta-helium-builder/rosetta-helium /app/rosetta-helium \
+  && rm -rf rosetta-helium-builder
 
 FROM helium-builder as blockchain-node-builder
 
@@ -70,5 +69,7 @@ COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
 RUN chmod -R 755 /app/*
 
 WORKDIR /app
+
+RUN bash -l -c "echo export LAST_BLESSED_SNAPSHOT=`cat blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\,\ ).*?(?=\})'` >> /etc/bash.bashrc"
 
 CMD ["make", "start"]

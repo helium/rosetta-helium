@@ -17,15 +17,21 @@ func CurrentBlockHeight() int64 {
 
 	var result int64
 
+	fmt.Print("Getting current block height: ")
+
 	if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println(result)
 
 	return result
 }
 
 func GetBlock(index int64) *types.Block {
 
+	fmt.Print("Getting block at height ")
+	fmt.Println(index)
 	type request struct {
 		Height int64 `json:"height"`
 	}

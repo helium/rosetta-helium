@@ -100,6 +100,13 @@ var (
 		Code:    9, //nolint
 		Message: "Signature invalid",
 	}
+
+	// ErrEnvVariableMissing is returned when an env variable
+	// cannot be found.
+	ErrEnvVariableMissing = &types.Error{
+		Code:    10, //nolint
+		Message: "Environment variable missing",
+	}
 )
 
 // wrapErr adds details to the types.Error provided. We use a function

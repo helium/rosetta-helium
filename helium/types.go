@@ -149,10 +149,6 @@ const (
 	// historical balance is supported.
 	HistoricalBalanceSupported = false
 
-	// LastBlessedSnapshotIndex is the index of the
-	// last sanctioned block for blockchain-node instances
-	LastBlessedSnapshotIndex = int64(762481)
-
 	// Genesis is the index of the
 	// genesis block for blockchain-etl instances
 	GenesisBlockIndex = int64(0)
