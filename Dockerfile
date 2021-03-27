@@ -22,31 +22,18 @@ RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 # Compile erlang 
 FROM ubuntu:20.04 as helium-builder
 
+ENV DEBIAN_FRONTEND noninteractive
+ENV PATH /root/.cargo/bin:${PATH}
+
 RUN mkdir -p /app \
   && chown -R nobody:nogroup /app
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y curl make gcc g++ git gnupg2 wget
-RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc | apt-key add -
-RUN echo "deb https://packages.erlang-solutions.com/ubuntu focal contrib" | tee /etc/apt/sources.list.d/rabbitmq.list
-RUN apt-get update && apt-get install -y erlang
-RUN curl https://sh.rustup.rs -sSf | sh
-RUN source $HOME/.cargo/env
-
-
-# Compile geth
-# FROM golang-builder as geth-builder
-
-# # VERSION: go-ethereum v.1.9.24
-# RUN git clone https://github.com/ethereum/go-ethereum \
-#   && cd go-ethereum \
-#   && git checkout cc05b050df5f88e80bb26aaf6d2f339c49c2d702
-
-# RUN cd go-ethereum \
-#   && make geth
-
-# RUN mv go-ethereum/build/bin/geth /app/geth \
-#   && rm -rf go-ethereum
+RUN wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && dpkg -i erlang-solutions_2.0_all.deb
+RUN apt-get update \
+    && apt-get install -y esl-erlang=1:22.3.4.1-1 cmake libsodium-dev libssl-dev build-essential
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
 # Compile rosetta-ethereum
 FROM golang-builder as rosetta-builder
@@ -57,29 +44,31 @@ RUN cd src \
   && go get -d ./... \
   && go build -o rosetta-helium
 
-RUN ls -lha src
-
 RUN mv src/rosetta-helium /app/rosetta-helium \
   && rm -rf src
 
-# ## Build Final Image
-FROM ubuntu:18.04
+FROM helium-builder as blockchain-node-builder
 
 RUN mkdir -p /app \
   && chown -R nobody:nogroup /app \
   && mkdir -p /data \
   && chown -R nobody:nogroup /data
 
-WORKDIR /app
+# Copy Makefile
+COPY ./docker/Makefile /app
 
-# Copy binary from geth-builder
-# COPY --from=geth-builder /app/geth /app/geth
+# VERSION: blockchain-node 
+RUN git clone https://github.com/helium/blockchain-node \
+   && cd blockchain-node \
+   && git checkout cc93faa198c99d9110cceebdc7996b350bac8eab
 
-# Copy binary from rosetta-builder
-# COPY --from=rosetta-builder /app/ethereum /app/ethereum
+RUN cd blockchain-node \
+  && make && make release
+
 COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
 
-# Set permissions for everything added to /app
 RUN chmod -R 755 /app/*
 
-CMD ["/app/rosetta-helium"]
+WORKDIR /app
+
+CMD ["make", "start"]
