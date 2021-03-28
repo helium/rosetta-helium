@@ -18,3 +18,4 @@ docker run -d --rm --ulimit "nofile=100000:100000" -v "$(pwd)/helium-data:/app/b
 ```text
 rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.json
 ```
+(Please wait a few minutes for the Helium node to initialize before running this command)
