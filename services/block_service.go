@@ -16,12 +16,11 @@ package services
 
 import (
 	"context"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/syuan100/rosetta-helium/helium"
 )
 
 // BlockAPIService implements the server.BlockAPIServicer interface.
@@ -41,17 +40,9 @@ func (s *BlockAPIService) Block(
 	ctx context.Context,
 	request *types.BlockRequest,
 ) (*types.BlockResponse, *types.Error) {
-	lastBlessedBlockHeight, err := strconv.ParseInt(os.Getenv("LAST_BLESSED_SNAPSHOT"), 10, 64)
-	if err != nil {
-		return nil, wrapErr(
-			ErrEnvVariableMissing,
-			err,
-		)
-	}
-
 	previousBlockIndex := *request.BlockIdentifier.Index - 1
-	if previousBlockIndex < lastBlessedBlockHeight {
-		previousBlockIndex = lastBlessedBlockHeight
+	if previousBlockIndex < *helium.LBS {
+		previousBlockIndex = *helium.LBS
 	}
 
 	requestedBlock := GetBlock(*request.BlockIdentifier.Index)

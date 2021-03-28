@@ -18,12 +18,13 @@ import (
 	"bytes"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
-func readLBSfile() *string {
+func readLBSfile() *int64 {
 	file, err := os.Open("lbs.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +37,13 @@ func readLBSfile() *string {
 	}
 	s := strings.TrimSuffix(buf.String(), "\n")
 
-	return &s
+	lbs, err := strconv.ParseInt(s, 10, 64)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &lbs
 }
 
 const (
