@@ -27,6 +27,12 @@ var (
 		ErrFailed,
 		ErrInvalidParameter,
 		ErrInvalidPassword,
+		ErrUnableToDerive,
+		ErrUnclearIntent,
+		ErrUnableToParseIntermediateResult,
+		ErrUnableToDecodeAddress,
+		ErrSignatureInvalid,
+		ErrEnvVariableMissing,
 	}
 
 	// ErrUnimplemented is returned when an endpoint

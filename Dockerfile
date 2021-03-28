@@ -64,12 +64,12 @@ RUN git clone https://github.com/helium/blockchain-node \
 RUN cd blockchain-node \
   && make && make release
 
+RUN cat ./blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > lbs.txt
+
 COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
 
 RUN chmod -R 755 /app/*
 
 WORKDIR /app
-
-RUN bash -l -c "echo export LAST_BLESSED_SNAPSHOT=`cat blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\,\ ).*?(?=\})'` >> /etc/bash.bashrc"
 
 CMD ["make", "start"]

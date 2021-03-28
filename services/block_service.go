@@ -16,7 +16,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"os"
 	"strconv"
 	"time"
@@ -46,7 +45,7 @@ func (s *BlockAPIService) Block(
 	if err != nil {
 		return nil, wrapErr(
 			ErrEnvVariableMissing,
-			errors.New("$LAST_BLESSED_SNAPSHOT varaible is missing"),
+			err,
 		)
 	}
 

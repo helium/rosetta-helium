@@ -15,8 +15,29 @@
 package helium
 
 import (
+	"bytes"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/coinbase/rosetta-sdk-go/types"
 )
+
+func readLBSfile() *string {
+	file, err := os.Open("lbs.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var buf bytes.Buffer
+	_, err = buf.ReadFrom(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s := strings.TrimSuffix(buf.String(), "\n")
+
+	return &s
+}
 
 const (
 	// NodeVersion is the version of helium we are using.
@@ -212,6 +233,9 @@ var (
 			Successful: false,
 		},
 	}
+
+	//LastBlessedSnapshotIndex
+	LBS = readLBSfile()
 )
 
 type Block struct {

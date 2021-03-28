@@ -59,6 +59,7 @@ func NewBlockchainRouter(
 }
 
 func main() {
+
 	network := &types.NetworkIdentifier{
 		Blockchain: "Helium",
 		Network:    "Mainnet",

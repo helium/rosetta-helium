@@ -16,9 +16,7 @@ package services
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/syuan100/rosetta-helium/helium"
@@ -56,13 +54,13 @@ func (s *NetworkAPIService) NetworkStatus(
 	ctx context.Context,
 	request *types.NetworkRequest,
 ) (*types.NetworkStatusResponse, *types.Error) {
-	fmt.Println("Getting current block: ")
+	fmt.Println("Getting latest block: ")
 	currentBlock := GetBlock(CurrentBlockHeight())
-	lastBlessedBlockHeight, err := strconv.ParseInt(os.Getenv("LAST_BLESSED_SNAPSHOT"), 10, 64)
+	lastBlessedBlockHeight, err := strconv.ParseInt(*helium.LBS, 10, 64)
 	if err != nil {
 		return nil, wrapErr(
 			ErrEnvVariableMissing,
-			errors.New("$LAST_BLESSED_SNAPSHOT varaible is missing"),
+			err,
 		)
 	}
 	fmt.Println("Getting last blessed block: ")
