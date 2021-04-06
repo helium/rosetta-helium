@@ -109,9 +109,13 @@ const (
 	// initial group of miners that bootstrapped the blockchain
 	GenesisGatewayTxn = "gen_gateway_v1"
 
-	// MultiPaymentTxn is used to describe
+	// PaymentV2Txn is used to describe
 	// a transaction from one wallet to multiple
-	MultiPaymentTxn = "payment_v2"
+	PaymentV2Txn = "payment_v2"
+
+	// SubPaymentV2Op is used to describe
+	// individual sub-payments of the PaymentV2Txn
+	SubPaymentV2Op = "subpayment_v2"
 
 	// OUIType is used to describe
 	// a new OUI for a new router on the network
@@ -221,9 +225,10 @@ var (
 		CreateProofOfCoverageRequestTxn,
 		DataCreditsTxn,
 		GenesisGatewayTxn,
-		MultiPaymentTxn,
 		OUITxn,
 		PaymentV1Txn,
+		PaymentV2Txn,
+		SubPaymentV2Op,
 		ProofOfCoverageReceiptsTxn,
 		RedeemHashedTimelockTxn,
 		RewardTxnV1,
