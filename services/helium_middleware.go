@@ -83,9 +83,7 @@ func GetTransaction(txHash string) *types.Transaction {
 		TransactionIdentifier: &types.TransactionIdentifier{
 			Hash: fmt.Sprint(result["hash"]),
 		},
-		Operations: []*types.Operation{
-			ParseOperationFromTx(result, 0),
-		},
+		Operations:          ParseOperationsFromTx(result, 0),
 		RelatedTransactions: nil,
 		Metadata:            nil,
 	}
@@ -94,24 +92,26 @@ func GetTransaction(txHash string) *types.Transaction {
 
 }
 
-func ParseOperationFromTx(tx map[string]interface{}, index int64) *types.Operation {
+func ParseOperationsFromTx(tx map[string]interface{}, index int64) []*types.Operation {
 	txType := tx["type"]
 	status := helium.SuccessStatus
 
-	operation := &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: index,
+	operations := []*types.Operation{
+		{
+			OperationIdentifier: &types.OperationIdentifier{
+				Index: index,
+			},
+			RelatedOperations: nil,
+			Type:              fmt.Sprint(txType),
+			Status:            &status,
+			Account:           nil,
+			Amount:            nil,
+			CoinChange:        nil,
+			Metadata:          nil,
 		},
-		RelatedOperations: nil,
-		Type:              fmt.Sprint(txType),
-		Status:            &status,
-		Account:           nil,
-		Amount:            nil,
-		CoinChange:        nil,
-		Metadata:          nil,
 	}
 
-	return operation
+	return operations
 }
 
 func GetAmount(address string) *types.Amount {
