@@ -69,101 +69,109 @@ const (
 	// used in Currency.
 	Decimals = 8
 
-	// AddGatewayOpType is used to describe
+	// AddGatewayTxn is used to describe
 	// adding a gateway.
-	AddGatewayOpType = "add_gateway_v1"
+	AddGatewayTxn = "add_gateway_v1"
 
-	// AssertLocationOpType is used to describe
+	// AssertLocationTxn is used to describe
 	// asserting a gateway's location.
-	AssertLocationOpType = "assert_location_v1"
+	AssertLocationTxn = "assert_location_v1"
 
-	// ChainVarsOpType is used to describe
+	// ChainVarsTxn is used to describe
 	// changing a chain variable.
-	ChainVarsOpType = "vars_v1"
+	ChainVarsTxn = "vars_v1"
 
-	// CoinbaseOpType is used to describe
+	// CoinbaseTxn is used to describe
 	// a coinbase transaction.
-	CoinbaseOpType = "COINBASE"
+	CoinbaseTxn = "COINBASE"
 
-	// CoinbaseDataCreditsOpType is used to describe
+	// CoinbaseDataCreditsTxn is used to describe
 	// the initial 10k credits to bring initial miners online.
-	CoinbaseDataCreditsOpType = "dc_coinbase_v1"
+	CoinbaseDataCreditsTxn = "dc_coinbase_v1"
 
-	// ConsensusGroupOpType is used to describe
+	// ConsensusGroupTxn is used to describe
 	// the election of a new consensus group
-	ConsensusGroupOpType = "consensus_group_v1"
+	ConsensusGroupTxn = "consensus_group_v1"
 
-	// CreateHashedTimelockOpType is used to describe
+	// CreateHashedTimelockTxn is used to describe
 	// creating a hashed timelock
-	CreateHashedTimelockOpType = "create_htlc_v1"
+	CreateHashedTimelockTxn = "create_htlc_v1"
 
-	// CreateProofOfCoverageRequestOpType is used to describe
+	// CreateProofOfCoverageRequestTxn is used to describe
 	// a proof of coverage request
-	CreateProofOfCoverageRequestOpType = "poc_request_v1"
+	CreateProofOfCoverageRequestTxn = "poc_request_v1"
 
-	// DataCreditsOpType is used to describe
+	// DataCreditsTxn is used to describe
 	// burning HNT for DCs
-	DataCreditsOpType = "token_burn_v1"
+	DataCreditsTxn = "token_burn_v1"
 
-	// GenesisGatewayOpType is used to describe
+	// GenesisGatewayTxn is used to describe
 	// initial group of miners that bootstrapped the blockchain
-	GenesisGatewayOpType = "gen_gateway_v1"
+	GenesisGatewayTxn = "gen_gateway_v1"
 
-	// MultiPaymentOpType is used to describe
+	// MultiPaymentTxn is used to describe
 	// a transaction from one wallet to multiple
-	MultiPaymentOpType = "payment_v2"
+	MultiPaymentTxn = "payment_v2"
 
 	// OUIType is used to describe
 	// a new OUI for a new router on the network
-	OUIOpType = "oui_v1"
+	OUITxn = "oui_v1"
 
-	// PaymentOpType is used to describe
+	// PaymentTxn is used to describe
 	// sending HNT from one wallet to another
-	PaymentV1OpType = "payment_v1"
+	PaymentV1Txn = "payment_v1"
 
-	// ProofOfCoverageReceiptsOpType is used to describe
+	// ProofOfCoverageReceiptsTxn is used to describe
 	// completed POC submitted to the network
-	ProofOfCoverageReceiptsOpType = "poc_receipts_v1"
+	ProofOfCoverageReceiptsTxn = "poc_receipts_v1"
 
-	// RedeemHashedTimelockOpType is used to describe
+	// RedeemHashedTimelockTxn is used to describe
 	// redeeming a hashed timelock
-	RedeemHashedTimelockOpType = "redeem_htlc_v1"
+	RedeemHashedTimelockTxn = "redeem_htlc_v1"
 
-	// RewardOpType is used to describe
+	// RewardTxn is used to describe
 	// a token payout for a specific event on the network
-	RewardOpType = "reward_v1"
+	RewardTxnV1 = "reward_v1"
 
-	// RewardsOpType is used to describe
+	// RewardsTxn is used to describe
 	// a bundle of multiple reward transactions
-	RewardsOpType = "rewards_v1"
+	RewardsTxnV1 = "rewards_v1"
 
-	// RoutingOpType is used to describe
+	// RewardTxn is used to describe
+	// a token payout for a specific event on the network
+	RewardTxnV2 = "reward_v1"
+
+	// RewardsTxn is used to describe
+	// a bundle of multiple reward transactions
+	RewardsTxnV2 = "rewards_v1"
+
+	// RoutingTxn is used to describe
 	// updating the routing information with an OUI
-	RoutingOpType = "routing_v1"
+	RoutingTxn = "routing_v1"
 
-	// SecurityCoinbaseOpType is used to describe
+	// SecurityCoinbaseTxn is used to describe
 	// the distribution of security tokens in genesis block
-	SecurityCoinbaseOpType = "security_coinbase_v1"
+	SecurityCoinbaseTxn = "security_coinbase_v1"
 
-	// SecurityExchangeOpType is used to describe
+	// SecurityExchangeTxn is used to describe
 	// the transfer of security tokens from one address to another
-	SecurityExchangeOpType = "security_exchange_v1"
+	SecurityExchangeTxn = "security_exchange_v1"
 
-	// StateChannelOpenOpType is used to describe
+	// StateChannelOpenTxn is used to describe
 	// opening a new state channel on a Helium router
-	StateChannelOpenOpType = "state_channel_open_v1"
+	StateChannelOpenTxn = "state_channel_open_v1"
 
-	// StateChannelCloseOpType is used to describe
+	// StateChannelCloseTxn is used to describe
 	// closing a state channel on a Helium router
-	StateChannelCloseOpType = "state_channel_close_v1"
+	StateChannelCloseTxn = "state_channel_close_v1"
 
-	// TokenBurnExchangeRateOpType is used to describe
+	// TokenBurnExchangeRateTxn is used to describe
 	// changing the exchange rate for burning HNT to DCs
-	TokenBurnExchangeRateOpType = "price_oracle_v1"
+	TokenBurnExchangeRateTxn = "price_oracle_v1"
 
-	// TransferHotspotOpType is used to describe
+	// TransferHotspotTxn is used to describe
 	// transferring hotspots from one wallet to another
-	TransferHotspotOpType = "transfer_hotspot_v1"
+	TransferHotspotTxn = "transfer_hotspot_v1"
 
 	// SuccessStatus is the status of any
 	// Helium operation considered successful.
@@ -203,30 +211,32 @@ var (
 
 	// OperationTypes are all suppoorted operation types.
 	OperationTypes = []string{
-		AddGatewayOpType,
-		AssertLocationOpType,
-		ChainVarsOpType,
-		CoinbaseOpType,
-		CoinbaseDataCreditsOpType,
-		ConsensusGroupOpType,
-		CreateHashedTimelockOpType,
-		CreateProofOfCoverageRequestOpType,
-		DataCreditsOpType,
-		GenesisGatewayOpType,
-		MultiPaymentOpType,
-		OUIOpType,
-		PaymentV1OpType,
-		ProofOfCoverageReceiptsOpType,
-		RedeemHashedTimelockOpType,
-		RewardOpType,
-		RewardsOpType,
-		RoutingOpType,
-		SecurityCoinbaseOpType,
-		SecurityExchangeOpType,
-		StateChannelOpenOpType,
-		StateChannelCloseOpType,
-		TokenBurnExchangeRateOpType,
-		TransferHotspotOpType,
+		AddGatewayTxn,
+		AssertLocationTxn,
+		ChainVarsTxn,
+		CoinbaseTxn,
+		CoinbaseDataCreditsTxn,
+		ConsensusGroupTxn,
+		CreateHashedTimelockTxn,
+		CreateProofOfCoverageRequestTxn,
+		DataCreditsTxn,
+		GenesisGatewayTxn,
+		MultiPaymentTxn,
+		OUITxn,
+		PaymentV1Txn,
+		ProofOfCoverageReceiptsTxn,
+		RedeemHashedTimelockTxn,
+		RewardTxnV1,
+		RewardsTxnV1,
+		RewardTxnV2,
+		RewardsTxnV2,
+		RoutingTxn,
+		SecurityCoinbaseTxn,
+		SecurityExchangeTxn,
+		StateChannelOpenTxn,
+		StateChannelCloseTxn,
+		TokenBurnExchangeRateTxn,
+		TransferHotspotTxn,
 	}
 
 	// OperationStatuses are all supported operation statuses.
