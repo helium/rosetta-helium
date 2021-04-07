@@ -5,7 +5,7 @@ Bare bones Rosetta API implementation of the Helium `blockchain-node`
 
 #### Build container
 ```text
-docker build -t rosetta-helium:latest .
+docker build . -t rosetta-helium:latest
 ```
 
 #### Run container
