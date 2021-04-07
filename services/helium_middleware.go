@@ -44,7 +44,10 @@ func GetBlock(index int64) (*types.Block, *types.Error) {
 	var processedTxs []*types.Transaction
 	for _, tx := range result.Transactions {
 		ptx, txErr := GetTransaction(tx)
-		return nil, txErr
+		if txErr != nil {
+			return nil, txErr
+		}
+
 		processedTxs = append(processedTxs, ptx)
 	}
 
