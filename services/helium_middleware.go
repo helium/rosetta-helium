@@ -28,10 +28,8 @@ func CurrentBlockHeight() int64 {
 	return result
 }
 
-func GetBlock(index int64) *types.Block {
+func GetBlock(index int64) (*types.Block, *types.Error) {
 
-	fmt.Print("Getting block at height ")
-	fmt.Println(index)
 	type request struct {
 		Height int64 `json:"height"`
 	}
@@ -40,12 +38,13 @@ func GetBlock(index int64) *types.Block {
 
 	req := request{Height: index}
 	if err := NodeClient.CallFor(&result, "block_get", req); err != nil {
-		log.Fatal(err)
+		return nil, wrapErr(ErrNotFound, err)
 	}
 
 	var processedTxs []*types.Transaction
 	for _, tx := range result.Transactions {
-		ptx := GetTransaction(tx)
+		ptx, txErr := GetTransaction(tx)
+		return nil, txErr
 		processedTxs = append(processedTxs, ptx)
 	}
 
@@ -63,10 +62,10 @@ func GetBlock(index int64) *types.Block {
 		Metadata:     nil,
 	}
 
-	return currentBlock
+	return currentBlock, nil
 }
 
-func GetTransaction(txHash string) *types.Transaction {
+func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 
 	type request struct {
 		Hash string `json:"hash"`
@@ -76,7 +75,10 @@ func GetTransaction(txHash string) *types.Transaction {
 
 	req := request{Hash: txHash}
 	if err := NodeClient.CallFor(&result, "transaction_get", req); err != nil {
-		log.Fatal(err)
+		return nil, wrapErr(
+			ErrNotFound,
+			err,
+		)
 	}
 
 	transaction := &types.Transaction{
@@ -88,7 +90,7 @@ func GetTransaction(txHash string) *types.Transaction {
 		Metadata:            nil,
 	}
 
-	return transaction
+	return transaction, nil
 
 }
 

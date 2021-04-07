@@ -39,7 +39,10 @@ func (s *AccountAPIService) AccountBalance(
 	request *types.AccountBalanceRequest,
 ) (*types.AccountBalanceResponse, *types.Error) {
 
-	currentBlock := GetBlock(CurrentBlockHeight())
+	currentBlock, cErr := GetBlock(CurrentBlockHeight())
+	if cErr != nil {
+		return nil, cErr
+	}
 
 	return &types.AccountBalanceResponse{
 		BlockIdentifier: &types.BlockIdentifier{

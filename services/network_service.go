@@ -54,9 +54,19 @@ func (s *NetworkAPIService) NetworkStatus(
 	request *types.NetworkRequest,
 ) (*types.NetworkStatusResponse, *types.Error) {
 	fmt.Println("Getting latest block: ")
-	currentBlock := GetBlock(CurrentBlockHeight())
+	currentBlock, cbErr := GetBlock(CurrentBlockHeight())
+
+	if cbErr != nil {
+		return nil, cbErr
+	}
+
 	fmt.Println("Getting last blessed block: ")
-	lastBlessedBlock := GetBlock(*helium.LBS)
+	lastBlessedBlock, lbErr := GetBlock(*helium.LBS)
+
+	if lbErr != nil {
+		return nil, lbErr
+	}
+
 	return &types.NetworkStatusResponse{
 		CurrentBlockIdentifier: &types.BlockIdentifier{
 			Index: currentBlock.BlockIdentifier.Index,

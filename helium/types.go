@@ -143,11 +143,11 @@ const (
 
 	// RewardTxn is used to describe
 	// a token payout for a specific event on the network
-	RewardTxnV2 = "reward_v1"
+	RewardTxnV2 = "reward_v2"
 
 	// RewardsTxn is used to describe
 	// a bundle of multiple reward transactions
-	RewardsTxnV2 = "rewards_v1"
+	RewardsTxnV2 = "rewards_v2"
 
 	// RoutingTxn is used to describe
 	// updating the routing information with an OUI

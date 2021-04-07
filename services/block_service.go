@@ -16,6 +16,8 @@ package services
 
 import (
 	"context"
+	"errors"
+	"strconv"
 	"time"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
@@ -45,8 +47,22 @@ func (s *BlockAPIService) Block(
 		previousBlockIndex = *helium.LBS
 	}
 
-	requestedBlock := GetBlock(*request.BlockIdentifier.Index)
-	previousBlock := GetBlock(previousBlockIndex)
+	requestedBlock, rErr := GetBlock(*request.BlockIdentifier.Index)
+	if rErr != nil {
+		return nil, rErr
+	}
+
+	previousBlock, pErr := GetBlock(previousBlockIndex)
+	if pErr != nil {
+		return nil, pErr
+	}
+
+	if requestedBlock.BlockIdentifier.Hash != *request.BlockIdentifier.Hash {
+		return nil, wrapErr(
+			ErrNotFound,
+			errors.New("ambiguous request: requested block height ("+strconv.FormatInt(*request.BlockIdentifier.Index, 10)+") does not match returned block hash ("+requestedBlock.BlockIdentifier.Hash+")"),
+		)
+	}
 
 	return &types.BlockResponse{
 		Block: &types.Block{
@@ -69,7 +85,13 @@ func (s *BlockAPIService) BlockTransaction(
 	ctx context.Context,
 	request *types.BlockTransactionRequest,
 ) (*types.BlockTransactionResponse, *types.Error) {
+
+	txn, txErr := GetTransaction(request.TransactionIdentifier.Hash)
+	if txErr != nil {
+		return nil, txErr
+	}
+
 	return &types.BlockTransactionResponse{
-		Transaction: GetTransaction(request.TransactionIdentifier.Hash),
+		Transaction: txn,
 	}, nil
 }
