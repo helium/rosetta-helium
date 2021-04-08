@@ -54,14 +54,14 @@ func (s *NetworkAPIService) NetworkStatus(
 	request *types.NetworkRequest,
 ) (*types.NetworkStatusResponse, *types.Error) {
 	fmt.Println("Getting latest block: ")
-	currentBlock, cbErr := GetBlock(CurrentBlockHeight())
+	currentBlock, cbErr := helium.GetBlock(helium.CurrentBlockHeight())
 
 	if cbErr != nil {
 		return nil, cbErr
 	}
 
 	fmt.Println("Getting last blessed block: ")
-	lastBlessedBlock, lbErr := GetBlock(*helium.LBS)
+	lastBlessedBlock, lbErr := helium.GetBlock(*helium.LBS)
 
 	if lbErr != nil {
 		return nil, lbErr
@@ -96,7 +96,7 @@ func (s *NetworkAPIService) NetworkOptions(
 			NodeVersion:    helium.NodeVersion,
 		},
 		Allow: &types.Allow{
-			Errors:                  Errors,
+			Errors:                  helium.Errors,
 			OperationTypes:          helium.OperationTypes,
 			OperationStatuses:       helium.OperationStatuses,
 			HistoricalBalanceLookup: helium.HistoricalBalanceSupported,

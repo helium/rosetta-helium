@@ -1,11 +1,11 @@
-package services
+package helium
 
 import (
 	"fmt"
 	"log"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
-	"github.com/syuan100/rosetta-helium/helium"
+	"github.com/syuan100/rosetta-helium/utils"
 	"github.com/ybbus/jsonrpc"
 )
 
@@ -34,11 +34,11 @@ func GetBlock(index int64) (*types.Block, *types.Error) {
 		Height int64 `json:"height"`
 	}
 
-	var result helium.Block
+	var result Block
 
 	req := request{Height: index}
 	if err := NodeClient.CallFor(&result, "block_get", req); err != nil {
-		return nil, wrapErr(ErrNotFound, err)
+		return nil, WrapErr(ErrNotFound, err)
 	}
 
 	var processedTxs []*types.Transaction
@@ -78,7 +78,7 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 
 	req := request{Hash: txHash}
 	if err := NodeClient.CallFor(&result, "transaction_get", req); err != nil {
-		return nil, wrapErr(
+		return nil, WrapErr(
 			ErrNotFound,
 			err,
 		)
@@ -88,7 +88,7 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		TransactionIdentifier: &types.TransactionIdentifier{
 			Hash: fmt.Sprint(result["hash"]),
 		},
-		Operations:          ParseOperationsFromTx(result, 0),
+		Operations:          ParseOperationsFromTx(result),
 		RelatedTransactions: nil,
 		Metadata:            nil,
 	}
@@ -97,14 +97,14 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 
 }
 
-func ParseOperationsFromTx(tx map[string]interface{}, index int64) []*types.Operation {
+func ParseOperationsFromTx(tx map[string]interface{}) []*types.Operation {
 	txType := tx["type"]
-	status := helium.SuccessStatus
+	status := SuccessStatus
 
 	operations := []*types.Operation{
 		{
 			OperationIdentifier: &types.OperationIdentifier{
-				Index: index,
+				Index: 0,
 			},
 			RelatedOperations: nil,
 			Type:              fmt.Sprint(txType),
@@ -119,7 +119,7 @@ func ParseOperationsFromTx(tx map[string]interface{}, index int64) []*types.Oper
 	return operations
 }
 
-func GetAmount(address string) *types.Amount {
+func GetBalance(address string) (*types.Amount, *types.Error) {
 
 	type request struct {
 		Address string `json:"address"`
@@ -129,17 +129,40 @@ func GetAmount(address string) *types.Amount {
 
 	req := request{Address: address}
 	if err := NodeClient.CallFor(&result, "account_get", req); err != nil {
-		log.Fatal(err)
+		return nil, WrapErr(
+			ErrNotFound,
+			err,
+		)
 	}
 
 	amount := &types.Amount{
 		Value: fmt.Sprint(result["balance"]),
 		Currency: &types.Currency{
-			Symbol:   helium.Currency.Symbol,
-			Decimals: helium.Currency.Decimals,
+			Symbol:   Currency.Symbol,
+			Decimals: Currency.Decimals,
 		},
 	}
 
-	return amount
+	return amount, nil
 
+}
+
+func GetOraclePrice(height int64) (*int64, *types.Error) {
+	type request struct {
+		Height int64 `json:"height"`
+	}
+
+	var result map[string]interface{}
+
+	req := request{Height: height}
+	if err := NodeClient.CallFor(&result, "oracle_price_get", req); err != nil {
+		return nil, WrapErr(
+			ErrNotFound,
+			err,
+		)
+	}
+
+	price := utils.MapToInt64(result["price"])
+
+	return &price, nil
 }

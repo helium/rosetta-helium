@@ -19,6 +19,7 @@ import (
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/syuan100/rosetta-helium/helium"
 )
 
 // AccountAPIService implements the server.AccountAPIServicer interface.
@@ -39,9 +40,14 @@ func (s *AccountAPIService) AccountBalance(
 	request *types.AccountBalanceRequest,
 ) (*types.AccountBalanceResponse, *types.Error) {
 
-	currentBlock, cErr := GetBlock(CurrentBlockHeight())
+	currentBlock, cErr := helium.GetBlock(helium.CurrentBlockHeight())
 	if cErr != nil {
 		return nil, cErr
+	}
+
+	accountBalance, aErr := helium.GetBalance(request.AccountIdentifier.Address)
+	if aErr != nil {
+		return nil, aErr
 	}
 
 	return &types.AccountBalanceResponse{
@@ -50,7 +56,7 @@ func (s *AccountAPIService) AccountBalance(
 			Hash:  currentBlock.BlockIdentifier.Hash,
 		},
 		Balances: []*types.Amount{
-			GetAmount(request.AccountIdentifier.Address),
+			accountBalance,
 		},
 	}, nil
 }

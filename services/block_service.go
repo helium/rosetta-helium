@@ -47,19 +47,19 @@ func (s *BlockAPIService) Block(
 		previousBlockIndex = *helium.LBS
 	}
 
-	requestedBlock, rErr := GetBlock(*request.BlockIdentifier.Index)
+	requestedBlock, rErr := helium.GetBlock(*request.BlockIdentifier.Index)
 	if rErr != nil {
 		return nil, rErr
 	}
 
-	previousBlock, pErr := GetBlock(previousBlockIndex)
+	previousBlock, pErr := helium.GetBlock(previousBlockIndex)
 	if pErr != nil {
 		return nil, pErr
 	}
 
 	if requestedBlock.BlockIdentifier.Hash != *request.BlockIdentifier.Hash {
-		return nil, wrapErr(
-			ErrNotFound,
+		return nil, helium.WrapErr(
+			helium.ErrNotFound,
 			errors.New("ambiguous request: requested block height ("+strconv.FormatInt(*request.BlockIdentifier.Index, 10)+") does not match returned block hash ("+requestedBlock.BlockIdentifier.Hash+")"),
 		)
 	}
@@ -86,7 +86,7 @@ func (s *BlockAPIService) BlockTransaction(
 	request *types.BlockTransactionRequest,
 ) (*types.BlockTransactionResponse, *types.Error) {
 
-	txn, txErr := GetTransaction(request.TransactionIdentifier.Hash)
+	txn, txErr := helium.GetTransaction(request.TransactionIdentifier.Hash)
 	if txErr != nil {
 		return nil, txErr
 	}

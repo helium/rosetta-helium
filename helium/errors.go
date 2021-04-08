@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package services
+package helium
 
 import (
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -115,10 +115,10 @@ var (
 	}
 )
 
-// wrapErr adds details to the types.Error provided. We use a function
+// WrapErr adds details to the types.Error provided. We use a function
 // to do this so that we don't accidentially overrwrite the standard
 // errors.
-func wrapErr(rErr *types.Error, err error) *types.Error {
+func WrapErr(rErr *types.Error, err error) *types.Error {
 	newErr := &types.Error{
 		Code:      rErr.Code,
 		Message:   rErr.Message,
