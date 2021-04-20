@@ -19,3 +19,6 @@ docker run -d --rm --ulimit "nofile=100000:100000" -v "$(pwd)/helium-data:/app/b
 rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.json
 ```
 (Please wait a few minutes for the Helium node to initialize before running this command)
+
+#### Buy me an HNT coffee :)
+HNT Address: 13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88
