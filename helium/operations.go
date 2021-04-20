@@ -1,28 +1,66 @@
 package helium
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
-	"github.com/syuan100/rosetta-helium/utils"
 )
 
-func ParsePaymentV1Txn(tx map[string]interface{}) (*types.Operation, *types.Error) {
-	status := SuccessStatus
-	tx_block := utils.MapToInt64(tx["block"])
-	hnt_price, hErr := GetOraclePrice(tx_block)
-	if hErr != nil {
-		return nil, hErr
+func CreatePaymentDebitOp(payer *string, amount *int64, opIndex int64) (*types.Operation, *types.Error) {
+	if *amount < 0 {
+		return nil, WrapErr(ErrUnableToParseTxn, errors.New("Negative payment amount not allowed."))
+	} else {
+		return &types.Operation{
+			OperationIdentifier: &types.OperationIdentifier{
+				Index: opIndex,
+			},
+			Type:   PaymentCreditOp,
+			Status: &SuccessStatus,
+			Amount: &types.Amount{
+				Value:    "-" + fmt.Sprint(amount),
+				Currency: HNT,
+			},
+		}, nil
+	}
+}
+
+func CreateFeeOp(payer *string, fee *int64, feeType *string, opIndex int64) (*types.Operation, *types.Error) {
+
+	var FeeOp *types.Operation
+	var FeeCurrency *types.Currency
+	var metadata map[string]interface{}
+
+	switch *feeType {
+	case "HNT":
+		FeeCurrency = HNT
+		metadata = map[string]interface{}{
+			"implicit_burn": true,
+		}
+	case "DC":
+		FeeCurrency = DC
+		metadata = map[string]interface{}{
+			"implicit_burn": false,
+		}
+	default:
+		return nil, WrapErr(ErrNotFound, errors.New("Incorrect or missing feeType."))
 	}
 
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: 0,
-		},
-		Type:   PaymentV1Txn,
-		Status: &status,
-		Account: &types.AccountIdentifier{
-			Address: fmt.Sprint(tx["payer"]),
-		},
-	}, nil
+	if *fee < 0 {
+		return nil, WrapErr(ErrUnableToParseTxn, errors.New("Negative fee amount not allowed."))
+	} else {
+		FeeOp = &types.Operation{
+			OperationIdentifier: &types.OperationIdentifier{
+				Index: opIndex,
+			},
+			Type:   PaymentCreditOp,
+			Status: &SuccessStatus,
+			Amount: &types.Amount{
+				Value:    "-" + fmt.Sprint(fee),
+				Currency: FeeCurrency,
+			},
+			Metadata: metadata,
+		}
+		return FeeOp, nil
+	}
 }

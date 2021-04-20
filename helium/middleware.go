@@ -84,39 +84,22 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		)
 	}
 
+	operations, oErr := OperationsFromTx(result)
+	if oErr != nil {
+		return nil, oErr
+	}
+
 	transaction := &types.Transaction{
 		TransactionIdentifier: &types.TransactionIdentifier{
 			Hash: fmt.Sprint(result["hash"]),
 		},
-		Operations:          ParseOperationsFromTx(result),
+		Operations:          operations,
 		RelatedTransactions: nil,
 		Metadata:            nil,
 	}
 
 	return transaction, nil
 
-}
-
-func ParseOperationsFromTx(tx map[string]interface{}) []*types.Operation {
-	txType := tx["type"]
-	status := SuccessStatus
-
-	operations := []*types.Operation{
-		{
-			OperationIdentifier: &types.OperationIdentifier{
-				Index: 0,
-			},
-			RelatedOperations: nil,
-			Type:              fmt.Sprint(txType),
-			Status:            &status,
-			Account:           nil,
-			Amount:            nil,
-			CoinChange:        nil,
-			Metadata:          nil,
-		},
-	}
-
-	return operations
 }
 
 func GetBalance(address string) (*types.Amount, *types.Error) {
@@ -136,11 +119,8 @@ func GetBalance(address string) (*types.Amount, *types.Error) {
 	}
 
 	amount := &types.Amount{
-		Value: fmt.Sprint(result["balance"]),
-		Currency: &types.Currency{
-			Symbol:   Currency.Symbol,
-			Decimals: Currency.Decimals,
-		},
+		Value:    fmt.Sprint(result["balance"]),
+		Currency: HNT,
 	}
 
 	return amount, nil

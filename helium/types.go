@@ -69,6 +69,18 @@ const (
 	// used in Currency.
 	Decimals = 8
 
+	// Symbol for Data Credits
+	DCSymbol = "DC"
+
+	// Decimals for Data Credits
+	DCDecimals = 0
+
+	// Symbol for Security Tokens
+	HSTSymbol = "HST"
+
+	// Decimals for Security Tokens
+	HSTDecimals = 8
+
 	// AddGatewayTxn is used to describe
 	// adding a gateway.
 	AddGatewayTxn = "add_gateway_v1"
@@ -112,10 +124,6 @@ const (
 	// PaymentV2Txn is used to describe
 	// a transaction from one wallet to multiple
 	PaymentV2Txn = "payment_v2"
-
-	// SubPaymentV2Op is used to describe
-	// individual sub-payments of the PaymentV2Txn
-	SubPaymentV2Op = "subpayment_v2"
 
 	// OUIType is used to describe
 	// a new OUI for a new router on the network
@@ -177,13 +185,21 @@ const (
 	// transferring hotspots from one wallet to another
 	TransferHotspotTxn = "transfer_hotspot_v1"
 
-	// SuccessStatus is the status of any
-	// Helium operation considered successful.
-	SuccessStatus = "SUCCESS"
+	// PaymentCreditOp is used to describe
+	// a payment from the receivers side (Positive HNT)
+	PaymentCreditOp = "payment_credit_op"
 
-	// FailureStatus is the status of any
-	// Helium operation considered unsuccessful.
-	FailureStatus = "FAILURE"
+	// PaymentDebitOp is used to describe
+	// a payment from the givers side (Negative HNT)
+	PaymentDebitOp = "payment_debit_op"
+
+	// FeeOp is used to describe
+	// a transaction fee (Negative HNT or DC)
+	FeeOp = "fee_op"
+
+	// RewardOp is used to describe
+	// a reward payout (Positive HNT)
+	RewardOp = "reward_op"
 
 	// HistoricalBalanceSupported is whether
 	// historical balance is supported.
@@ -199,6 +215,14 @@ const (
 
 var (
 
+	// SuccessStatus is the status of any
+	// Helium operation considered successful.
+	SuccessStatus = "SUCCESS"
+
+	// FailureStatus is the status of any
+	// Helium operation considered unsuccessful.
+	FailureStatus = "FAILURE"
+
 	// GenesisBlockIdentifier is the *types.BlockIdentifier
 	// of the mainnet genesis block.
 	GenesisBlockIdentifier = &types.BlockIdentifier{
@@ -206,15 +230,26 @@ var (
 		Index: 1,
 	}
 
-	// Currency is the *types.Currency for all
-	// Ethereum networks.
-	Currency = &types.Currency{
+	// Currency is the *types.Currency for HNT.
+	HNT = &types.Currency{
 		Symbol:   Symbol,
 		Decimals: Decimals,
 	}
 
-	// OperationTypes are all suppoorted operation types.
-	OperationTypes = []string{
+	// DCCurrency is the *types.Currency for DC.
+	DC = &types.Currency{
+		Symbol:   DCSymbol,
+		Decimals: DCDecimals,
+	}
+
+	// HSTCurrency is the *types.Currency for HST.
+	HST = &types.Currency{
+		Symbol:   HSTSymbol,
+		Decimals: HSTDecimals,
+	}
+
+	// TransactionTypes are all suppoorted operation types.
+	TransactionTypes = []string{
 		AddGatewayTxn,
 		AssertLocationTxn,
 		ChainVarsTxn,
@@ -228,7 +263,6 @@ var (
 		OUITxn,
 		PaymentV1Txn,
 		PaymentV2Txn,
-		SubPaymentV2Op,
 		ProofOfCoverageReceiptsTxn,
 		RedeemHashedTimelockTxn,
 		RewardTxnV1,
@@ -242,6 +276,15 @@ var (
 		StateChannelCloseTxn,
 		TokenBurnExchangeRateTxn,
 		TransferHotspotTxn,
+	}
+
+	//s are all supported base operations
+	// that make up a transaction
+	OperationTypes = []string{
+		PaymentCreditOp,
+		PaymentDebitOp,
+		FeeOp,
+		RewardOp,
 	}
 
 	// OperationStatuses are all supported operation statuses.

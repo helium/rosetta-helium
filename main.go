@@ -68,7 +68,7 @@ func main() {
 	// The asserter automatically rejects incorrectly formatted
 	// requests.
 	asserter, err := asserter.NewServer(
-		helium.OperationTypes,
+		helium.TransactionTypes,
 		helium.HistoricalBalanceSupported,
 		[]*types.NetworkIdentifier{network},
 		nil,

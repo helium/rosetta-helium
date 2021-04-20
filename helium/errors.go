@@ -30,6 +30,7 @@ var (
 		ErrUnableToDerive,
 		ErrUnclearIntent,
 		ErrUnableToParseIntermediateResult,
+		ErrUnableToParseTxn,
 		ErrUnableToDecodeAddress,
 		ErrSignatureInvalid,
 		ErrEnvVariableMissing,
@@ -112,6 +113,13 @@ var (
 	ErrEnvVariableMissing = &types.Error{
 		Code:    10, //nolint
 		Message: "Environment variable missing",
+	}
+
+	// ErrUnableToParseTxn is returned when a txn
+	// cannot be parsed into valid operations
+	ErrUnableToParseTxn = &types.Error{
+		Code:    11, //nolint
+		Message: "Unable to parse transaction into valid operations",
 	}
 )
 
