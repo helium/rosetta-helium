@@ -9,7 +9,7 @@ import (
 
 func CreatePaymentDebitOp(payer *string, amount *int64, opIndex int64) (*types.Operation, *types.Error) {
 	if *amount < 0 {
-		return nil, WrapErr(ErrUnableToParseTxn, errors.New("Negative payment amount not allowed."))
+		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative payment amount not allowed"))
 	} else {
 		return &types.Operation{
 			OperationIdentifier: &types.OperationIdentifier{
@@ -43,11 +43,11 @@ func CreateFeeOp(payer *string, fee *int64, feeType *string, opIndex int64) (*ty
 			"implicit_burn": false,
 		}
 	default:
-		return nil, WrapErr(ErrNotFound, errors.New("Incorrect or missing feeType."))
+		return nil, WrapErr(ErrNotFound, errors.New("incorrect or missing feeType"))
 	}
 
 	if *fee < 0 {
-		return nil, WrapErr(ErrUnableToParseTxn, errors.New("Negative fee amount not allowed."))
+		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative fee amount not allowed"))
 	} else {
 		FeeOp = &types.Operation{
 			OperationIdentifier: &types.OperationIdentifier{

@@ -146,3 +146,28 @@ func GetOraclePrice(height int64) (*int64, *types.Error) {
 
 	return &price, nil
 }
+
+func GetImplicitBurn(hash string) (*Fee, *types.Error) {
+	type request struct {
+		Hash string `json:"hash"`
+	}
+
+	var result map[string]interface{}
+
+	req := request{Hash: hash}
+	if err := NodeClient.CallFor(&result, "implicit_burn_get", req); err != nil {
+		return nil, WrapErr(
+			ErrNotFound,
+			err,
+		)
+	}
+
+	feeResult := &Fee{
+		Amount:   utils.MapToInt64(result["fee"]),
+		Payer:    fmt.Sprint(result["payer"]),
+		Currency: HNT,
+	}
+
+	return feeResult, nil
+
+}
