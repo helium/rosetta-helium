@@ -11,7 +11,7 @@ docker build . -t rosetta-helium:latest
 #### Run container
 Local data is stored in `helium-data`
 ```text
-docker run -d --rm --ulimit "nofile=100000:100000" -v "$(pwd)/helium-data:/app/blockchain-node/_build/dev/rel/blockchain_node/data" -p 8080:8080 -p 44158:44158 rosetta-helium:latest
+docker run -d --rm --ulimit "nofile=100000:100000" -v "$(pwd)/helium-data:/app/blockchain-node/_build/dev/rel/blockchain_node/data" -p 8080:8080 -p 44158:44158 -p 4467:4467 rosetta-helium:latest
 ```
 
 #### Rosetta CLI check

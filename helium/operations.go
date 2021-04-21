@@ -15,10 +15,10 @@ func CreatePaymentDebitOp(payer *string, amount *int64, opIndex int64) (*types.O
 			OperationIdentifier: &types.OperationIdentifier{
 				Index: opIndex,
 			},
-			Type:   PaymentCreditOp,
+			Type:   PaymentDebitOp,
 			Status: &SuccessStatus,
 			Amount: &types.Amount{
-				Value:    "-" + fmt.Sprint(amount),
+				Value:    "-" + fmt.Sprint(*amount),
 				Currency: HNT,
 			},
 		}, nil

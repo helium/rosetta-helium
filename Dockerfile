@@ -57,12 +57,12 @@ RUN mkdir -p /app \
 COPY ./docker/Makefile /app
 
 # VERSION: blockchain-node 
-RUN git clone https://github.com/helium/blockchain-node \
+RUN git clone https://github.com/syuan100/blockchain-node \
    && cd blockchain-node \
-   && git checkout cc93faa198c99d9110cceebdc7996b350bac8eab
+   && git checkout ced91e1a3ef1d1942022c4585fe5d71e1117ea41
 
 RUN cd blockchain-node \
-  && make && make release
+  && make && make release PROFILE=devib
 
 RUN cat ./blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > lbs.txt
 
@@ -72,4 +72,4 @@ RUN chmod -R 755 /app/*
 
 WORKDIR /app
 
-CMD ["make", "start"]
+CMD ["make", "start", "PROFILE=devib"]

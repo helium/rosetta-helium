@@ -13,30 +13,30 @@ var (
 	NodeClient = jsonrpc.NewClient("http://localhost:4467")
 )
 
-func CurrentBlockHeight() int64 {
+func CurrentBlockHeight() *int64 {
 
 	var result int64
-
-	fmt.Print("Getting current block height: ")
 
 	if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(result)
-
-	return result
+	return &result
 }
 
-func GetBlock(index int64) (*types.Block, *types.Error) {
+func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *types.Error) {
 
 	type request struct {
-		Height int64 `json:"height"`
+		Height int64  `json:"index,omitempty"`
+		Hash   string `json:"hash,omitempty"`
 	}
 
 	var result Block
 
-	req := request{Height: index}
+	req := request{
+		Height: *blockIdentifier.Index,
+		Hash:   *blockIdentifier.Hash,
+	}
 	if err := NodeClient.CallFor(&result, "block_get", req); err != nil {
 		return nil, WrapErr(ErrNotFound, err)
 	}
@@ -84,10 +84,10 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		)
 	}
 
-	operations, oErr := OperationsFromTx(result)
-	if oErr != nil {
-		return nil, oErr
-	}
+	operations, _ := OperationsFromTx(result)
+	// if oErr != nil {
+	// 	return nil, oErr
+	// }
 
 	transaction := &types.Transaction{
 		TransactionIdentifier: &types.TransactionIdentifier{

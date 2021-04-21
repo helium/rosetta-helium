@@ -16,7 +16,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/syuan100/rosetta-helium/helium"
 
@@ -53,15 +52,17 @@ func (s *NetworkAPIService) NetworkStatus(
 	ctx context.Context,
 	request *types.NetworkRequest,
 ) (*types.NetworkStatusResponse, *types.Error) {
-	fmt.Println("Getting latest block: ")
-	currentBlock, cbErr := helium.GetBlock(helium.CurrentBlockHeight())
+	currentBlock, cbErr := helium.GetBlock(&types.PartialBlockIdentifier{
+		Index: helium.CurrentBlockHeight(),
+	})
 
 	if cbErr != nil {
 		return nil, cbErr
 	}
 
-	fmt.Println("Getting last blessed block: ")
-	lastBlessedBlock, lbErr := helium.GetBlock(*helium.LBS)
+	lastBlessedBlock, lbErr := helium.GetBlock(&types.PartialBlockIdentifier{
+		Index: helium.LBS,
+	})
 
 	if lbErr != nil {
 		return nil, lbErr

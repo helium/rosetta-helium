@@ -47,21 +47,25 @@ func (s *BlockAPIService) Block(
 		previousBlockIndex = *helium.LBS
 	}
 
-	requestedBlock, rErr := helium.GetBlock(*request.BlockIdentifier.Index)
+	requestedBlock, rErr := helium.GetBlock(request.BlockIdentifier)
 	if rErr != nil {
 		return nil, rErr
 	}
 
-	previousBlock, pErr := helium.GetBlock(previousBlockIndex)
+	previousBlock, pErr := helium.GetBlock(&types.PartialBlockIdentifier{
+		Index: &previousBlockIndex,
+	})
 	if pErr != nil {
 		return nil, pErr
 	}
 
-	if requestedBlock.BlockIdentifier.Hash != *request.BlockIdentifier.Hash {
-		return nil, helium.WrapErr(
-			helium.ErrNotFound,
-			errors.New("ambiguous request: requested block height ("+strconv.FormatInt(*request.BlockIdentifier.Index, 10)+") does not match returned block hash ("+requestedBlock.BlockIdentifier.Hash+")"),
-		)
+	if request.BlockIdentifier.Hash != nil {
+		if requestedBlock.BlockIdentifier.Hash != *request.BlockIdentifier.Hash {
+			return nil, helium.WrapErr(
+				helium.ErrNotFound,
+				errors.New("ambiguous request: requested block height ("+strconv.FormatInt(*request.BlockIdentifier.Index, 10)+") does not match returned block hash ("+requestedBlock.BlockIdentifier.Hash+")"),
+			)
+		}
 	}
 
 	return &types.BlockResponse{
