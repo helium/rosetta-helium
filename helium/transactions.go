@@ -43,13 +43,19 @@ func PaymentV1(payer string, payee string, amount int64, fee int64, feeType stri
 		return nil, pErr
 	}
 
-	Fee, fErr := CreateFeeOp(&payer, &fee, &feeType, 1)
+	PaymentCredit, pcErr := CreatePaymentCreditOp(&payee, &amount, 1)
+	if pcErr != nil {
+		return nil, pcErr
+	}
+
+	Fee, fErr := CreateFeeOp(&payer, &fee, &feeType, 2)
 	if fErr != nil {
 		return nil, fErr
 	}
 
 	return []*types.Operation{
 		PaymentDebit,
+		PaymentCredit,
 		Fee,
 	}, nil
 
