@@ -17,6 +17,9 @@ func CreatePaymentDebitOp(payer *string, amount *int64, opIndex int64) (*types.O
 			},
 			Type:   PaymentDebitOp,
 			Status: &SuccessStatus,
+			Account: &types.AccountIdentifier{
+				Address: *payer,
+			},
 			Amount: &types.Amount{
 				Value:    "-" + fmt.Sprint(*amount),
 				Currency: HNT,
@@ -55,8 +58,11 @@ func CreateFeeOp(payer *string, fee *int64, feeType *string, opIndex int64) (*ty
 			},
 			Type:   PaymentCreditOp,
 			Status: &SuccessStatus,
+			Account: &types.AccountIdentifier{
+				Address: *payer,
+			},
 			Amount: &types.Amount{
-				Value:    "-" + fmt.Sprint(fee),
+				Value:    "-" + fmt.Sprint(*fee),
 				Currency: FeeCurrency,
 			},
 			Metadata: metadata,

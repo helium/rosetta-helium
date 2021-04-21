@@ -27,16 +27,27 @@ func CurrentBlockHeight() *int64 {
 func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *types.Error) {
 
 	type request struct {
-		Height int64  `json:"index,omitempty"`
+		Height int64  `json:"height,omitempty"`
 		Hash   string `json:"hash,omitempty"`
 	}
 
 	var result Block
+	var req request
 
-	req := request{
-		Height: *blockIdentifier.Index,
-		Hash:   *blockIdentifier.Hash,
+	if blockIdentifier.Index != nil && blockIdentifier.Hash != nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	} else if blockIdentifier.Index == nil && blockIdentifier.Hash != nil {
+		req = request{
+			Hash: *blockIdentifier.Hash,
+		}
+	} else if blockIdentifier.Index != nil && blockIdentifier.Hash == nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
 	}
+
 	if err := NodeClient.CallFor(&result, "block_get", req); err != nil {
 		return nil, WrapErr(ErrNotFound, err)
 	}
