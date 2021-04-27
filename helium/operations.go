@@ -91,3 +91,24 @@ func CreateFeeOp(payer *string, fee *int64, feeType *string, opIndex int64) (*ty
 		return FeeOp, nil
 	}
 }
+
+func CreateRewardOp(payee *string, amount *int64, opIndex int64) (*types.Operation, *types.Error) {
+	if *amount < 0 {
+		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative reward amount not allowed"))
+	} else {
+		return &types.Operation{
+			OperationIdentifier: &types.OperationIdentifier{
+				Index: opIndex,
+			},
+			Type:   RewardOp,
+			Status: &SuccessStatus,
+			Account: &types.AccountIdentifier{
+				Address: *payee,
+			},
+			Amount: &types.Amount{
+				Value:    fmt.Sprint(*amount),
+				Currency: HNT,
+			},
+		}, nil
+	}
+}

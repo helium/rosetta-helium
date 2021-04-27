@@ -31,6 +31,10 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			utils.MapToInt64(txn["amount"]),
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol)
+	case RewardTxnV1:
+		return RewardV1(
+			fmt.Sprint(txn["payee"]),
+			utils.MapToInt64(txn["amount"]))
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
 	}
@@ -57,6 +61,19 @@ func PaymentV1(payer string, payee string, amount int64, fee int64, feeType stri
 		PaymentDebit,
 		PaymentCredit,
 		Fee,
+	}, nil
+
+}
+
+func RewardV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
+
+	Reward, rErr := CreateRewardOp(&payee, &amount, 0)
+	if rErr != nil {
+		return nil, rErr
+	}
+
+	return []*types.Operation{
+		Reward,
 	}, nil
 
 }
