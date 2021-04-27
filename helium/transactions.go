@@ -45,10 +45,11 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			}
 		}
 		var payments []*Payment
-		for _, p := range txn["payments"].([]map[string]interface{}) {
+
+		for _, p := range txn["payments"].([]interface{}) {
 			payments = append(payments, &Payment{
-				Payee:  fmt.Sprint(p["payee"]),
-				Amount: utils.MapToInt64(p["amount"]),
+				Payee:  fmt.Sprint(p.(map[string]interface{})["payee"]),
+				Amount: utils.MapToInt64(int64(p.(map[string]interface{})["amount"].(float64))),
 			})
 		}
 		return PaymentV2(

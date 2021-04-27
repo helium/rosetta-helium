@@ -130,7 +130,7 @@ func GetBalance(address string) (*types.Amount, *types.Error) {
 	}
 
 	amount := &types.Amount{
-		Value:    fmt.Sprint(result["balance"]),
+		Value:    fmt.Sprint(utils.MapToInt64(result["balance"])),
 		Currency: HNT,
 	}
 
