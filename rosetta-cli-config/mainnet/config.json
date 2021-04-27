@@ -4,7 +4,7 @@
    "network": "Mainnet"
   },
   "online_url": "http://localhost:8080",
-  "data_directory": "/Users/steven.yuan/Downloads/helium-data",
+  "data_directory": "helium-data",
   "http_timeout": 2000,
   "tip_delay": 300,
   "max_retries": 10,
