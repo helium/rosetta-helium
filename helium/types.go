@@ -321,6 +321,19 @@ type Payment struct {
 	Amount int64  `json:"amount"`
 }
 
+type Fee struct {
+	Amount   int64
+	Payer    string
+	Currency *types.Currency
+}
+
+type Reward struct {
+	Account string `json:"account"`
+	Amount  int64  `json:"amount"`
+	Gateway string `json:"gateway"`
+	Type    string `json:"type"`
+}
+
 type PaymentV2Transaction struct {
 	Transaction
 	Fee      int64     `json:"fee"`

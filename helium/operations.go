@@ -92,8 +92,8 @@ func CreateFeeOp(payer *string, fee *int64, feeType *string, opIndex int64) (*ty
 	}
 }
 
-func CreateRewardOp(payee *string, amount *int64, opIndex int64) (*types.Operation, *types.Error) {
-	if *amount < 0 {
+func CreateRewardOp(payee string, amount int64, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	if amount < 0 {
 		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative reward amount not allowed"))
 	} else {
 		return &types.Operation{
@@ -103,12 +103,13 @@ func CreateRewardOp(payee *string, amount *int64, opIndex int64) (*types.Operati
 			Type:   RewardOp,
 			Status: &SuccessStatus,
 			Account: &types.AccountIdentifier{
-				Address: *payee,
+				Address: payee,
 			},
 			Amount: &types.Amount{
-				Value:    fmt.Sprint(*amount),
+				Value:    fmt.Sprint(amount),
 				Currency: HNT,
 			},
+			Metadata: metadata,
 		}, nil
 	}
 }

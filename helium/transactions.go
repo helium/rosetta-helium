@@ -8,12 +8,6 @@ import (
 	"github.com/syuan100/rosetta-helium/utils"
 )
 
-type Fee struct {
-	Amount   int64
-	Payer    string
-	Currency *types.Currency
-}
-
 func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Error) {
 	switch txn["type"] {
 	case PaymentV1Txn:
@@ -28,13 +22,11 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		return PaymentV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),
-			utils.MapToInt64(txn["amount"]),
+			int64(txn["amount"].(float64)),
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol)
-	case RewardTxnV1:
-		return RewardV1(
-			fmt.Sprint(txn["payee"]),
-			utils.MapToInt64(txn["amount"]))
+	case RewardsTxnV1:
+		return RewardsV1(txn["rewards"].([]interface{}))
 	case PaymentV2Txn:
 		feeDetails, bErr := GetImplicitBurn(fmt.Sprint(txn["hash"]))
 		if bErr != nil {
@@ -117,15 +109,26 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 
 }
 
-func RewardV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
+func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 
-	Reward, rErr := CreateRewardOp(&payee, &amount, 0)
-	if rErr != nil {
-		return nil, rErr
+	var rewardOps []*types.Operation
+
+	for i, reward := range rewards {
+		rewardOp, rErr := CreateRewardOp(
+			fmt.Sprint(reward.(map[string]interface{})["account"]),
+			utils.MapToInt64(int64(reward.(map[string]interface{})["amount"].(float64))),
+			int64(i),
+			map[string]interface{}{
+				"gateway": fmt.Sprint(reward.(map[string]interface{})["gateway"]),
+				"type":    fmt.Sprint(reward.(map[string]interface{})["type"]),
+			})
+		if rErr != nil {
+			return nil, rErr
+		}
+
+		rewardOps = append(rewardOps, rewardOp)
 	}
 
-	return []*types.Operation{
-		Reward,
-	}, nil
+	return rewardOps, nil
 
 }
