@@ -47,7 +47,7 @@ func (s *AccountAPIService) AccountBalance(
 		return nil, cErr
 	}
 
-	accountBalance, aErr := helium.GetBalance(request.AccountIdentifier.Address)
+	accountBalances, aErr := helium.GetBalance(request.AccountIdentifier.Address)
 	if aErr != nil {
 		return nil, aErr
 	}
@@ -57,9 +57,7 @@ func (s *AccountAPIService) AccountBalance(
 			Index: currentBlock.BlockIdentifier.Index,
 			Hash:  currentBlock.BlockIdentifier.Hash,
 		},
-		Balances: []*types.Amount{
-			accountBalance,
-		},
+		Balances: accountBalances,
 	}, nil
 }
 

@@ -113,7 +113,9 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 
 }
 
-func GetBalance(address string) (*types.Amount, *types.Error) {
+func GetBalance(address string) ([]*types.Amount, *types.Error) {
+
+	var balances []*types.Amount
 
 	type request struct {
 		Address string `json:"address"`
@@ -129,12 +131,24 @@ func GetBalance(address string) (*types.Amount, *types.Error) {
 		)
 	}
 
-	amount := &types.Amount{
+	amountHNT := &types.Amount{
 		Value:    fmt.Sprint(int64(result["balance"].(float64))),
 		Currency: HNT,
 	}
 
-	return amount, nil
+	amountDC := &types.Amount{
+		Value:    fmt.Sprint(int64(result["dc_balance"].(float64))),
+		Currency: DC,
+	}
+
+	amountHST := &types.Amount{
+		Value:    fmt.Sprint(int64(result["sec_balance"].(float64))),
+		Currency: HST,
+	}
+
+	balances = append(balances, amountHNT, amountDC, amountHST)
+
+	return balances, nil
 
 }
 
