@@ -25,8 +25,6 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			int64(txn["amount"].(float64)),
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol)
-	case RewardsTxnV1:
-		return RewardsV1(txn["rewards"].([]interface{}))
 	case PaymentV2Txn:
 		feeDetails, bErr := GetImplicitBurn(fmt.Sprint(txn["hash"]))
 		if bErr != nil {
@@ -50,6 +48,8 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol,
 		)
+	case RewardsTxnV1:
+		return RewardsV1(txn["rewards"].([]interface{}))
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
 	}
@@ -57,17 +57,17 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 
 func PaymentV1(payer string, payee string, amount int64, fee int64, feeType string) ([]*types.Operation, *types.Error) {
 
-	PaymentDebit, pErr := CreatePaymentDebitOp(&payer, &amount, 0)
+	PaymentDebit, pErr := CreateDebitOp(payer, amount, HNT, 0, map[string]interface{}{"credit_category": "payment"})
 	if pErr != nil {
 		return nil, pErr
 	}
 
-	PaymentCredit, pcErr := CreatePaymentCreditOp(&payee, &amount, 1)
+	PaymentCredit, pcErr := CreateCreditOp(payee, amount, HNT, 1, map[string]interface{}{"debit_category": "payment"})
 	if pcErr != nil {
 		return nil, pcErr
 	}
 
-	Fee, fErr := CreateFeeOp(&payer, &fee, &feeType, 2)
+	Fee, fErr := CreateFeeOp(payer, fee, feeType, 2, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -85,12 +85,12 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 	var paymentV2Operations []*types.Operation
 
 	for i, p := range payments {
-		PaymentDebit, pErr := CreatePaymentDebitOp(&p.Payee, &p.Amount, int64(2*i))
+		PaymentDebit, pErr := CreateDebitOp(p.Payee, p.Amount, HNT, int64(2*i), map[string]interface{}{"credit_category": "payment"})
 		if pErr != nil {
 			return nil, pErr
 		}
 
-		PaymentCredit, pcErr := CreatePaymentCreditOp(&p.Payee, &p.Amount, int64((2*i)+1))
+		PaymentCredit, pcErr := CreateCreditOp(p.Payee, p.Amount, HNT, int64((2*i)+1), map[string]interface{}{"debit_category": "payment"})
 		if pcErr != nil {
 			return nil, pcErr
 		}
@@ -98,7 +98,7 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 		paymentV2Operations = append(paymentV2Operations, PaymentDebit, PaymentCredit)
 	}
 
-	Fee, fErr := CreateFeeOp(&payer, &fee, &feeType, int64(len(paymentV2Operations)))
+	Fee, fErr := CreateFeeOp(payer, fee, feeType, int64(len(paymentV2Operations)), map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -114,13 +114,15 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 	var rewardOps []*types.Operation
 
 	for i, reward := range rewards {
-		rewardOp, rErr := CreateRewardOp(
+		rewardOp, rErr := CreateCreditOp(
 			fmt.Sprint(reward.(map[string]interface{})["account"]),
 			utils.MapToInt64(int64(reward.(map[string]interface{})["amount"].(float64))),
+			HNT,
 			int64(i),
 			map[string]interface{}{
-				"gateway": fmt.Sprint(reward.(map[string]interface{})["gateway"]),
-				"type":    fmt.Sprint(reward.(map[string]interface{})["type"]),
+				"credit_category": "reward",
+				"gateway":         fmt.Sprint(reward.(map[string]interface{})["gateway"]),
+				"type":            fmt.Sprint(reward.(map[string]interface{})["type"]),
 			})
 		if rErr != nil {
 			return nil, rErr
@@ -130,5 +132,19 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 	}
 
 	return rewardOps, nil
+
+}
+
+func SecurityCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
+	var securityCoinbaseOps []*types.Operation
+
+	secOps, secErr := CreateCreditOp(payee, amount, HST, 0, map[string]interface{}{"credit_category": "security_coinbase"})
+	if secErr != nil {
+		return nil, secErr
+	}
+
+	securityCoinbaseOps = append(securityCoinbaseOps, secOps)
+
+	return securityCoinbaseOps, nil
 
 }

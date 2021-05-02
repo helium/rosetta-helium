@@ -185,21 +185,17 @@ const (
 	// transferring hotspots from one wallet to another
 	TransferHotspotTxn = "transfer_hotspot_v1"
 
-	// PaymentCreditOp is used to describe
-	// a payment from the receivers side (Positive HNT)
-	PaymentCreditOp = "payment_credit_op"
+	// CreditOp is used to describe
+	// a credit to an account (HNT, HST, or DC)
+	CreditOp = "credit_op"
 
-	// PaymentDebitOp is used to describe
-	// a payment from the givers side (Negative HNT)
-	PaymentDebitOp = "payment_debit_op"
+	// DebitOp is used to describe
+	// a debit from an account (HNT, HST, or DC)
+	DebitOp = "debit_op"
 
 	// FeeOp is used to describe
 	// a transaction fee (Negative HNT or DC)
 	FeeOp = "fee_op"
-
-	// RewardOp is used to describe
-	// a reward payout (Positive HNT)
-	RewardOp = "reward_op"
 
 	// HistoricalBalanceSupported is whether
 	// historical balance is supported.
@@ -281,10 +277,9 @@ var (
 	//s are all supported base operations
 	// that make up a transaction
 	OperationTypes = []string{
-		PaymentCreditOp,
-		PaymentDebitOp,
+		CreditOp,
+		DebitOp,
 		FeeOp,
-		RewardOp,
 	}
 
 	// OperationStatuses are all supported operation statuses.
