@@ -35,31 +35,30 @@ const (
 // of server controllers.
 func NewBlockchainRouter(
 	network *types.NetworkIdentifier,
-	asserter *asserter.Asserter,
+	a *asserter.Asserter,
 ) http.Handler {
 	networkAPIService := services.NewNetworkAPIService(network)
 	networkAPIController := server.NewNetworkAPIController(
 		networkAPIService,
-		asserter,
+		a,
 	)
 
 	blockAPIService := services.NewBlockAPIService(network)
 	blockAPIController := server.NewBlockAPIController(
 		blockAPIService,
-		asserter,
+		a,
 	)
 
 	accountAPIService := services.NewAccountAPIService(network)
 	accountAPIController := server.NewAccountAPIController(
 		accountAPIService,
-		asserter,
+		a,
 	)
 
 	return server.NewRouter(networkAPIController, blockAPIController, accountAPIController)
 }
 
 func main() {
-
 	network := &types.NetworkIdentifier{
 		Blockchain: "Helium",
 		Network:    "Mainnet",
@@ -67,7 +66,7 @@ func main() {
 
 	// The asserter automatically rejects incorrectly formatted
 	// requests.
-	asserter, err := asserter.NewServer(
+	a, err := asserter.NewServer(
 		helium.TransactionTypes,
 		helium.HistoricalBalanceSupported,
 		[]*types.NetworkIdentifier{network},
@@ -80,7 +79,7 @@ func main() {
 
 	// Create the main router handler then apply the logger and Cors
 	// middlewares in sequence.
-	router := NewBlockchainRouter(network, asserter)
+	router := NewBlockchainRouter(network, a)
 	loggedRouter := server.LoggerMiddleware(router)
 	corsRouter := server.CorsMiddleware(loggedRouter)
 	log.Printf("Listening on port %d\n", serverPort)

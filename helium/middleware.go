@@ -14,7 +14,6 @@ var (
 )
 
 func CurrentBlockHeight() *int64 {
-
 	var result int64
 
 	if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
@@ -25,7 +24,6 @@ func CurrentBlockHeight() *int64 {
 }
 
 func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *types.Error) {
-
 	type request struct {
 		Height int64  `json:"height,omitempty"`
 		Hash   string `json:"hash,omitempty"`
@@ -80,7 +78,6 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 }
 
 func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
-
 	type request struct {
 		Hash string `json:"hash"`
 	}
@@ -95,10 +92,10 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		)
 	}
 
-	operations, _ := OperationsFromTx(result)
-	// if oErr != nil {
-	// 	return nil, oErr
-	// }
+	operations, oErr := OperationsFromTx(result)
+	if oErr != nil {
+		return nil, oErr
+	}
 
 	transaction := &types.Transaction{
 		TransactionIdentifier: &types.TransactionIdentifier{
@@ -110,11 +107,9 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 	}
 
 	return transaction, nil
-
 }
 
 func GetBalance(address string) ([]*types.Amount, *types.Error) {
-
 	var balances []*types.Amount
 
 	type request struct {
@@ -149,7 +144,6 @@ func GetBalance(address string) ([]*types.Amount, *types.Error) {
 	balances = append(balances, amountHNT, amountDC, amountHST)
 
 	return balances, nil
-
 }
 
 func GetOraclePrice(height int64) (*int64, *types.Error) {
@@ -195,5 +189,4 @@ func GetFee(hash string, fee int64, payer string) *Fee {
 	}
 
 	return feeResult
-
 }

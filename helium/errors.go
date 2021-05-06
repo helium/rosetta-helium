@@ -39,42 +39,42 @@ var (
 	// ErrUnimplemented is returned when an endpoint
 	// is called that is not implemented.
 	ErrUnimplemented = &types.Error{
-		Code:    0, //nolint
+		Code:    0,
 		Message: "Endpoint not implemented",
 	}
 
 	// ErrNotFound is returned when
 	// the requested object is not found
 	ErrNotFound = &types.Error{
-		Code:    1, //nolint
+		Code:    1,
 		Message: "Object not found",
 	}
 
 	// ErrFailed is returned when
 	// an endpoint fails
 	ErrFailed = &types.Error{
-		Code:    2, //nolint
+		Code:    2,
 		Message: "Endpoint failed",
 	}
 
 	// ErrInvalidParameter is returned when
 	// an invalid parameter is passed to an endpoint
 	ErrInvalidParameter = &types.Error{
-		Code:    3, //nolint
+		Code:    3,
 		Message: "Invalid parameter",
 	}
 
 	// ErrInvalidPassword is returned when
 	// an invalid password is passed to a wallet
 	ErrInvalidPassword = &types.Error{
-		Code:    4, //nolint
+		Code:    4,
 		Message: "InvalidPassword",
 	}
 
 	// ErrUnableToDerive is returned when an address
 	// cannot be derived from a provided public key.
 	ErrUnableToDerive = &types.Error{
-		Code:    5, //nolint
+		Code:    5,
 		Message: "Unable to derive address",
 	}
 
@@ -82,7 +82,7 @@ var (
 	// provided in /construction/preprocess or /construction/payloads
 	// are not valid.
 	ErrUnclearIntent = &types.Error{
-		Code:    6, //nolint
+		Code:    6,
 		Message: "Unable to parse intent",
 	}
 
@@ -90,35 +90,35 @@ var (
 	// when a data structure passed between Construction
 	// API calls is not valid.
 	ErrUnableToParseIntermediateResult = &types.Error{
-		Code:    7, //nolint
+		Code:    7,
 		Message: "Unable to parse intermediate result",
 	}
 
 	// ErrUnableToDecodeAddress is returned when an address
 	// cannot be parsed during construction.
 	ErrUnableToDecodeAddress = &types.Error{
-		Code:    8, //nolint
+		Code:    8,
 		Message: "Unable to decode address",
 	}
 
 	// ErrSignatureInvalid is returned when a signature
 	// cannot be parsed.
 	ErrSignatureInvalid = &types.Error{
-		Code:    9, //nolint
+		Code:    9,
 		Message: "Signature invalid",
 	}
 
 	// ErrEnvVariableMissing is returned when an env variable
 	// cannot be found.
 	ErrEnvVariableMissing = &types.Error{
-		Code:    10, //nolint
+		Code:    10,
 		Message: "Environment variable missing",
 	}
 
 	// ErrUnableToParseTxn is returned when a txn
 	// cannot be parsed into valid operations
 	ErrUnableToParseTxn = &types.Error{
-		Code:    11, //nolint
+		Code:    11,
 		Message: "Unable to parse transaction into valid operations",
 	}
 )

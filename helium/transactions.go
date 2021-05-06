@@ -54,7 +54,7 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 	}
 }
 
-func PaymentV1(payer string, payee string, amount int64, fee int64, feeType string) ([]*types.Operation, *types.Error) {
+func PaymentV1(payer, payee string, amount, fee int64, feeType string) ([]*types.Operation, *types.Error) {
 	PaymentDebit, pErr := CreateDebitOp(payer, amount, HNT, 0, map[string]interface{}{"credit_category": "payment"})
 	if pErr != nil {
 		return nil, pErr
@@ -75,20 +75,30 @@ func PaymentV1(payer string, payee string, amount int64, fee int64, feeType stri
 		PaymentCredit,
 		Fee,
 	}, nil
-
 }
 
 func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]*types.Operation, *types.Error) {
-
 	var paymentV2Operations []*types.Operation
-
+	indexIncrementer := 2
 	for i, p := range payments {
-		PaymentDebit, pErr := CreateDebitOp(p.Payee, p.Amount, HNT, int64(2*i), map[string]interface{}{"credit_category": "payment"})
+		PaymentDebit, pErr := CreateDebitOp(
+			p.Payee,
+			p.Amount,
+			HNT,
+			int64(indexIncrementer*i),
+			map[string]interface{}{"credit_category": "payment"},
+		)
 		if pErr != nil {
 			return nil, pErr
 		}
 
-		PaymentCredit, pcErr := CreateCreditOp(p.Payee, p.Amount, HNT, int64((2*i)+1), map[string]interface{}{"debit_category": "payment"})
+		PaymentCredit, pcErr := CreateCreditOp(
+			p.Payee,
+			p.Amount,
+			HNT,
+			int64((indexIncrementer*i)+1),
+			map[string]interface{}{"debit_category": "payment"},
+		)
 		if pcErr != nil {
 			return nil, pcErr
 		}
@@ -104,13 +114,10 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 	paymentV2Operations = append(paymentV2Operations, Fee)
 
 	return paymentV2Operations, nil
-
 }
 
 func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
-
 	var rewardOps []*types.Operation
-
 	for i, reward := range rewards {
 		rewardOp, rErr := CreateCreditOp(
 			fmt.Sprint(reward.(map[string]interface{})["account"]),
@@ -130,7 +137,6 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 	}
 
 	return rewardOps, nil
-
 }
 
 func SecurityCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
@@ -144,7 +150,6 @@ func SecurityCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.
 	securityCoinbaseOps = append(securityCoinbaseOps, secOps)
 
 	return securityCoinbaseOps, nil
-
 }
 
 func DCCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
@@ -158,10 +163,17 @@ func DCCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error)
 	DCCoinbaseOps = append(DCCoinbaseOps, dccOps)
 
 	return DCCoinbaseOps, nil
-
 }
 
-func AddGatewayV1(payer string, feeTotal int64, feeType string, gateway string, owner string, metaBaseFee int64, metaStakingFee int64) ([]*types.Operation, *types.Error) {
+func AddGatewayV1(
+	payer string,
+	feeTotal int64,
+	feeType,
+	gateway,
+	owner string,
+	metaBaseFee,
+	metaStakingFee int64,
+) ([]*types.Operation, *types.Error) {
 	var AddGatewayOps []*types.Operation
 
 	feeOp, feeErr := CreateFeeOp(payer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": metaBaseFee, "staking_fee": metaStakingFee})
@@ -177,5 +189,4 @@ func AddGatewayV1(payer string, feeTotal int64, feeType string, gateway string, 
 	AddGatewayOps = append(AddGatewayOps, feeOp, agwOp)
 
 	return AddGatewayOps, nil
-
 }
