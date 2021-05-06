@@ -117,9 +117,7 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 }
 
 func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
-	// reward_v1 will only ever have 1 op
-	// so make a preallocation
-	rewardOps := make([]*types.Operation, 1)
+	var rewardOps []*types.Operation
 	for i, reward := range rewards {
 		rewardOp, rErr := CreateCreditOp(
 			fmt.Sprint(reward.(map[string]interface{})["account"]),
