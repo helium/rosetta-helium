@@ -10,7 +10,8 @@ import (
 func CreateDebitOp(payer string, amount int64, currency *types.Currency, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
 	if amount < 0 {
 		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative payment amount not allowed"))
-	} else {
+	}
+	{
 		return &types.Operation{
 			OperationIdentifier: &types.OperationIdentifier{
 				Index: opIndex,
@@ -32,7 +33,8 @@ func CreateDebitOp(payer string, amount int64, currency *types.Currency, opIndex
 func CreateCreditOp(payee string, amount int64, currency *types.Currency, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
 	if amount < 0 {
 		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative payment amount not allowed"))
-	} else {
+	}
+	{
 		return &types.Operation{
 			OperationIdentifier: &types.OperationIdentifier{
 				Index: opIndex,
@@ -69,7 +71,8 @@ func CreateFeeOp(payer string, fee int64, feeType string, opIndex int64, metadat
 
 	if fee < 0 {
 		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative fee amount not allowed"))
-	} else {
+	}
+	{
 		FeeOp = &types.Operation{
 			OperationIdentifier: &types.OperationIdentifier{
 				Index: opIndex,

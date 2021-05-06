@@ -230,19 +230,19 @@ var (
 		Index: 1,
 	}
 
-	// Currency is the *types.Currency for HNT.
+	// HNT is the *types.Currency for HNT.
 	HNT = &types.Currency{
 		Symbol:   Symbol,
 		Decimals: Decimals,
 	}
 
-	// DCCurrency is the *types.Currency for DC.
+	// DC is the *types.Currency for DC.
 	DC = &types.Currency{
 		Symbol:   DCSymbol,
 		Decimals: DCDecimals,
 	}
 
-	// HSTCurrency is the *types.Currency for HST.
+	// HST is the *types.Currency for HST.
 	HST = &types.Currency{
 		Symbol:   HSTSymbol,
 		Decimals: HSTDecimals,
@@ -278,7 +278,7 @@ var (
 		TransferHotspotTxn,
 	}
 
-	//s are all supported base operations
+	// OperationTypes are all supported base operations
 	// that make up a transaction
 	OperationTypes = []string{
 		CreditOp,
@@ -299,7 +299,7 @@ var (
 		},
 	}
 
-	//LastBlessedSnapshotIndex
+	// LBS is the LastBlessedBlock height as an int64
 	LBS = readLBSfile()
 )
 

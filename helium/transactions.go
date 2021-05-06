@@ -31,7 +31,6 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 	case PaymentV2Txn:
 		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		var payments []*Payment
-
 		for _, p := range txn["payments"].([]interface{}) {
 			payments = append(payments, &Payment{
 				Payee:  fmt.Sprint(p.(map[string]interface{})["payee"]),
@@ -56,7 +55,6 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 }
 
 func PaymentV1(payer string, payee string, amount int64, fee int64, feeType string) ([]*types.Operation, *types.Error) {
-
 	PaymentDebit, pErr := CreateDebitOp(payer, amount, HNT, 0, map[string]interface{}{"credit_category": "payment"})
 	if pErr != nil {
 		return nil, pErr
