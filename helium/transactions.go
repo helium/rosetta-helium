@@ -10,15 +10,18 @@ import (
 
 func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Error) {
 	switch txn["type"] {
+	case AddGatewayTxn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		return AddGatewayV1(
+			fmt.Sprint(txn["payer"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+			fmt.Sprint(txn["gateway"]),
+			fmt.Sprint(txn["owner"]),
+			utils.MapToInt64(txn["fee"]),
+			utils.MapToInt64(txn["staking_fee"]))
 	case PaymentV1Txn:
-		feeDetails, bErr := GetImplicitBurn(fmt.Sprint(txn["hash"]))
-		if bErr != nil {
-			feeDetails = &Fee{
-				Amount:   utils.MapToInt64(txn["fee"]),
-				Payer:    fmt.Sprint(txn["payer"]),
-				Currency: DC,
-			}
-		}
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		return PaymentV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),
@@ -26,14 +29,7 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol)
 	case PaymentV2Txn:
-		feeDetails, bErr := GetImplicitBurn(fmt.Sprint(txn["hash"]))
-		if bErr != nil {
-			feeDetails = &Fee{
-				Amount:   utils.MapToInt64(txn["fee"]),
-				Payer:    fmt.Sprint(txn["payer"]),
-				Currency: DC,
-			}
-		}
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		var payments []*Payment
 
 		for _, p := range txn["payments"].([]interface{}) {
@@ -50,6 +46,10 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		)
 	case RewardsTxnV1:
 		return RewardsV1(txn["rewards"].([]interface{}))
+	case SecurityCoinbaseTxn:
+		return SecurityCoinbaseV1(fmt.Sprint(txn["payee"]), int64(txn["amount"].(float64)))
+	case CoinbaseDataCreditsTxn:
+		return DCCoinbaseV1(fmt.Sprint(txn["payee"]), int64(txn["amount"].(float64)))
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
 	}
@@ -146,5 +146,38 @@ func SecurityCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.
 	securityCoinbaseOps = append(securityCoinbaseOps, secOps)
 
 	return securityCoinbaseOps, nil
+
+}
+
+func DCCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
+	var DCCoinbaseOps []*types.Operation
+
+	dccOps, dccErr := CreateCreditOp(payee, amount, DC, 0, map[string]interface{}{"credit_category": "dc_coinbase"})
+	if dccErr != nil {
+		return nil, dccErr
+	}
+
+	DCCoinbaseOps = append(DCCoinbaseOps, dccOps)
+
+	return DCCoinbaseOps, nil
+
+}
+
+func AddGatewayV1(payer string, feeTotal int64, feeType string, gateway string, owner string, metaBaseFee int64, metaStakingFee int64) ([]*types.Operation, *types.Error) {
+	var AddGatewayOps []*types.Operation
+
+	feeOp, feeErr := CreateFeeOp(payer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": metaBaseFee, "staking_fee": metaStakingFee})
+	if feeErr != nil {
+		return nil, feeErr
+	}
+
+	agwOp, agwErr := CreateAddGatewayOp(gateway, owner, 1, map[string]interface{}{})
+	if agwErr != nil {
+		return nil, agwErr
+	}
+
+	AddGatewayOps = append(AddGatewayOps, feeOp, agwOp)
+
+	return AddGatewayOps, nil
 
 }

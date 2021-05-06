@@ -197,6 +197,10 @@ const (
 	// a transaction fee (Negative HNT or DC)
 	FeeOp = "fee_op"
 
+	// AddGatewayOp is used to describe
+	// associating a new gateway with an owner
+	AddGatewayOp = "add_gateway_op"
+
 	// HistoricalBalanceSupported is whether
 	// historical balance is supported.
 	HistoricalBalanceSupported = false
@@ -280,6 +284,7 @@ var (
 		CreditOp,
 		DebitOp,
 		FeeOp,
+		AddGatewayOp,
 	}
 
 	// OperationStatuses are all supported operation statuses.

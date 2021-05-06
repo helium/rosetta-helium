@@ -172,7 +172,7 @@ func GetOraclePrice(height int64) (*int64, *types.Error) {
 	return &price, nil
 }
 
-func GetImplicitBurn(hash string) (*Fee, *types.Error) {
+func GetFee(hash string, fee int64, payer string) *Fee {
 	type request struct {
 		Hash string `json:"hash"`
 	}
@@ -181,10 +181,11 @@ func GetImplicitBurn(hash string) (*Fee, *types.Error) {
 
 	req := request{Hash: hash}
 	if err := NodeClient.CallFor(&result, "implicit_burn_get", req); err != nil {
-		return nil, WrapErr(
-			ErrNotFound,
-			err,
-		)
+		return &Fee{
+			Amount:   fee,
+			Payer:    payer,
+			Currency: DC,
+		}
 	}
 
 	feeResult := &Fee{
@@ -193,6 +194,6 @@ func GetImplicitBurn(hash string) (*Fee, *types.Error) {
 		Currency: HNT,
 	}
 
-	return feeResult, nil
+	return feeResult
 
 }

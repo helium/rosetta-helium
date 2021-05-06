@@ -24,6 +24,7 @@ func CreateDebitOp(payer string, amount int64, currency *types.Currency, opIndex
 				Value:    "-" + fmt.Sprint(amount),
 				Currency: currency,
 			},
+			Metadata: metadata,
 		}, nil
 	}
 }
@@ -45,6 +46,7 @@ func CreateCreditOp(payee string, amount int64, currency *types.Currency, opInde
 				Value:    fmt.Sprint(amount),
 				Currency: currency,
 			},
+			Metadata: metadata,
 		}, nil
 	}
 }
@@ -85,4 +87,17 @@ func CreateFeeOp(payer string, fee int64, feeType string, opIndex int64, metadat
 		}
 		return FeeOp, nil
 	}
+}
+
+func CreateAddGatewayOp(gateway string, owner string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	metadata["gateway"] = gateway
+	metadata["owner"] = owner
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Type:     AddGatewayOp,
+		Status:   &SuccessStatus,
+		Metadata: metadata,
+	}, nil
 }
