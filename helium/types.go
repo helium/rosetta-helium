@@ -75,9 +75,9 @@ const (
 	// Decimals for Security Tokens
 	HSTDecimals = 8
 
-	// AddGatewayTxn is used to describe
+	// AddGatewayV1Txn is used to describe
 	// adding a gateway.
-	AddGatewayTxn = "add_gateway_v1"
+	AddGatewayV1Txn = "add_gateway_v1"
 
 	// AssertLocationV1Txn is used to describe
 	// asserting a gateway's location.
@@ -87,101 +87,93 @@ const (
 	// asserting a gateway's location with extra info
 	AssertLocationV2Txn = "assert_location_v2"
 
-	// ChainVarsTxn is used to describe
+	// VarsV1Txn is used to describe
 	// changing a chain variable.
-	ChainVarsTxn = "vars_v1"
+	VarsV1Txn = "vars_v1"
 
 	// CoinbaseTxn is used to describe
 	// a coinbase transaction.
 	CoinbaseTxn = "COINBASE"
 
-	// CoinbaseDataCreditsTxn is used to describe
+	// DCCoinbaseV1Txn is used to describe
 	// the initial 10k credits to bring initial miners online.
-	CoinbaseDataCreditsTxn = "dc_coinbase_v1"
+	DCCoinbaseV1Txn = "dc_coinbase_v1"
 
-	// ConsensusGroupTxn is used to describe
+	// ConsensusGroupV1Txn is used to describe
 	// the election of a new consensus group
-	ConsensusGroupTxn = "consensus_group_v1"
+	ConsensusGroupV1Txn = "consensus_group_v1"
 
-	// CreateHashedTimelockTxn is used to describe
+	// CreateHTLCV1Txn is used to describe
 	// creating a hashed timelock
-	CreateHashedTimelockTxn = "create_htlc_v1"
+	CreateHTLCV1Txn = "create_htlc_v1"
 
-	// CreateProofOfCoverageRequestTxn is used to describe
+	// POCRequestV1Txn is used to describe
 	// a proof of coverage request
-	CreateProofOfCoverageRequestTxn = "poc_request_v1"
+	POCRequestV1Txn = "poc_request_v1"
 
-	// DataCreditsTxn is used to describe
+	// TokenBurnV1Txn is used to describe
 	// burning HNT for DCs
-	DataCreditsTxn = "token_burn_v1"
+	TokenBurnV1Txn = "token_burn_v1"
 
-	// GenesisGatewayTxn is used to describe
+	// GenGatewayV1Txn is used to describe
 	// initial group of miners that bootstrapped the blockchain
-	GenesisGatewayTxn = "gen_gateway_v1"
+	GenGatewayV1Txn = "gen_gateway_v1"
 
 	// PaymentV2Txn is used to describe
 	// a transaction from one wallet to multiple
 	PaymentV2Txn = "payment_v2"
 
-	// OUIType is used to describe
+	// OUIV1Txn is used to describe
 	// a new OUI for a new router on the network
-	OUITxn = "oui_v1"
+	OUIV1Txn = "oui_v1"
 
 	// PaymentTxn is used to describe
 	// sending HNT from one wallet to another
 	PaymentV1Txn = "payment_v1"
 
-	// ProofOfCoverageReceiptsTxn is used to describe
+	// POCReceiptsV1 is used to describe
 	// completed POC submitted to the network
-	ProofOfCoverageReceiptsTxn = "poc_receipts_v1"
+	POCReceiptsV1 = "poc_receipts_v1"
 
-	// RedeemHashedTimelockTxn is used to describe
+	// RedeemHTLCV1Txn is used to describe
 	// redeeming a hashed timelock
-	RedeemHashedTimelockTxn = "redeem_htlc_v1"
-
-	// RewardTxn is used to describe
-	// a token payout for a specific event on the network
-	RewardTxnV1 = "reward_v1"
+	RedeemHTLCV1Txn = "redeem_htlc_v1"
 
 	// RewardsTxn is used to describe
 	// a bundle of multiple reward transactions
-	RewardsTxnV1 = "rewards_v1"
-
-	// RewardTxn is used to describe
-	// a token payout for a specific event on the network
-	RewardTxnV2 = "reward_v2"
+	RewardsV1Txn = "rewards_v1"
 
 	// RewardsTxn is used to describe
 	// a bundle of multiple reward transactions
-	RewardsTxnV2 = "rewards_v2"
+	RewardsV2Txn = "rewards_v2"
 
-	// RoutingTxn is used to describe
+	// RoutingV1Txn is used to describe
 	// updating the routing information with an OUI
-	RoutingTxn = "routing_v1"
+	RoutingV1Txn = "routing_v1"
 
-	// SecurityCoinbaseTxn is used to describe
+	// SecurityCoinbaseV1Txn is used to describe
 	// the distribution of security tokens in genesis block
-	SecurityCoinbaseTxn = "security_coinbase_v1"
+	SecurityCoinbaseV1Txn = "security_coinbase_v1"
 
 	// SecurityExchangeV1Txn is used to describe
 	// the transfer of security tokens from one address to another
 	SecurityExchangeV1Txn = "security_exchange_v1"
 
-	// StateChannelOpenTxn is used to describe
+	// StateChannelOpenV1Txn is used to describe
 	// opening a new state channel on a Helium router
-	StateChannelOpenTxn = "state_channel_open_v1"
+	StateChannelOpenV1Txn = "state_channel_open_v1"
 
-	// StateChannelCloseTxn is used to describe
+	// StateChannelCloseV1Txn is used to describe
 	// closing a state channel on a Helium router
-	StateChannelCloseTxn = "state_channel_close_v1"
+	StateChannelCloseV1Txn = "state_channel_close_v1"
 
-	// TokenBurnExchangeRateTxn is used to describe
+	// PriceOracleV1Txn is used to describe
 	// changing the exchange rate for burning HNT to DCs
-	TokenBurnExchangeRateTxn = "price_oracle_v1"
+	PriceOracleV1Txn = "price_oracle_v1"
 
-	// TransferHotspotTxn is used to describe
+	// TransferHotspotV1Txn is used to describe
 	// transferring hotspots from one wallet to another
-	TransferHotspotTxn = "transfer_hotspot_v1"
+	TransferHotspotV1Txn = "transfer_hotspot_v1"
 
 	// CreditOp is used to describe
 	// a credit to an account (HNT, HST, or DC)
@@ -198,6 +190,10 @@ const (
 	// AddGatewayOp is used to describe
 	// associating a new gateway with an owner
 	AddGatewayOp = "add_gateway_op"
+
+	// AddGatewayOp is used to describe
+	// associating a new gateway with an owner
+	AssertLocationOp = "assert_location_op"
 
 	// HistoricalBalanceSupported is whether
 	// historical balance is supported.
@@ -242,33 +238,31 @@ var (
 
 	// TransactionTypes are all suppoorted operation types.
 	TransactionTypes = []string{
-		AddGatewayTxn,
+		AddGatewayV1Txn,
 		AssertLocationV1Txn,
 		AssertLocationV2Txn,
-		ChainVarsTxn,
+		VarsV1Txn,
 		CoinbaseTxn,
-		CoinbaseDataCreditsTxn,
-		ConsensusGroupTxn,
-		CreateHashedTimelockTxn,
-		CreateProofOfCoverageRequestTxn,
-		DataCreditsTxn,
-		GenesisGatewayTxn,
-		OUITxn,
+		DCCoinbaseV1Txn,
+		ConsensusGroupV1Txn,
+		CreateHTLCV1Txn,
+		POCRequestV1Txn,
+		TokenBurnV1Txn,
+		GenGatewayV1Txn,
+		OUIV1Txn,
 		PaymentV1Txn,
 		PaymentV2Txn,
-		ProofOfCoverageReceiptsTxn,
-		RedeemHashedTimelockTxn,
-		RewardTxnV1,
-		RewardsTxnV1,
-		RewardTxnV2,
-		RewardsTxnV2,
-		RoutingTxn,
-		SecurityCoinbaseTxn,
+		POCReceiptsV1,
+		RedeemHTLCV1Txn,
+		RewardsV1Txn,
+		RewardsV2Txn,
+		RoutingV1Txn,
+		SecurityCoinbaseV1Txn,
 		SecurityExchangeV1Txn,
-		StateChannelOpenTxn,
-		StateChannelCloseTxn,
-		TokenBurnExchangeRateTxn,
-		TransferHotspotTxn,
+		StateChannelOpenV1Txn,
+		StateChannelCloseV1Txn,
+		PriceOracleV1Txn,
+		TransferHotspotV1Txn,
 	}
 
 	// OperationTypes are all supported base operations
@@ -278,6 +272,7 @@ var (
 		DebitOp,
 		FeeOp,
 		AddGatewayOp,
+		AssertLocationOp,
 	}
 
 	// OperationStatuses are all supported operation statuses.

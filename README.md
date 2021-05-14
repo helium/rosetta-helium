@@ -82,8 +82,6 @@ TODO: `create_htlc_v1`*
 TODO: `redeem_htlc_v1`*
 
 
-*Lower priority 
-
 ## Unimplemented transactions
 DC only transactions:
 

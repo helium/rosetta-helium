@@ -11,7 +11,7 @@ import (
 func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Error) {
 	switch txn["type"] {
 
-	case AddGatewayTxn:
+	case AddGatewayV1Txn:
 		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
 		return AddGatewayV1(
 			fmt.Sprint(txn["payer"]),
@@ -73,13 +73,13 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			feeDetails.Currency.Symbol,
 		)
 
-	case RewardsTxnV1, RewardsTxnV2:
+	case RewardsV1Txn, RewardsV2Txn:
 		// rewards_v1 and rewards_v2 have the same structure
 		return RewardsV1(
 			txn["rewards"].([]interface{}),
 		)
 
-	case SecurityCoinbaseTxn:
+	case SecurityCoinbaseV1Txn:
 		return SecurityCoinbaseV1(
 			fmt.Sprint(txn["payee"]),
 			int64(txn["amount"].(float64)),

@@ -136,7 +136,7 @@ func CreateAssertLocationOp(gateway, owner, location string, opIndex int64, meta
 		OperationIdentifier: &types.OperationIdentifier{
 			Index: opIndex,
 		},
-		Type:     AddGatewayOp,
+		Type:     AssertLocationOp,
 		Status:   &SuccessStatus,
 		Metadata: metadata,
 	}, nil
