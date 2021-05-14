@@ -71,7 +71,7 @@ func CreateFeeOp(payer string, fee int64, feeType string, opIndex int64, metadat
 		FeeCurrency = HNT
 		metadata["implicit_burn"] = true
 	case "DC":
-		// No reconciliation for DC txns, this is only an FYI
+		// No reconciliation for DC fees, this is only an FYI
 		metadata["implicit_burn"] = false
 		metadata["dc_fee"] = fee
 		return &types.Operation{
