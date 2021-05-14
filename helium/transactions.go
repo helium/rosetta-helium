@@ -10,6 +10,7 @@ import (
 
 func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Error) {
 	switch txn["type"] {
+
 	case AddGatewayTxn:
 		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
 		return AddGatewayV1(
@@ -20,6 +21,7 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			fmt.Sprint(txn["owner"]),
 			utils.MapToInt64(txn["fee"]),
 			utils.MapToInt64(txn["staking_fee"]))
+
 	case AssertLocationV1Txn:
 		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
 		return AssertLocationV1(
@@ -31,6 +33,7 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			utils.MapToInt64(txn["staking_fee"]),
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol)
+
 	case AssertLocationV2Txn:
 		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
 		return AssertLocationV2(
@@ -44,6 +47,7 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			utils.MapToInt64(txn["staking_fee"]),
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol)
+
 	case PaymentV1Txn:
 		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		return PaymentV1(
@@ -52,6 +56,7 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			int64(txn["amount"].(float64)),
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol)
+
 	case PaymentV2Txn:
 		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		var payments []*Payment
@@ -67,10 +72,13 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			feeDetails.Amount,
 			feeDetails.Currency.Symbol,
 		)
+
 	case RewardsTxnV1:
 		return RewardsV1(txn["rewards"].([]interface{}))
+
 	case SecurityCoinbaseTxn:
 		return SecurityCoinbaseV1(fmt.Sprint(txn["payee"]), int64(txn["amount"].(float64)))
+
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
 	}

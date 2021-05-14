@@ -56,9 +56,9 @@ TODO: `redeem_htlc_v1`*
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
 `add_gateway_v1`
 
-TODO: `assert_location_v1`
+`assert_location_v1`
 
-TODO: `assert_location_v2`
+`assert_location_v2`
 
 TODO: `oui_v1`
 
