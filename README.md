@@ -43,7 +43,7 @@ TODO: `reward_v2`
 
 `security_coinbase_v1`
 
-TODO: `security_exchange_v1`
+`security_exchange_v1`
 
 TODO: `token_burn_v1`
 
