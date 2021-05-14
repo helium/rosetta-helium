@@ -163,9 +163,9 @@ const (
 	// the distribution of security tokens in genesis block
 	SecurityCoinbaseTxn = "security_coinbase_v1"
 
-	// SecurityExchangeTxn is used to describe
+	// SecurityExchangeV1Txn is used to describe
 	// the transfer of security tokens from one address to another
-	SecurityExchangeTxn = "security_exchange_v1"
+	SecurityExchangeV1Txn = "security_exchange_v1"
 
 	// StateChannelOpenTxn is used to describe
 	// opening a new state channel on a Helium router
@@ -264,7 +264,7 @@ var (
 		RewardsTxnV2,
 		RoutingTxn,
 		SecurityCoinbaseTxn,
-		SecurityExchangeTxn,
+		SecurityExchangeV1Txn,
 		StateChannelOpenTxn,
 		StateChannelCloseTxn,
 		TokenBurnExchangeRateTxn,

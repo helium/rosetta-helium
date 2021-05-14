@@ -74,10 +74,25 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		)
 
 	case RewardsTxnV1:
-		return RewardsV1(txn["rewards"].([]interface{}))
+		return RewardsV1(
+			txn["rewards"].([]interface{}),
+		)
 
 	case SecurityCoinbaseTxn:
-		return SecurityCoinbaseV1(fmt.Sprint(txn["payee"]), int64(txn["amount"].(float64)))
+		return SecurityCoinbaseV1(
+			fmt.Sprint(txn["payee"]),
+			int64(txn["amount"].(float64)),
+		)
+
+	case SecurityExchangeV1Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
+		return SecurityExchangeV1(
+			fmt.Sprint(txn["payer"]),
+			fmt.Sprint(txn["payee"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+			int64(txn["amount"].(float64)),
+		)
 
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
@@ -263,4 +278,27 @@ func AssertLocationV2(
 
 	AssertLocationOps = append(AssertLocationOps, feeOp, alOp)
 	return AssertLocationOps, nil
+}
+
+func SecurityExchangeV1(payer, payee string, fee int64, feeType string, amount int64) ([]*types.Operation, *types.Error) {
+	PaymentDebit, pErr := CreateDebitOp(payer, amount, HST, 0, map[string]interface{}{"credit_category": "payment"})
+	if pErr != nil {
+		return nil, pErr
+	}
+
+	PaymentCredit, pcErr := CreateCreditOp(payee, amount, HST, 1, map[string]interface{}{"debit_category": "payment"})
+	if pcErr != nil {
+		return nil, pcErr
+	}
+
+	Fee, fErr := CreateFeeOp(payer, fee, feeType, 2, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	return []*types.Operation{
+		PaymentDebit,
+		PaymentCredit,
+		Fee,
+	}, nil
 }
