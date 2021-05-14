@@ -67,9 +67,30 @@ TODO: `routing_v1`
 TODO: `state_channel_open_v1`
 
 ### Unimplemented transactions
+DC only transactions:
+
 `dc_coinbase_v1`
 
 `state_channel_close_v1`
+
+
+Internal blockchain transactions:
+
+`gen_gateway_v1` 
+
+`poc_request_v1`
+
+`poc_receipt_v1`
+
+`consensus_group_v1`
+
+`vars_v1`
+
+
+Oracle transactions:
+
+`price_oracle_v1`
+
 
 ## Construction API transactions
 Transaction support for creation via the construction API
