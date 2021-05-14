@@ -79,9 +79,13 @@ const (
 	// adding a gateway.
 	AddGatewayTxn = "add_gateway_v1"
 
-	// AssertLocationTxn is used to describe
+	// AssertLocationV1Txn is used to describe
 	// asserting a gateway's location.
-	AssertLocationTxn = "assert_location_v1"
+	AssertLocationV1Txn = "assert_location_v1"
+
+	// AssertLocationV2Txn is used to describe
+	// asserting a gateway's location with extra info
+	AssertLocationV2Txn = "assert_location_v2"
 
 	// ChainVarsTxn is used to describe
 	// changing a chain variable.
@@ -239,7 +243,8 @@ var (
 	// TransactionTypes are all suppoorted operation types.
 	TransactionTypes = []string{
 		AddGatewayTxn,
-		AssertLocationTxn,
+		AssertLocationV1Txn,
+		AssertLocationV2Txn,
 		ChainVarsTxn,
 		CoinbaseTxn,
 		CoinbaseDataCreditsTxn,

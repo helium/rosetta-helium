@@ -127,3 +127,17 @@ func CreateAddGatewayOp(gateway, owner string, opIndex int64, metadata map[strin
 		Metadata: metadata,
 	}, nil
 }
+
+func CreateAssertLocationOp(gateway, owner, location string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	metadata["gateway"] = gateway
+	metadata["owner"] = owner
+	metadata["location"] = location
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Type:     AddGatewayOp,
+		Status:   &SuccessStatus,
+		Metadata: metadata,
+	}, nil
+}

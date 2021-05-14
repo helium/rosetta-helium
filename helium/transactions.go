@@ -20,6 +20,30 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			fmt.Sprint(txn["owner"]),
 			utils.MapToInt64(txn["fee"]),
 			utils.MapToInt64(txn["staking_fee"]))
+	case AssertLocationV1Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		return AssertLocationV1(
+			utils.MapToInt64(txn["fee"]),
+			fmt.Sprint(txn["gateway"]),
+			fmt.Sprint(txn["location"]),
+			fmt.Sprint(txn["owner"]),
+			fmt.Sprint(txn["payer"]),
+			utils.MapToInt64(txn["staking_fee"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol)
+	case AssertLocationV2Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		return AssertLocationV2(
+			utils.MapToInt64(txn["elevation"]),
+			utils.MapToInt64(txn["fee"]),
+			utils.MapToInt64(txn["gain"]),
+			fmt.Sprint(txn["gateway"]),
+			fmt.Sprint(txn["location"]),
+			fmt.Sprint(txn["owner"]),
+			fmt.Sprint(txn["payer"]),
+			utils.MapToInt64(txn["staking_fee"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol)
 	case PaymentV1Txn:
 		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		return PaymentV1(
@@ -174,4 +198,61 @@ func AddGatewayV1(
 	AddGatewayOps = append(AddGatewayOps, feeOp, agwOp)
 
 	return AddGatewayOps, nil
+}
+
+func AssertLocationV1(
+	metaBaseFee int64,
+	gateway,
+	location string,
+	owner,
+	payer string,
+	metaStakingFee,
+	feeTotal int64,
+	feeType string,
+) ([]*types.Operation, *types.Error) {
+	var AssertLocationOps []*types.Operation
+
+	feeOp, feeErr := CreateFeeOp(payer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": metaBaseFee, "staking_fee": metaStakingFee})
+	if feeErr != nil {
+		return nil, feeErr
+	}
+
+	alOp, alErr := CreateAssertLocationOp(gateway, owner, location, 1, map[string]interface{}{})
+	if alErr != nil {
+		return nil, alErr
+	}
+
+	AssertLocationOps = append(AssertLocationOps, feeOp, alOp)
+	return AssertLocationOps, nil
+}
+
+func AssertLocationV2(
+	elevation,
+	metaBaseFee,
+	gain int64,
+	gateway,
+	location string,
+	owner,
+	payer string,
+	metaStakingFee,
+	feeTotal int64,
+	feeType string,
+) ([]*types.Operation, *types.Error) {
+	var AssertLocationOps []*types.Operation
+
+	feeOp, feeErr := CreateFeeOp(payer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": metaBaseFee, "staking_fee": metaStakingFee})
+	if feeErr != nil {
+		return nil, feeErr
+	}
+
+	alOp, alErr := CreateAssertLocationOp(gateway, owner, location, 1, map[string]interface{}{
+		"elevation": elevation,
+		"gain":      gain,
+	})
+	if alErr != nil {
+		return nil, alErr
+	}
+
+	AssertLocationOps = append(AssertLocationOps, feeOp, alOp)
+	return AssertLocationOps, nil
 }
