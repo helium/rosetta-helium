@@ -73,7 +73,8 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			feeDetails.Currency.Symbol,
 		)
 
-	case RewardsTxnV1:
+	case RewardsTxnV1, RewardsTxnV2:
+		// rewards_v1 and rewards_v2 have the same structure
 		return RewardsV1(
 			txn["rewards"].([]interface{}),
 		)

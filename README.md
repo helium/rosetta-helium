@@ -39,7 +39,7 @@ Transactions support for reading from the Data API
 
 `reward_v1`
 
-TODO: `reward_v2`
+`reward_v2`
 
 `security_coinbase_v1`
 
