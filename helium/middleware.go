@@ -131,17 +131,12 @@ func GetBalance(address string) ([]*types.Amount, *types.Error) {
 		Currency: HNT,
 	}
 
-	amountDC := &types.Amount{
-		Value:    fmt.Sprint(int64(result["dc_balance"].(float64))),
-		Currency: DC,
-	}
-
 	amountHST := &types.Amount{
 		Value:    fmt.Sprint(int64(result["sec_balance"].(float64))),
 		Currency: HST,
 	}
 
-	balances = append(balances, amountHNT, amountDC, amountHST)
+	balances = append(balances, amountHNT, amountHST)
 
 	return balances, nil
 }
@@ -176,9 +171,12 @@ func GetFee(hash string, fee int64, payer string) *Fee {
 	req := request{Hash: hash}
 	if err := NodeClient.CallFor(&result, "implicit_burn_get", req); err != nil {
 		return &Fee{
-			Amount:   fee,
-			Payer:    payer,
-			Currency: DC,
+			Amount: fee,
+			Payer:  payer,
+			Currency: &types.Currency{
+				Symbol:   "DC",
+				Decimals: 8,
+			},
 		}
 	}
 

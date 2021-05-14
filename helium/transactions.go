@@ -47,8 +47,6 @@ func OperationsFromTx(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		return RewardsV1(txn["rewards"].([]interface{}))
 	case SecurityCoinbaseTxn:
 		return SecurityCoinbaseV1(fmt.Sprint(txn["payee"]), int64(txn["amount"].(float64)))
-	case CoinbaseDataCreditsTxn:
-		return DCCoinbaseV1(fmt.Sprint(txn["payee"]), int64(txn["amount"].(float64)))
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
 	}
@@ -150,19 +148,6 @@ func SecurityCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.
 	securityCoinbaseOps = append(securityCoinbaseOps, secOps)
 
 	return securityCoinbaseOps, nil
-}
-
-func DCCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
-	var DCCoinbaseOps []*types.Operation
-
-	dccOps, dccErr := CreateCreditOp(payee, amount, DC, 0, map[string]interface{}{"credit_category": "dc_coinbase"})
-	if dccErr != nil {
-		return nil, dccErr
-	}
-
-	DCCoinbaseOps = append(DCCoinbaseOps, dccOps)
-
-	return DCCoinbaseOps, nil
 }
 
 func AddGatewayV1(

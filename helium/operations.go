@@ -71,8 +71,24 @@ func CreateFeeOp(payer string, fee int64, feeType string, opIndex int64, metadat
 		FeeCurrency = HNT
 		metadata["implicit_burn"] = true
 	case "DC":
-		FeeCurrency = DC
+		// No reconciliation for DC txns, this is only an FYI
 		metadata["implicit_burn"] = false
+		metadata["dc_fee"] = fee
+		return &types.Operation{
+			OperationIdentifier: &types.OperationIdentifier{
+				Index: opIndex,
+			},
+			Type:   DebitOp,
+			Status: &SuccessStatus,
+			Account: &types.AccountIdentifier{
+				Address: payer,
+			},
+			Amount: &types.Amount{
+				Value:    "0",
+				Currency: HNT,
+			},
+			Metadata: metadata,
+		}, nil
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("incorrect or missing feeType"))
 	}
