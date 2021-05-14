@@ -66,7 +66,25 @@ TODO: `routing_v1`
 
 TODO: `state_channel_open_v1`
 
-### Unimplemented transactions
+
+## Construction API transactions
+Transaction support for creation via the construction API
+
+### Implemented
+TODO: `payment_v1`
+
+TODO: `payment_v2`
+
+TODO: `security_exchange_v1`
+
+TODO: `create_htlc_v1`*
+
+TODO: `redeem_htlc_v1`*
+
+
+*Lower priority 
+
+## Unimplemented transactions
 DC only transactions:
 
 `dc_coinbase_v1`
@@ -90,24 +108,6 @@ Internal blockchain transactions:
 Oracle transactions:
 
 `price_oracle_v1`
-
-
-## Construction API transactions
-Transaction support for creation via the construction API
-
-### Implemented
-TODO: `payment_v1`
-
-TODO: `payment_v2`
-
-TODO: `security_exchange_v1`
-
-TODO: `create_htlc_v1`*
-
-TODO: `redeem_htlc_v1`*
-
-
-*Lower priority 
 
 #### Buy me an HNT coffee :)
 HNT Address: 13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88
