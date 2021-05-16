@@ -1,6 +1,28 @@
-# Compile golang 
-FROM ubuntu:20.04 as builder
+FROM ubuntu:20.04 as node-builder
+RUN apt-get update && apt-get install -y curl make gcc g++ git gnupg2 wget
 
+ENV DEBIAN_FRONTEND noninteractive
+ENV PATH /root/.cargo/bin:${PATH}
+
+RUN wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && dpkg -i erlang-solutions_2.0_all.deb
+RUN apt-get update \
+    && apt-get install -y esl-erlang=1:22.3.4.1-1 cmake libsodium-dev libssl-dev build-essential
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+WORKDIR /usr/src
+
+# Add our code
+RUN git clone https://github.com/syuan100/blockchain-node \
+   && cd blockchain-node \
+   && git checkout 52586988fb4ed4ce81333bf5d4cedcf17fa86292
+
+WORKDIR /usr/src/blockchain-node
+
+RUN ./rebar3 as devib tar
+RUN mkdir -p /opt/blockchain-node-build
+RUN tar -zxvf _build/devib/rel/*/*.tar.gz -C /opt/blockchain-node-build
+
+FROM ubuntu:20.04 as rosetta-builder
 RUN mkdir -p /app \
   && chown -R nobody:nogroup /app
 WORKDIR /app
@@ -19,43 +41,41 @@ ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV PATH /root/.cargo/bin:${PATH}
-
-RUN wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && dpkg -i erlang-solutions_2.0_all.deb
-RUN apt-get update \
-    && apt-get install -y esl-erlang=1:22.3.4.1-1 cmake libsodium-dev libssl-dev build-essential
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-
-# Compile rosetta-ethereum
-FROM builder as rosetta-builder
-
-# Use native remote build context to build in any directory
 COPY . rosetta-helium-builder
-RUN cd rosetta-helium-builder \
-  && go build -o rosetta-helium
 
-RUN mv rosetta-helium-builder/rosetta-helium /app/rosetta-helium \
-  && rm -rf rosetta-helium-builder
+WORKDIR /app/rosetta-helium-builder
 
-RUN mkdir -p /data \
-  && chown -R nobody:nogroup /data
-
-# Copy Makefile
-COPY ./docker/Makefile /app
-
-# VERSION: blockchain-node 
-RUN git clone https://github.com/syuan100/blockchain-node \
-   && cd blockchain-node \
-   && git checkout ced91e1a3ef1d1942022c4585fe5d71e1117ea41
-
-RUN cd blockchain-node \
-  && make && make release PROFILE=devib
-
-RUN cat ./blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > lbs.txt
-
-RUN chmod -R 755 /app/*
+RUN go build -o rosetta-helium
+RUN mv rosetta-helium /app/rosetta-helium
 
 WORKDIR /app
 
-CMD ["make", "start", "PROFILE=devib"]
+RUN rm -rf rosetta-helium-builder
+
+FROM ubuntu:20.04 as runner
+RUN apt-get update && apt-get install -y gnupg2 wget
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && dpkg -i erlang-solutions_2.0_all.deb
+RUN apt-get update \
+    && apt-get install -y esl-erlang=1:22.3.4.1-1
+
+RUN ulimit -n 100000
+
+ENV COOKIE=blockchain-node \
+    # Write files generated during startup to /tmp
+    RELX_OUT_FILE_PATH=/tmp \
+    # add miner to path, for easy interactions
+    PATH=$PATH:/app/blockchain-node/bin
+
+COPY --from=node-builder /opt/blockchain-node-build /app/blockchain-node
+COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
+
+RUN cat /app/blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > lbs.txt
+
+COPY ./docker/start.sh /app
+
+RUN chmod +x /app/start.sh
+
+CMD ["/app/start.sh"]
