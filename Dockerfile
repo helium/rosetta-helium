@@ -51,8 +51,6 @@ ENV PATH="/usr/local/go/bin:$PATH" \
     GOPATH=/opt/go/ \
     PATH=$PATH:$GOPATH/bin 
 
-RUN ulimit -n 100000
-
 ENV COOKIE=blockchain-node \
     # Write files generated during startup to /tmp
     RELX_OUT_FILE_PATH=/tmp \
