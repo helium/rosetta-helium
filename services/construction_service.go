@@ -2,9 +2,11 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/syuan100/rosetta-helium/helium"
 )
 
 // ConstructionAPIService implements the server.ConstructionAPIServicer interface.
@@ -66,15 +68,20 @@ func (s *ConstructionAPIService) ConstructionPreprocess(
 	request *types.ConstructionPreprocessRequest,
 ) (*types.ConstructionPreprocessResponse, *types.Error) {
 
-	// operations := request.Operations
+	operations := request.Operations
+	transactionPreprocessor, err := helium.OpsToTransaction(operations)
+	if err != nil {
+		return nil, err
+	}
 
-	// totalOperations := len(operations)
+	// Convert transactionPreprocessor into map to satisfy Option requirement
+	var options map[string]interface{}
+	marshalledPreprocessor, _ := json.Marshal(transactionPreprocessor)
+	json.Unmarshal(marshalledPreprocessor, &options)
 
-	// for i, operation := range operations {
-
-	// }
-
-	return nil, nil
+	return &types.ConstructionPreprocessResponse{
+		Options: options,
+	}, nil
 
 }
 

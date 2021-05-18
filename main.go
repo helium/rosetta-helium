@@ -55,7 +55,13 @@ func NewBlockchainRouter(
 		a,
 	)
 
-	return server.NewRouter(networkAPIController, blockAPIController, accountAPIController)
+	constructionAPIService := services.NewConstructionAPIService(network)
+	constructionAPIController := server.NewConstructionAPIController(
+		constructionAPIService,
+		a,
+	)
+
+	return server.NewRouter(networkAPIController, blockAPIController, accountAPIController, constructionAPIController)
 }
 
 func main() {
@@ -67,7 +73,7 @@ func main() {
 	// The asserter automatically rejects incorrectly formatted
 	// requests.
 	a, err := asserter.NewServer(
-		helium.TransactionTypes,
+		helium.OperationTypes,
 		helium.HistoricalBalanceSupported,
 		[]*types.NetworkIdentifier{network},
 		nil,
