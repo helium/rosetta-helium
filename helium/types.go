@@ -195,6 +195,14 @@ const (
 	// associating a new gateway with an owner
 	AssertLocationOp = "assert_location_op"
 
+	// CreateHTLCOp is used to describe
+	// creating an HTLC transaction
+	CreateHTLCOp = "create_htlc_op"
+
+	// CreateHTLCOp is used to describe
+	// creating an HTLC transaction
+	RedeemHTLCOp = "redeem_htlc_op"
+
 	// HistoricalBalanceSupported is whether
 	// historical balance is supported.
 	HistoricalBalanceSupported = false
@@ -270,9 +278,8 @@ var (
 	OperationTypes = []string{
 		CreditOp,
 		DebitOp,
-		FeeOp,
-		AddGatewayOp,
-		AssertLocationOp,
+		CreateHTLCOp,
+		RedeemHTLCOp,
 	}
 
 	// OperationStatuses are all supported operation statuses.

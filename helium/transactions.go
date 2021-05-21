@@ -128,7 +128,7 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 	indexIncrementer := 2
 	for i, p := range payments {
 		PaymentDebit, pErr := CreateDebitOp(
-			p.Payee,
+			payer,
 			p.Amount,
 			HNT,
 			int64(indexIncrementer*i),
