@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -78,6 +79,8 @@ func (s *ConstructionAPIService) ConstructionPreprocess(
 	var options map[string]interface{}
 	marshalledPreprocessor, _ := json.Marshal(transactionPreprocessor)
 	json.Unmarshal(marshalledPreprocessor, &options)
+
+	fmt.Println(options)
 
 	return &types.ConstructionPreprocessResponse{
 		Options: options,

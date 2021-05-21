@@ -20,15 +20,20 @@ func OpsToTransaction(operations []*types.Operation) (*Preprocessor, *types.Erro
 		// Set txn type
 		preprocessedTransaction.TransactionType = PaymentV2Txn
 
+		if len(operations) <= 1 {
+			return nil, WrapErr(ErrNotFound, errors.New("payment_v2 require at least two ops (debit and credit)"))
+		}
+
 		// Parse payer
 		if operations[0].Account == nil {
 			return nil, WrapErr(ErrNotFound, errors.New("payment_v2 ops require Accounts"))
 		} else {
-			preprocessedTransaction.RequestedMetadata["payer"] = operations[0].Account.Address
+			preprocessedTransaction.RequestedMetadata = map[string]interface{}{"payer": operations[0].Account.Address}
 		}
 
 		// Parse payments
 		var payments []map[string]interface{}
+
 		for i, operation := range operations {
 			if operation.Account == nil {
 				return nil, WrapErr(ErrNotFound, errors.New("payment_v2 ops require Accounts"))
@@ -38,14 +43,23 @@ func OpsToTransaction(operations []*types.Operation) (*Preprocessor, *types.Erro
 			if i%2 == 0 {
 				// Confirm payer is the same
 				if preprocessedTransaction.RequestedMetadata["payer"] != operations[0].Account.Address {
-					return nil, WrapErr(ErrNotFound, errors.New("cannot exceed more than one payer for payment_v2 txn"))
+					return nil, WrapErr(ErrUnclearIntent, errors.New("cannot exceed more than one payer for payment_v2 txn"))
+				}
+				if operations[i].Amount.Value[0:1] != "-" {
+					return nil, WrapErr(ErrUnclearIntent, errors.New(DebitOp+"s cannot be positive"))
 				}
 			} else {
 				if operations[i].Amount == nil {
 					return nil, WrapErr(ErrNotFound, errors.New(CreditOp+"s require Amounts"))
 				}
+				if operations[i].Amount.Value[0:1] == "-" {
+					return nil, WrapErr(ErrUnclearIntent, errors.New(CreditOp+"s cannot be negative"))
+				}
 				if operations[i].Amount.Value != utils.TrimLeftChar(operations[i-1].Amount.Value) {
-					return nil, WrapErr(ErrNotFound, errors.New("debit value does not match credit value"))
+					return nil, WrapErr(ErrUnclearIntent, errors.New("debit value does not match credit value"))
+				}
+				if operations[i].Account.Address == preprocessedTransaction.RequestedMetadata["payer"] {
+					return nil, WrapErr(ErrUnclearIntent, errors.New("payee and payer cannot be the same address"))
 				}
 				payments = append(payments, map[string]interface{}{"payee": operations[i].Account.Address, "amount": operations[i].Amount.Value})
 			}
@@ -53,6 +67,6 @@ func OpsToTransaction(operations []*types.Operation) (*Preprocessor, *types.Erro
 		preprocessedTransaction.RequestedMetadata["payments"] = payments
 		return &preprocessedTransaction, nil
 	default:
-		return nil, WrapErr(ErrUnclearIntent, errors.New("supported transactions cannot start with "+operations[0].Type+" ops"))
+		return nil, WrapErr(ErrUnclearIntent, errors.New("supported transactions cannot start with "+operations[0].Type))
 	}
 }
