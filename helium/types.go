@@ -69,6 +69,14 @@ const (
 	// used in Currency.
 	Decimals = 8
 
+	// Symbol is the symbol value
+	// used in Currency.
+	DCSymbol = "DC"
+
+	// Decimals is the decimals value
+	// used in Currency.
+	DCDecimals = 1
+
 	// Symbol for Security Tokens
 	HSTSymbol = "HST"
 
@@ -236,6 +244,12 @@ var (
 	HNT = &types.Currency{
 		Symbol:   Symbol,
 		Decimals: Decimals,
+	}
+
+	// DC is the *types.Currency for DC.
+	DC = &types.Currency{
+		Symbol:   DCSymbol,
+		Decimals: DCDecimals,
 	}
 
 	// HST is the *types.Currency for HST.
