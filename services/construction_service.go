@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -46,6 +47,12 @@ func (s *ConstructionAPIService) ConstructionMetadata(
 	ctx context.Context,
 	request *types.ConstructionMetadataRequest,
 ) (*types.ConstructionMetadataResponse, *types.Error) {
+
+	options := request.Options
+	if options["transaction_type"] != nil {
+		return nil, helium.WrapErr(helium.ErrNotFound, errors.New("transcation_type is required"))
+	}
+
 	return nil, nil
 }
 
