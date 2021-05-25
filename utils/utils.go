@@ -18,3 +18,12 @@ func TrimLeftChar(s string) string {
 	}
 	return s[:0]
 }
+
+func StringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}

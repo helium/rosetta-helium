@@ -48,12 +48,12 @@ func (s *ConstructionAPIService) ConstructionMetadata(
 	request *types.ConstructionMetadataRequest,
 ) (*types.ConstructionMetadataResponse, *types.Error) {
 
-	options := request.Options
-	if options["transaction_type"] != nil {
-		return nil, helium.WrapErr(helium.ErrNotFound, errors.New("transcation_type is required"))
+	metadata, err := helium.GetMetadata(request)
+	if err != nil {
+		return nil, helium.WrapErr(helium.ErrUnclearIntent, errors.New("unable to retrieve metadata"))
 	}
 
-	return nil, nil
+	return metadata, nil
 }
 
 func (s *ConstructionAPIService) ConstructionParse(
