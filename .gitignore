@@ -2,3 +2,5 @@ helium-data
 cli-data
 rosetta-helium
 lbs.txt
+node_modules
+helium-constructor/public
