@@ -28,7 +28,7 @@ func OpsToTransaction(operations []*types.Operation) (*Preprocessor, *types.Erro
 		if operations[0].Account == nil {
 			return nil, WrapErr(ErrNotFound, errors.New("payment_v2 ops require Accounts"))
 		} else {
-			preprocessedTransaction.RequestedMetadata = map[string]interface{}{"get_nonce_for": operations[0].Account.Address}
+			preprocessedTransaction.RequestedMetadata = map[string]interface{}{"get_nonce_for": map[string]interface{}{"address": operations[0].Account.Address}}
 		}
 
 		for i, operation := range operations {
@@ -39,7 +39,7 @@ func OpsToTransaction(operations []*types.Operation) (*Preprocessor, *types.Erro
 			// Even Ops must be debits, odd Ops must be credits
 			if i%2 == 0 {
 				// Confirm payer is the same
-				if preprocessedTransaction.RequestedMetadata["get_nonce_for"] != operations[0].Account.Address {
+				if preprocessedTransaction.RequestedMetadata["get_nonce_for"].(map[string]interface{})["address"] != operations[0].Account.Address {
 					return nil, WrapErr(ErrUnclearIntent, errors.New("cannot exceed more than one payer for payment_v2 txn"))
 				}
 				if operations[i].Amount.Value[0:1] != "-" {
