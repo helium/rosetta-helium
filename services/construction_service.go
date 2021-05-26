@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -50,7 +49,7 @@ func (s *ConstructionAPIService) ConstructionMetadata(
 
 	metadata, err := helium.GetMetadata(request)
 	if err != nil {
-		return nil, helium.WrapErr(helium.ErrUnclearIntent, errors.New("unable to retrieve metadata"))
+		return nil, err
 	}
 
 	return metadata, nil

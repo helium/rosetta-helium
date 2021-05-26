@@ -2,6 +2,7 @@ package helium
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -26,9 +27,27 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 	for k, v := range options.RequestedMetadata {
 		switch k {
 		case "get_nonce_for":
-			fmt.Println(v)
+			switch t := v.(type) {
+			case map[string]interface{}:
+				if v.(map[string]interface{})["address"] == nil {
+					return nil, WrapErr(ErrUnclearIntent, errors.New("get_nonce_for requires `address` to be present in JSON object"))
+				}
+
+				nonce, nErr := GetNonce(fmt.Sprint(v.(map[string]interface{})["address"]))
+				if nErr != nil {
+					return nil, nErr
+				}
+
+				return &types.ConstructionMetadataResponse{
+					Metadata: map[string]interface{}{
+						"nonce": nonce,
+					},
+				}, nil
+			default:
+				return nil, WrapErr(ErrUnclearIntent, errors.New("unexpected object "+fmt.Sprint(t)+" in get_nonce_for"))
+			}
 		default:
-			return nil, nil
+			return nil, WrapErr(ErrUnclearIntent, errors.New("metadata request `"+fmt.Sprint(k)+"` not recognized"))
 		}
 	}
 

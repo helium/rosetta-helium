@@ -141,6 +141,28 @@ func GetBalance(address string) ([]*types.Amount, *types.Error) {
 	return balances, nil
 }
 
+func GetNonce(address string) (*int64, *types.Error) {
+	var nonce int64
+
+	type request struct {
+		Address string `json:"address"`
+	}
+
+	var result map[string]interface{}
+
+	req := request{Address: address}
+	if err := NodeClient.CallFor(&result, "account_get", req); err != nil {
+		return nil, WrapErr(
+			ErrNotFound,
+			err,
+		)
+	}
+
+	nonce = int64(result["nonce"].(float64))
+
+	return &nonce, nil
+}
+
 func GetOraclePrice(height int64) (*int64, *types.Error) {
 	type request struct {
 		Height int64 `json:"height"`
