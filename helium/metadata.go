@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
 )
@@ -14,6 +15,23 @@ type MetadataOptions struct {
 }
 
 func GetMetadata(request *types.ConstructionMetadataRequest) (*types.ConstructionMetadataResponse, *types.Error) {
+	metadataResponse := types.ConstructionMetadataResponse{
+		Metadata: map[string]interface{}{},
+	}
+
+	var chainVars map[string]interface{}
+	resp, vErr := http.Get("http://localhost:3000/chain-vars")
+	if vErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, vErr)
+	}
+	//defer resp.Body.Close()
+	dErr := json.NewDecoder(resp.Body).Decode(&chainVars)
+	if dErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, dErr)
+	}
+
+	metadataResponse.Metadata["chain_vars"] = chainVars
+
 	jsonString, _ := json.Marshal(request.Options)
 	options := MetadataOptions{}
 	err := json.Unmarshal(jsonString, &options)
@@ -38,11 +56,9 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 					return nil, nErr
 				}
 
-				return &types.ConstructionMetadataResponse{
-					Metadata: map[string]interface{}{
-						"nonce": nonce,
-					},
-				}, nil
+				metadataResponse.Metadata["get_nonce_for"] = map[string]interface{}{
+					"nonce": nonce,
+				}
 			default:
 				return nil, WrapErr(ErrUnclearIntent, errors.New("unexpected object "+fmt.Sprint(t)+" in get_nonce_for"))
 			}
@@ -51,5 +67,5 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 		}
 	}
 
-	return nil, nil
+	return &metadataResponse, nil
 }
