@@ -19,19 +19,20 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 		Metadata: map[string]interface{}{},
 	}
 
+	// Get chain_vars (default metadata)
 	var chainVars map[string]interface{}
 	resp, vErr := http.Get("http://localhost:3000/chain-vars")
 	if vErr != nil {
 		return nil, WrapErr(ErrUnclearIntent, vErr)
 	}
-	//defer resp.Body.Close()
+	defer resp.Body.Close()
 	dErr := json.NewDecoder(resp.Body).Decode(&chainVars)
 	if dErr != nil {
 		return nil, WrapErr(ErrUnclearIntent, dErr)
 	}
-
 	metadataResponse.Metadata["chain_vars"] = chainVars
 
+	// Get raw options
 	jsonString, _ := json.Marshal(request.Options)
 	options := MetadataOptions{}
 	err := json.Unmarshal(jsonString, &options)
