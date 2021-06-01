@@ -1,12 +1,12 @@
 **THIS IS NOT PRODUCTION READY. USE AT YOUR OWN RISK.**
 
-## Overview
+# Overview
 Dockerized Rosetta API implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
 - This is NOT a full node, but rather works off the latest snapshot as specified in `blockchain-node`. As a result, there is currently no support for historical balances or reconciliation.
 - `blockchain-node` provides the basic blockchain that the Data API reads from
 - `./helium-constructor` implements a simple Express server exposing [helium-js](https://github.com/helium/helium-js) for Construction API actions (transaction construction, signing mechanisms, etc)
 
-## Quick setup
+# Quick setup
 
 #### Build container
 ```text
@@ -25,7 +25,7 @@ rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.js
 ```
 (Please wait a few minutes for the Helium node to initialize before running this command)
 
-## Contributing
+# Contributing
 It's annoying to spin up a docker container for every change that you want to make. So for local development, it is recommended that you run each part of the implementation separately.
 
 ### rosetta-helium
@@ -48,7 +48,7 @@ It's annoying to spin up a docker container for every change that you want to ma
 
 At this point you should be able to run the `rosetta-cli` check from above and get similiar results to the docker container. Remember, make sure to give `blockchain-node` a few minutes to warm up before it picks up blocks.
 
-## Implementation details
+# Implementation details
 
 ### Suported currencies
 - HNT
