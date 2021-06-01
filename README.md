@@ -38,7 +38,7 @@ It's annoying to spin up a docker container for every change that you want to ma
 2. Run `make && make release PROFILE=devib` to build a release
 3. Run `make start PROFILE=devib` to start blockchain-node at port `:4467`
 
-### helium-js
+### helium-constructor
 1. Install `node`. I prefer [nvm](https://github.com/nvm-sh/nvm).
 1. `cd helium-constructor`
 2. `npm ci`
