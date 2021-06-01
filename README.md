@@ -2,7 +2,7 @@
 
 ## Overview
 Dockerized Rosetta API implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
-- This is NOT a full node, but rather works off the latest snapshot as specified in blockchain-node. As a result, there is currently no support for historical balances or reconciliation.
+- This is NOT a full node, but rather works off the latest snapshot as specified in `blockchain-node`. As a result, there is currently no support for historical balances or reconciliation.
 - `blockchain-node` provides the basic blockchain that the Data API reads from
 - `./helium-constructor` implements a simple Express server exposing [helium-js](https://github.com/helium/helium-js) for Construction API actions (transaction construction, signing mechanisms, etc)
 
@@ -33,9 +33,9 @@ It's annoying to spin up a docker container for every change that you want to ma
 2. At the root directory, run `go run .` to start the rosetta server at port `:8080`
 
 ### blockchain-node
-1. Checkout my version [custom version of blockchain-node](https://github.com/syuan100/blockchain-node/tree/syuan100-fee-differentiator) that accounts for [implicit burn](https://docs.helium.com/blockchain/transaction-fees/) events.
-2. `make && make release PROFILE=devib` to build a release
-3. `make start PROFILE=devib` to start blockchain-node at port `:4467`
+1. Checkout my [custom version of blockchain-node](https://github.com/syuan100/blockchain-node/tree/syuan100-fee-differentiator) that accounts for [implicit burn](https://docs.helium.com/blockchain/transaction-fees/) events.
+2. Run `make && make release PROFILE=devib` to build a release
+3. Run `make start PROFILE=devib` to start blockchain-node at port `:4467`
 
 ### helium-js
 1. Install `node`. I prefer [nvm](https://github.com/nvm-sh/nvm).
@@ -48,11 +48,13 @@ It's annoying to spin up a docker container for every change that you want to ma
 
 At this point you should be able to run the `rosetta-cli` check from above and get similiar results to the docker container. Remember, make sure to give `blockchain-node` a few minutes to warm up before it picks up blocks.
 
-## Implemented currencies
+## Implementation details
+
+### Suported currencies
 - HNT
 - HST
 
-### Unimplemented currencies
+### Unsupported currencies
 - DC (DCs are not implemented as they cannot be actively traded)
 
 ## Data API transactions
