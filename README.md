@@ -1,7 +1,10 @@
 **THIS IS NOT PRODUCTION READY. USE AT YOUR OWN RISK.**
 
 ## Overview
-Bare bones Rosetta API implementation of the Helium `blockchain-node`
+Dockerized Rosetta API implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
+- This is NOT a full node, but rather works off the latest snapshot as specified in blockchain-node. As a result, there is currently no support for historical balances or reconciliation.
+- `blockchain-node` provides the basic blockchain that the Data API reads from
+- `./helium-constructor` implements a simple Express server exposing [helium-js](https://github.com/helium/helium-js) for Construction API actions (transaction construction, signing mechanisms, etc)
 
 ## Quick setup
 
@@ -21,6 +24,29 @@ docker run -d --rm --ulimit "nofile=100000:100000" -v "$(pwd)/helium-data:/app/b
 rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.json
 ```
 (Please wait a few minutes for the Helium node to initialize before running this command)
+
+## Contributing
+It's annoying to spin up a docker container for every change that you want to make. So for local development, it is recommended that you run each part of the implementation separately.
+
+### rosetta-helium
+1. Install [golang](https://golang.org/doc/install) if you haven't yet.
+2. At the root directory, run `go run .` to start the rosetta server at port `:8080`
+
+### blockchain-node
+1. Checkout my version [custom version of blockchain-node](https://github.com/syuan100/blockchain-node/tree/syuan100-fee-differentiator) that accounts for [implicit burn](https://docs.helium.com/blockchain/transaction-fees/) events.
+2. `make && make release PROFILE=devib` to build a release
+3. `make start PROFILE=devib` to start blockchain-node at port `:4467`
+
+### helium-js
+1. Install `node`. I prefer [nvm](https://github.com/nvm-sh/nvm).
+1. `cd helium-constructor`
+2. `npm ci`
+3. `npm run build` or `npm run watch`
+4. `npm run start` to start the express server at port `:3000`
+
+*TODO: install nodemon for development*
+
+At this point you should be able to run the `rosetta-cli` check from above and get similiar results to the docker container. Remember, make sure to give `blockchain-node` a few minutes to warm up before it picks up blocks.
 
 ## Implemented currencies
 - HNT
@@ -71,7 +97,6 @@ TODO: `state_channel_open_v1`
 Transaction support for creation via the construction API
 
 ### Implemented
-TODO: `payment_v1`
 
 TODO: `payment_v2`
 
@@ -83,6 +108,9 @@ TODO: `redeem_htlc_v1`*
 
 
 ## Unimplemented transactions
+Deprecated transactions (construction API only):
+`payment_v1`
+
 DC only transactions:
 
 `dc_coinbase_v1`
