@@ -10,7 +10,7 @@ ENV CC=gcc CXX=g++ CFLAGS="-U__sun__" \
     PATH="/root/.cargo/bin:$PATH" \
     RUSTFLAGS="-C target-feature=-crt-static"
 
-# Install Rust toolchain
+# install Rust toolchain
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 WORKDIR /usr/src
@@ -23,33 +23,26 @@ RUN git clone https://github.com/syuan100/blockchain-node \
 WORKDIR /usr/src/blockchain-node
 
 RUN ./rebar3 as devib tar
-RUN mkdir -p /opt/blockchain-node-build
-RUN tar -zxvf _build/devib/rel/*/*.tar.gz -C /opt/blockchain-node-build
+RUN mkdir -p /opt/blockchain-node-build \
+ && tar -zxvf _build/devib/rel/*/*.tar.gz -C /opt/blockchain-node-build
 
+####
 FROM erlang:22.3.2-alpine as rosetta-builder
 RUN apk add --no-cache --virtual .build-deps bash gcc musl-dev openssl go
 ENV PATH="/usr/local/go/bin:$PATH" \
     GOPATH=/opt/go/ \
     PATH=$PATH:$GOPATH/bin 
 
-WORKDIR /app
-
-COPY . rosetta-helium-builder
-
+COPY . /app/rosetta-helium-builder
 WORKDIR /app/rosetta-helium-builder
 
-RUN go build -o rosetta-helium
-RUN mv rosetta-helium /app/rosetta-helium
+RUN go build -o rosetta-helium \
+ && mv rosetta-helium /app/rosetta-helium \
+ && rm -rf /app/rosetta-helium-builder
 
-WORKDIR /app
-
-RUN rm -rf rosetta-helium-builder
-
+####
 FROM erlang:22.3.2-alpine as runner
-RUN apk add --no-cache --update --virtual .build-deps bash gcc musl-dev openssl go grep ncurses dbus gmp libsodium
-ENV PATH="/usr/local/go/bin:$PATH" \
-    GOPATH=/opt/go/ \
-    PATH=$PATH:$GOPATH/bin 
+RUN apk add --no-cache --update --virtual .build-deps bash gcc openssl grep dbus gmp libsodium
 
 ENV COOKIE=blockchain-node \
     # Write files generated during startup to /tmp
@@ -60,11 +53,9 @@ ENV COOKIE=blockchain-node \
 
 COPY --from=node-builder /opt/blockchain-node-build /app/blockchain-node
 COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
-
-RUN cat /app/blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > lbs.txt
-
 COPY ./docker/start.sh /app
 
-RUN chmod +x /app/start.sh
+RUN chmod +x /app/start.sh \
+ && cat /app/blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > lbs.txt
 
 CMD ["/app/start.sh"]
