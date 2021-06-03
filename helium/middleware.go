@@ -203,7 +203,7 @@ func GetFee(hash string, fee int64, payer string) *Fee {
 	}
 
 	feeResult := &Fee{
-		Amount:   utils.MapToInt64(result["fee"]),
+		Amount:   int64(result["fee"].(float64)),
 		Payer:    fmt.Sprint(result["payer"]),
 		Currency: HNT,
 	}
