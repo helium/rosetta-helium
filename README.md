@@ -7,6 +7,12 @@ Dockerized Rosetta API implementation mostly based off of [blockchain-node](http
 - `blockchain-node` provides the basic blockchain that the Data API reads from
 - `./helium-constructor` implements a simple Express server written in TypeScript exposing [helium-js](https://github.com/helium/helium-js) for Construction API actions (transaction construction, signing mechanisms, etc)
 
+## Support This Project
+
+#### Buy me an HNT coffee :)
+
+HNT Address: [13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88](https://explorer.helium.com/accounts/13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88)
+
 # Quick setup
 
 #### Build container
@@ -109,7 +115,3 @@ Transaction support for creation via the construction API
 | `consensus_group_v1` | NEVER | Internal blockchain only |
 | `vars_v1` | NEVER | |
 | `price_oracle_v1` | NEVER | Oracle HNT value transactions | 
-
-#### Buy me an HNT coffee :)
-
-HNT Address: [13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88](https://explorer.helium.com/accounts/13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88)
