@@ -1,8 +1,8 @@
 **THIS IS NOT PRODUCTION READY. USE AT YOUR OWN RISK.**
 
 # Overview
-Dockerized Rosetta API implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
-- Rosetta specs: [https://www.rosetta-api.org/](https://www.rosetta-api.org/)
+Dockerized [Rosetta API](https://www.rosetta-api.org/) implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
+- Rosetta specs: [https://www.rosetta-api.org/](rosetta-api.org)
 - This is NOT a full node, but rather works off the latest snapshot as specified in `blockchain-node`. As a result, there is currently no support for historical balances or reconciliation.
 - `blockchain-node` provides the basic blockchain that the Data API reads from
 - `./helium-constructor` implements a simple Express server written in TypeScript exposing [helium-js](https://github.com/helium/helium-js) for Construction API actions (transaction construction, signing mechanisms, etc)
