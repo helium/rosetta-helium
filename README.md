@@ -63,7 +63,7 @@ At this point you should be able to run the `rosetta-cli` check from above and g
 Transactions support for reading from the Data API
 
 | API | Implemented | TODO | Notes |
-| --- |:-----------:|:----:|       |
+|----|:-----------:|:----:|       |
 | `payment_v1` | DONE | | |
 | `payment_v2` | DONE | | |
 | `reward_v1` | DONE | | |
