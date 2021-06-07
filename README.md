@@ -63,7 +63,7 @@ At this point you should be able to run the `rosetta-cli` check from above and g
 Transactions support for reading from the Data API
 
 | API | Implemented | TODO | Notes |
-|----|:-----------:|:----:|       |
+|----|:-----------:|:----:|-------|
 | `payment_v1` | DONE | | |
 | `payment_v2` | DONE | | |
 | `reward_v1` | DONE | | |
@@ -78,7 +78,7 @@ Transactions support for reading from the Data API
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
 
 | API | Implemented | TODO | Notes |
-| --- |:-----------:|:----:|       |
+| --- |:-----------:|:----:|-------|
 | `add_gateway_v1` | DONE | | |
 | `assert_location_v1` | DONE | | |
 | `assert_location_v2` | DONE | | |
@@ -90,7 +90,7 @@ Transactions support for reading from the Data API
 Transaction support for creation via the construction API
 
 | API | Implemented | TODO | Notes |
-| --- |:-----------:|:----:|       |
+|-----|:-----------:|:----:|-------|
 | `payment_v2` | | TODO | |
 | `security_exchange_v1` | | TODO | |
 | `create_htlc_v1`* | | TODO | |
@@ -99,7 +99,7 @@ Transaction support for creation via the construction API
 ## No Plans to Implement
 
 | API | Implemented | TODO | Notes |
-| --- |:-----------:|:----:|       |
+|-----|:-----------:|:----:|-------|
 | `payment_v1` | NEVER | | Deprecated transactions (construction API only) |
 | `dc_coinbase_v1` | NEVER | | DC only transaction |
 | `state_channel_close_v1` | NEVER | | DC only transaction |
