@@ -98,17 +98,17 @@ Transaction support for creation via the construction API
 
 ## No Plans to Implement
 
-| API | Implemented | TODO | Notes |
-|-----|:-----------:|:----:|-------|
-| `payment_v1` | NEVER | | Deprecated transactions (construction API only) |
-| `dc_coinbase_v1` | NEVER | | DC only transaction |
-| `state_channel_close_v1` | NEVER | | DC only transaction |
-| `gen_gateway_v1` | NEVER | | Internal blockchain only |
-| `poc_request_v1`| NEVER | | Internal blockchain only |
-| `poc_receipt_v1` | NEVER | | Internal blockchain only | 
-| `consensus_group_v1` | NEVER | | Internal blockchain only |
-| `vars_v1` | NEVER | | |
-| `price_oracle_v1` | NEVER | | Oracle HNT value transactions | 
+| API | Implemented | Notes |
+|-----|:-----------:|-------|
+| `payment_v1` | NEVER | Deprecated transactions (construction API only) |
+| `dc_coinbase_v1` | NEVER | DC only transaction |
+| `state_channel_close_v1` | NEVER | DC only transaction |
+| `gen_gateway_v1` | NEVER | Internal blockchain only |
+| `poc_request_v1`| NEVER | Internal blockchain only |
+| `poc_receipt_v1` | NEVER | Internal blockchain only | 
+| `consensus_group_v1` | NEVER | Internal blockchain only |
+| `vars_v1` | NEVER | |
+| `price_oracle_v1` | NEVER | Oracle HNT value transactions | 
 
 #### Buy me an HNT coffee :)
 
