@@ -66,7 +66,19 @@ func (s *ConstructionAPIService) ConstructionPayloads(
 	ctx context.Context,
 	request *types.ConstructionPayloadsRequest,
 ) (*types.ConstructionPayloadsResponse, *types.Error) {
-	return nil, nil
+
+	operations := request.Operations
+	metadata := helium.MetadataOptions{
+		RequestedMetadata: request.Metadata["requested_metadata"].(map[string]interface{}),
+		TransactionType:   request.Metadata["transaction_type"].(string),
+	}
+
+	payload, err := helium.PayloadGenerator(operations, metadata)
+	if err != nil {
+		return nil, err
+	}
+
+	return payload, nil
 }
 
 func (s *ConstructionAPIService) ConstructionPreprocess(
