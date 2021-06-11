@@ -97,7 +97,7 @@ Transaction support for creation via the construction API
 
 | API | Implemented | TODO | Notes |
 |-----|:-----------:|:----:|-------|
-| `payment_v2` | | TODO | |
+| `payment_v2` | | IN PROGRESS | |
 | `security_exchange_v1` | | TODO | |
 | `create_htlc_v1`* | | TODO | |
 | `redeem_htlc_v1`* | | TODO | |

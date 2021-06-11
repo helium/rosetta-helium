@@ -132,7 +132,7 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 			p.Amount,
 			HNT,
 			int64(indexIncrementer*i),
-			map[string]interface{}{"credit_category": "payment"},
+			map[string]interface{}{"debit_category": "payment"},
 		)
 		if pErr != nil {
 			return nil, pErr
@@ -143,7 +143,7 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 			p.Amount,
 			HNT,
 			int64((indexIncrementer*i)+1),
-			map[string]interface{}{"debit_category": "payment"},
+			map[string]interface{}{"credit_category": "payment"},
 		)
 		if pcErr != nil {
 			return nil, pcErr
