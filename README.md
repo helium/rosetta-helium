@@ -1,11 +1,17 @@
 **THIS IS NOT PRODUCTION READY. USE AT YOUR OWN RISK.**
 
 # Overview
-Dockerized Rosetta API implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
-- Rosetta specs: [https://www.rosetta-api.org/](https://www.rosetta-api.org/)
+Dockerized [Rosetta API](https://www.rosetta-api.org/) implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
+- Rosetta specs: [https://www.rosetta-api.org/](rosetta-api.org)
 - This is NOT a full node, but rather works off the latest snapshot as specified in `blockchain-node`. As a result, there is currently no support for historical balances or reconciliation.
 - `blockchain-node` provides the basic blockchain that the Data API reads from
 - `./helium-constructor` implements a simple Express server written in TypeScript exposing [helium-js](https://github.com/helium/helium-js) for Construction API actions (transaction construction, signing mechanisms, etc)
+
+## Support This Project
+
+#### Buy me an HNT coffee :)
+
+HNT Address: [13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88](https://explorer.helium.com/accounts/13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88)
 
 # Quick setup
 
@@ -51,92 +57,61 @@ At this point you should be able to run the `rosetta-cli` check from above and g
 
 # Implementation details
 
-### Suported currencies
-- HNT
-- HST
+### Supported currencies
+
+- [HNT](https://www.coinbase.com/price/helium) (Helium Token)
+- HST (Helium Security Token)
 
 ### Unsupported currencies
-- DC (DCs are not implemented as they cannot be actively traded)
+- DC (Data Credits): not implemented as they cannot be actively traded
 
 ## Data API transactions
 Transactions support for reading from the Data API
 
-### Implemented
-`payment_v1`
-
-`payment_v2`
-
-`reward_v1`
-
-`reward_v2`
-
-`security_coinbase_v1`
-
-`security_exchange_v1`
-
-TODO: `token_burn_v1`
-
-TODO: `transfer_hotspot_v1`
-
-TODO: `create_htlc_v1`*
-
-TODO: `redeem_htlc_v1`*
+| API | Implemented | TODO | Notes |
+|----|:-----------:|:----:|-------|
+| `payment_v1` | DONE | | |
+| `payment_v2` | DONE | | |
+| `reward_v1` | DONE | | |
+| `reward_v2` | DONE | | |
+| `security_coinbase_v1` | DONE | | |
+| `security_exchange_v1` | DONE | | |
+| `token_burn_v1` | | TODO | |
+| `transfer_hotspot_v1` | | TODO | |
+| `create_htlc_v1`* | | TODO | |
+|  `redeem_htlc_v1`* | | TODO | |
 
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
-`add_gateway_v1`
 
-`assert_location_v1`
-
-`assert_location_v2`
-
-TODO: `oui_v1`
-
-TODO: `routing_v1`
-
-TODO: `state_channel_open_v1`
-
+| API | Implemented | TODO | Notes |
+| --- |:-----------:|:----:|-------|
+| `add_gateway_v1` | DONE | | |
+| `assert_location_v1` | DONE | | |
+| `assert_location_v2` | DONE | | |
+| `oui_v1` | | TODO | |
+| `routing_v1` | | TODO | |
+| `state_channel_open_v1` | | TODO | |
 
 ## Construction API transactions
 Transaction support for creation via the construction API
 
-### Implemented
+| API | Implemented | TODO | Notes |
+|-----|:-----------:|:----:|-------|
+| `payment_v2` | | IN PROGRESS | |
+| `security_exchange_v1` | | TODO | |
+| `create_htlc_v1`* | | TODO | |
+| `redeem_htlc_v1`* | | TODO | |
 
-`payment_v2`
+## No Plans to Implement
 
-TODO: `security_exchange_v1`
-
-TODO: `create_htlc_v1`*
-
-TODO: `redeem_htlc_v1`*
-
-
-## Unimplemented transactions
-Deprecated transactions (construction API only):
-`payment_v1`
-
-DC only transactions:
-
-`dc_coinbase_v1`
-
-`state_channel_close_v1`
-
-
-Internal blockchain transactions:
-
-`gen_gateway_v1` 
-
-`poc_request_v1`
-
-`poc_receipt_v1`
-
-`consensus_group_v1`
-
-`vars_v1`
-
-
-Oracle transactions:
-
-`price_oracle_v1`
-
-#### Buy me an HNT coffee :)
-HNT Address: 13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88
+| API | Implemented | Notes |
+|-----|:-----------:|-------|
+| `payment_v1` | NEVER | Deprecated transactions (construction API only) |
+| `dc_coinbase_v1` | NEVER | DC only transaction |
+| `state_channel_close_v1` | NEVER | DC only transaction |
+| `gen_gateway_v1` | NEVER | Internal blockchain only |
+| `poc_request_v1`| NEVER | Internal blockchain only |
+| `poc_receipt_v1` | NEVER | Internal blockchain only | 
+| `consensus_group_v1` | NEVER | Internal blockchain only |
+| `vars_v1` | NEVER | |
+| `price_oracle_v1` | NEVER | Oracle HNT value transactions | 
