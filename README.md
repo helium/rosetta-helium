@@ -49,9 +49,7 @@ It's annoying to spin up a docker container for every change that you want to ma
 1. `cd helium-constructor`
 2. `npm ci`
 3. `npm run build` or `npm run watch`
-4. `npm run start` to start the express server at port `:3000`
-
-*TODO: install nodemon for development*
+4. `npm run nodemon` to start the express server at port `:3000`
 
 At this point you should be able to run the `rosetta-cli` check from above and get similiar results to the docker container. Remember, make sure to give `blockchain-node` a few minutes to warm up before it picks up blocks.
 
