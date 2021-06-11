@@ -101,7 +101,7 @@ Transaction support for creation via the construction API
 
 ### Implemented
 
-TODO: `payment_v2`
+`payment_v2`
 
 TODO: `security_exchange_v1`
 
