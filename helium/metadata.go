@@ -11,6 +11,7 @@ import (
 
 type MetadataOptions struct {
 	RequestedMetadata map[string]interface{} `json:"requested_metadata"`
+	HeliumMetadata    map[string]interface{} `json:"helium_metadata"`
 	TransactionType   string                 `json:"transaction_type"`
 }
 
@@ -42,6 +43,7 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 		}
 		return nil, WrapErr(ErrUnclearIntent, err)
 	}
+	metadataResponse.Metadata["options"] = options
 
 	for k, v := range options.RequestedMetadata {
 		switch k {

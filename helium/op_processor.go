@@ -8,14 +8,8 @@ import (
 	"github.com/syuan100/rosetta-helium/utils"
 )
 
-type Preprocessor struct {
-	TransactionType   string                 `json:"transaction_type"`
-	HeliumMetadata    map[string]interface{} `json:"helium_metadata"`
-	RequestedMetadata map[string]interface{} `json:"requested_metadata"`
-}
-
-func OpsToTransaction(operations []*types.Operation) (*Preprocessor, *types.Error) {
-	var preprocessedTransaction Preprocessor
+func OpsToTransaction(operations []*types.Operation) (*MetadataOptions, *types.Error) {
+	var preprocessedTransaction MetadataOptions
 
 	switch operations[0].Type {
 	case DebitOp:

@@ -68,12 +68,8 @@ func (s *ConstructionAPIService) ConstructionPayloads(
 ) (*types.ConstructionPayloadsResponse, *types.Error) {
 
 	operations := request.Operations
-	metadata := helium.MetadataOptions{
-		RequestedMetadata: request.Metadata["requested_metadata"].(map[string]interface{}),
-		TransactionType:   request.Metadata["transaction_type"].(string),
-	}
 
-	payload, err := helium.PayloadGenerator(operations, metadata)
+	payload, err := helium.PayloadGenerator(operations, request.Metadata)
 	if err != nil {
 		return nil, err
 	}

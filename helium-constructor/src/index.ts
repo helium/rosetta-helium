@@ -1,4 +1,5 @@
 import { Keypair, Address } from '@helium/crypto'
+import proto from '@helium/proto'
 import { PaymentV2, PaymentV1, Transaction } from '@helium/transactions'
 import { Client } from '@helium/http'
 
@@ -10,32 +11,34 @@ const asyncHandler = require('express-async-handler');
 var app = express();
 app.use(bodyParser.json());
 app.set('port', process.env.PORT || 3000);
-app.get('/fee', function(req: express.Request, res: express.Response) {
+app.post('/create-tx', function(req: express.Request, res: express.Response) {
   try {
-    if (!req.body.transaction_type) {
-      throw { "error": "`transaction_type` required" };
-    }
-    const transaction_type:string = req.body.transaction_type;
+    const vars = req.body["chain_vars"];
+    Transaction.config(vars); 
 
-    if (!req.body.chain_vars) {
-      throw { "error": "`chain_vars` required"};
-    }
-    // Transaction library must be configured with
-    // chain vars before being used
-    Transaction.config(req.body.chain_vars);
-
-    switch (transaction_type) {
+    switch (req.body["options"]["transaction_type"]) {
       case "payment_v2":
-        console.log(transaction_type)
-        const payment:PaymentV1 = new PaymentV1({
-          payer: Address.fromB58("13HPSdf8Ng8E2uKpLm8Ba3sQ6wdNimTcaKXYmMkHyTUUeUELPwJ"),
-          payee: Address.fromB58("1aCjThQENE7h1r8qQ52H2P1hCN53uBR6sVrr4MKJPh4Bg8dVqbY")
-        })
-        console.log(payment.fee)
-        res.send(200, payment.fee)
+        const payments = []
+        req.body["options"]["helium_metadata"]["payments"].forEach(payment => {
+          payments.push({
+            "payee": payment["payee"],
+            "amount": payment["amount"]
+          })
+        });
+
+        const unsignedPaymentV2Txn:PaymentV2 = new PaymentV2({
+          payer: Address.fromB58(req.body["options"]["helium_metadata"]["payer"]),
+          payments: payments,
+          nonce: req.body["get_nonce_for"]["nonce"] + 1
+        });
+
+        const hex_bytes:string = Buffer.from(unsignedPaymentV2Txn.serialize()).toString('hex');
+
+        res.status(200).send({"unsigned_txn": unsignedPaymentV2Txn.toString(), "type": "payment_v2", "payload": hex_bytes });
         break;
       default:
-        throw { "error": "transaction type '" + transaction_type + "' is not valid"}
+        res.status(500);
+        break;
     }
   } catch(e:any) {
     res.status(500).send(e);
