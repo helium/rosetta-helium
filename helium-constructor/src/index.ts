@@ -2,9 +2,10 @@ import { Keypair, Address } from '@helium/crypto'
 import proto from '@helium/proto'
 import { PaymentV2, PaymentV1, Transaction } from '@helium/transactions'
 import { Client } from '@helium/http'
+import * as express from "express"
+import * as http from "http"
 
-import express = require('express');
-import http = require('http');
+const express = require('express');
 const bodyParser = require('body-parser');
 const asyncHandler = require('express-async-handler');
 
@@ -43,7 +44,28 @@ app.post('/create-tx', function(req: express.Request, res: express.Response) {
   } catch(e:any) {
     res.status(500).send(e);
   }
-  
+});
+
+app.post('/combine-tx', function(req: express.Request, res: express.Response) {
+  try {
+    const rawUnsignedTxn:string = req.body["unsigned_transaction"]
+    const unsignedTxnType:string = Transaction.stringType(rawUnsignedTxn);
+
+    switch (unsignedTxnType) {
+      case "paymentV2":
+        const signature:string = req.body["signatures"][0]["hex_bytes"];
+        const payment:PaymentV2 = PaymentV2.fromString(rawUnsignedTxn);
+        payment.signature = Uint8Array.from(Buffer.from(signature, "hex"));
+        res.status(200).send({"signed_transaction": payment.toString()});
+        break;
+      default:
+        res.status(500).send({"error": "error"});
+        break;
+    }
+    // res.status(200);
+  } catch(e:any) {
+    res.status(500).send(e);
+  }
 });
 
 app.get('/chain-vars', asyncHandler(async function(req: express.Request, res: express.Response) {

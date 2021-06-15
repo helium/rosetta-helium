@@ -25,7 +25,12 @@ func (s *ConstructionAPIService) ConstructionCombine(
 	ctx context.Context,
 	request *types.ConstructionCombineRequest,
 ) (*types.ConstructionCombineResponse, *types.Error) {
-	return nil, nil
+	combineResponse, cErr := helium.CombineTransaction(request.UnsignedTransaction, request.Signatures)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	return combineResponse, nil
 }
 
 func (s *ConstructionAPIService) ConstructionDerive(
