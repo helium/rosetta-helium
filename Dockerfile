@@ -28,18 +28,20 @@ RUN mkdir -p /opt/blockchain-node-build \
 
 ####
 FROM erlang:22.3.2-alpine as rosetta-builder
-RUN apk add --no-cache --virtual .build-deps bash gcc musl-dev openssl go
+RUN apk add --no-cache --virtual .build-deps --update git bash gcc musl-dev openssl go
 ENV PATH="/usr/local/go/bin:$PATH" \
     GOPATH=/opt/go/ \
     PATH=$PATH:$GOPATH/bin 
 
+WORKDIR /app/builder
 RUN git clone https://github.com/syuan100/rosetta-helium \
     && cd rosetta-helium \
     && git checkout 3c302059246badbe51c2adb5007b6e0ea3287bef \
-    && go build -o rosetta-helium \
-    && mv rosetta-helium /app/rosetta-helium \
-    && mv docker/start.sh /app/start.sh \
-    && mv helium-constructor /app/helium-constructor
+    && go build -o rosetta-helium
+RUN cd rosetta-helium \
+    && mv rosetta-helium /app \
+    && mv docker/start.sh /app \
+    && cp -R helium-constructor /app
 
 RUN rm -rf /app/builder/rosetta-helium
 
@@ -57,7 +59,7 @@ ENV COOKIE=blockchain-node \
 COPY --from=node-builder /opt/blockchain-node-build /app/blockchain-node
 COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
 COPY --from=rosetta-builder /app/start.sh /app/start.sh
-COPY --from=rosetta-builder /app/helium-builder /app/helium-builder
+COPY --from=rosetta-builder /app/helium-constructor /app/helium-constructor
 
 RUN cd /app/helium-constructor \
     && npm install \
