@@ -35,6 +35,7 @@ ENV PATH="/usr/local/go/bin:$PATH" \
 
 RUN git clone https://github.com/syuan100/rosetta-helium \
     && cd rosetta-helium \
+    && git checkout 3c302059246badbe51c2adb5007b6e0ea3287bef \
     && go build -o rosetta-helium \
     && mv rosetta-helium /app/rosetta-helium \
     && mv docker/start.sh /app/start.sh \
