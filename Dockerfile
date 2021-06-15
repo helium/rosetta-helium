@@ -33,16 +33,18 @@ ENV PATH="/usr/local/go/bin:$PATH" \
     GOPATH=/opt/go/ \
     PATH=$PATH:$GOPATH/bin 
 
-COPY . /app/rosetta-helium-builder
-WORKDIR /app/rosetta-helium-builder
+RUN git clone https://github.com/syuan100/rosetta-helium \
+    && cd rosetta-helium \
+    && go build -o rosetta-helium \
+    && mv rosetta-helium /app/rosetta-helium \
+    && mv docker/start.sh /app/start.sh \
+    && mv helium-constructor /app/helium-constructor
 
-RUN go build -o rosetta-helium \
- && mv rosetta-helium /app/rosetta-helium \
- && rm -rf /app/rosetta-helium-builder
+RUN rm -rf /app/builder/rosetta-helium
 
 ####
 FROM erlang:22.3.2-alpine as runner
-RUN apk add --no-cache --update --virtual .build-deps bash gcc openssl grep dbus gmp libsodium
+RUN apk add --no-cache --update --virtual .build-deps bash gcc openssl grep dbus gmp libsodium npm
 
 ENV COOKIE=blockchain-node \
     # Write files generated during startup to /tmp
@@ -53,7 +55,12 @@ ENV COOKIE=blockchain-node \
 
 COPY --from=node-builder /opt/blockchain-node-build /app/blockchain-node
 COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
-COPY ./docker/start.sh /app
+COPY --from=rosetta-builder /app/start.sh /app/start.sh
+COPY --from=rosetta-builder /app/helium-builder /app/helium-builder
+
+RUN cd /app/helium-constructor \
+    && npm install \
+    && npm run build
 
 RUN chmod +x /app/start.sh \
  && cat /app/blockchain-node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > lbs.txt
