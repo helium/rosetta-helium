@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -42,4 +43,26 @@ func CombineTransaction(unsignedTxn string, signatures []*types.Signature) (*typ
 	return &types.ConstructionCombineResponse{
 		SignedTransaction: signedTransaction,
 	}, nil
+}
+
+func ParseTransaction(rawTxn string, signed bool) ([]*types.Operation, *types.Error) {
+	var jsonData = []byte(fmt.Sprintf(`{ "raw_transaction": "%s", "signed": %t }`, rawTxn, signed))
+
+	var payload map[string]interface{}
+	resp, ctErr := http.Post("http://localhost:3000/parse-tx", "application/json", bytes.NewBuffer(jsonData))
+	if ctErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, ctErr)
+	}
+	defer resp.Body.Close()
+	dErr := json.NewDecoder(resp.Body).Decode(&payload)
+	if dErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, dErr)
+	}
+
+	operations, oErr := OperationsFromTx(payload)
+	if oErr != nil {
+		return nil, oErr
+	}
+
+	return operations, nil
 }

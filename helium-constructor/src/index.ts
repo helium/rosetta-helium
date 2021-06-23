@@ -68,6 +68,38 @@ app.post('/combine-tx', function(req: express.Request, res: express.Response) {
   }
 });
 
+app.post('/parse-tx', function(req: express.Request, res: express.Response) {
+  try {
+    const rawTxn:string = req.body["raw_transaction"];
+    const signed:boolean = req.body["signed"];
+    const txnType:string = Transaction.stringType(rawTxn);
+
+    switch (txnType) {
+      case "paymentV2":
+        const payment:PaymentV2 = PaymentV2.fromString(rawTxn)
+        res.status(200).send(payment);
+      default:
+        res.status(500);
+    }
+
+
+
+    // switch (unsignedTxnType) {
+    //   case "paymentV2":
+    //     const signature:string = req.body["signatures"][0]["hex_bytes"];
+    //     const payment:PaymentV2 = PaymentV2.fromString(rawUnsignedTxn);
+    //     payment.signature = Uint8Array.from(Buffer.from(signature, "hex"));
+    //     res.status(200).send({"signed_transaction": payment.toString()});
+    //     break;
+    //   default:
+    //     res.status(500).send({"error": "error"});
+    //     break;
+    // }
+  } catch(e:any) {
+    res.status(500).send(e);
+  }
+});
+
 app.get('/chain-vars', asyncHandler(async function(req: express.Request, res: express.Response) {
   const client:Client = new Client();
   const vars = await client.vars.get();

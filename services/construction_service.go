@@ -64,7 +64,14 @@ func (s *ConstructionAPIService) ConstructionParse(
 	ctx context.Context,
 	request *types.ConstructionParseRequest,
 ) (*types.ConstructionParseResponse, *types.Error) {
-	return nil, nil
+	operations, err := helium.ParseTransaction(request.Transaction, request.Signed)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.ConstructionParseResponse{
+		Operations: operations,
+	}, nil
 }
 
 func (s *ConstructionAPIService) ConstructionPayloads(
