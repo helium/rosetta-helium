@@ -2,6 +2,7 @@ package helium
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -77,5 +78,97 @@ func OpsToTransaction(operations []*types.Operation) (*MetadataOptions, *types.E
 		return &preprocessedTransaction, nil
 	default:
 		return nil, WrapErr(ErrUnclearIntent, errors.New("supported transactions cannot start with "+operations[0].Type))
+	}
+}
+
+func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Error) {
+	switch txn["type"] {
+
+	case AddGatewayV1Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		return AddGatewayV1(
+			fmt.Sprint(txn["payer"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+			fmt.Sprint(txn["gateway"]),
+			fmt.Sprint(txn["owner"]),
+			utils.MapToInt64(txn["fee"]),
+			utils.MapToInt64(txn["staking_fee"]))
+
+	case AssertLocationV1Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		return AssertLocationV1(
+			utils.MapToInt64(txn["fee"]),
+			fmt.Sprint(txn["gateway"]),
+			fmt.Sprint(txn["location"]),
+			fmt.Sprint(txn["owner"]),
+			fmt.Sprint(txn["payer"]),
+			utils.MapToInt64(txn["staking_fee"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol)
+
+	case AssertLocationV2Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		return AssertLocationV2(
+			utils.MapToInt64(txn["elevation"]),
+			utils.MapToInt64(txn["fee"]),
+			utils.MapToInt64(txn["gain"]),
+			fmt.Sprint(txn["gateway"]),
+			fmt.Sprint(txn["location"]),
+			fmt.Sprint(txn["owner"]),
+			fmt.Sprint(txn["payer"]),
+			utils.MapToInt64(txn["staking_fee"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol)
+
+	case PaymentV1Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
+		return PaymentV1(
+			fmt.Sprint(txn["payer"]),
+			fmt.Sprint(txn["payee"]),
+			int64(txn["amount"].(float64)),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol)
+
+	case PaymentV2Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
+		var payments []*Payment
+		for _, p := range txn["payments"].([]interface{}) {
+			payments = append(payments, &Payment{
+				Payee:  fmt.Sprint(p.(map[string]interface{})["payee"]),
+				Amount: utils.MapToInt64(int64(p.(map[string]interface{})["amount"].(float64))),
+			})
+		}
+		return PaymentV2(
+			fmt.Sprint(txn["payer"]),
+			payments,
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+		)
+
+	case RewardsV1Txn, RewardsV2Txn:
+		// rewards_v1 and rewards_v2 have the same structure
+		return RewardsV1(
+			txn["rewards"].([]interface{}),
+		)
+
+	case SecurityCoinbaseV1Txn:
+		return SecurityCoinbaseV1(
+			fmt.Sprint(txn["payee"]),
+			int64(txn["amount"].(float64)),
+		)
+
+	case SecurityExchangeV1Txn:
+		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
+		return SecurityExchangeV1(
+			fmt.Sprint(txn["payer"]),
+			fmt.Sprint(txn["payee"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+			int64(txn["amount"].(float64)),
+		)
+
+	default:
+		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
 	}
 }

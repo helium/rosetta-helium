@@ -1,9 +1,11 @@
 import { Keypair, Address } from '@helium/crypto'
 import proto from '@helium/proto'
+import * as utils from './utils'
 import { PaymentV2, PaymentV1, Transaction } from '@helium/transactions'
 import { Client } from '@helium/http'
 import * as express from "express"
 import * as http from "http"
+import { PaymentV2Json, PaymentJson } from './transaction_types'
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -22,7 +24,7 @@ app.post('/create-tx', function(req: express.Request, res: express.Response) {
         const payments = []
         req.body["options"]["helium_metadata"]["payments"].forEach(payment => {
           payments.push({
-            "payee": payment["payee"],
+            "payee": Address.fromB58(payment["payee"]),
             "amount": payment["amount"]
           })
         });
@@ -76,8 +78,9 @@ app.post('/parse-tx', function(req: express.Request, res: express.Response) {
 
     switch (txnType) {
       case "paymentV2":
-        const payment:PaymentV2 = PaymentV2.fromString(rawTxn)
-        res.status(200).send(payment);
+        const paymentV2:PaymentV2 = PaymentV2.fromString(rawTxn);
+        const payload:PaymentV2Json = utils.paymentV2toJson(paymentV2);
+        res.status(200).send(payload);
       default:
         res.status(500);
     }
