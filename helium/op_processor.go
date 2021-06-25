@@ -82,10 +82,11 @@ func OpsToTransaction(operations []*types.Operation) (*MetadataOptions, *types.E
 }
 
 func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Error) {
+	hash := fmt.Sprint(txn["hash"])
 	switch txn["type"] {
 
 	case AddGatewayV1Txn:
-		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
 		return AddGatewayV1(
 			fmt.Sprint(txn["payer"]),
 			feeDetails.Amount,
@@ -96,7 +97,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			utils.MapToInt64(txn["staking_fee"]))
 
 	case AssertLocationV1Txn:
-		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
 		return AssertLocationV1(
 			utils.MapToInt64(txn["fee"]),
 			fmt.Sprint(txn["gateway"]),
@@ -108,7 +109,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			feeDetails.Currency.Symbol)
 
 	case AssertLocationV2Txn:
-		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
 		return AssertLocationV2(
 			utils.MapToInt64(txn["elevation"]),
 			utils.MapToInt64(txn["fee"]),
@@ -122,7 +123,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			feeDetails.Currency.Symbol)
 
 	case PaymentV1Txn:
-		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		return PaymentV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),
@@ -131,7 +132,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			feeDetails.Currency.Symbol)
 
 	case PaymentV2Txn:
-		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		var payments []*Payment
 		for _, p := range txn["payments"].([]interface{}) {
 			payments = append(payments, &Payment{
@@ -159,7 +160,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		)
 
 	case SecurityExchangeV1Txn:
-		feeDetails := GetFee(fmt.Sprint(txn["hash"]), utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]), fmt.Sprint(txn["payer"]))
 		return SecurityExchangeV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),

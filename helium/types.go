@@ -334,6 +334,7 @@ type Fee struct {
 	Amount   int64
 	Payer    string
 	Currency *types.Currency
+	Estimate bool
 }
 
 type Reward struct {
