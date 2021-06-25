@@ -12,7 +12,7 @@ function paymentV2toJson(p:PaymentV2):PaymentV2Json {
         })
     })
     const paymentV2Json:PaymentV2Json = {
-        type: "paymentV2",
+        type: "payment_v2",
         payer: p.payer.b58,
         nonce: p.nonce,
         fee: p.fee,
