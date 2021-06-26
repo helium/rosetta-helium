@@ -1,4 +1,3 @@
-import { Address } from "@helium/crypto";
 import { PaymentV2 } from "@helium/transactions"
 import { PaymentJson, PaymentV2Json } from "./transaction_types"
 
