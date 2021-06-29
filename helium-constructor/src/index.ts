@@ -23,9 +23,17 @@ app.post('/create-tx', function(req: express.Request, res: express.Response) {
       case "payment_v2":
         const payments = []
         req.body["options"]["helium_metadata"]["payments"].forEach(payment => {
+          
+          // Ensure 8-byte base64 encoded memo is available for each payment to generate proper signature
+          const memo = payment["memo"] ? payment["memo"] : "MDAwMDAwMDA=";
+          if (Buffer.from(memo, "base64").length != 8) {
+            res.status(200).send({"error": "invalid memo" });
+          }
+
           payments.push({
             "payee": Address.fromB58(payment["payee"]),
-            "amount": payment["amount"]
+            "amount": payment["amount"],
+            "memo": memo
           })
         });
 
