@@ -138,5 +138,16 @@ func (s *ConstructionAPIService) ConstructionSubmit(
 	ctx context.Context,
 	request *types.ConstructionSubmitRequest,
 ) (*types.TransactionIdentifierResponse, *types.Error) {
-	return nil, nil
+	submittedTxnHash, sErr := helium.SubmitTransaction(request.SignedTransaction)
+	if sErr != nil {
+		return nil, sErr
+	}
+
+	submitResponse := &types.TransactionIdentifierResponse{
+		TransactionIdentifier: &types.TransactionIdentifier{
+			Hash: *submittedTxnHash,
+		},
+	}
+
+	return submitResponse, nil
 }

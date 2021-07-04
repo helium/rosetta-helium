@@ -356,7 +356,6 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 }
 
 func CombineTransaction(unsignedTxn string, signatures []*types.Signature) (*types.ConstructionCombineResponse, *types.Error) {
-
 	jsonObject, jErr := json.Marshal(combination{
 		UnsignedTransaction: unsignedTxn,
 		Signatures:          signatures,
@@ -449,4 +448,32 @@ func PayloadGenerator(operations []*types.Operation, metadata map[string]interfa
 			},
 		},
 	}, nil
+}
+
+func SubmitTransaction(signedTransaction string) (*string, *types.Error) {
+	type request struct {
+		SignedTransaction string `json:"signed_transaction,omitempty"`
+	}
+
+	jsonObject, jErr := json.Marshal(request{
+		SignedTransaction: signedTransaction,
+	})
+	if jErr != nil {
+		return nil, WrapErr(ErrUnableToParseTxn, errors.New(`unable to decode combination object into json`))
+	}
+
+	var payload map[string]interface{}
+	resp, rErr := http.Post("http://localhost:3000/submit-tx", "application/json", bytes.NewBuffer(jsonObject))
+	if rErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, rErr)
+	}
+	defer resp.Body.Close()
+	dErr := json.NewDecoder(resp.Body).Decode(&payload)
+	if dErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, dErr)
+	}
+
+	hash := payload["hash"].(string)
+
+	return &hash, nil
 }

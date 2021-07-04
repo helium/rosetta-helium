@@ -2,7 +2,7 @@ import { Keypair, Address } from '@helium/crypto'
 import proto from '@helium/proto'
 import * as utils from './utils'
 import { PaymentV2, PaymentV1, Transaction } from '@helium/transactions'
-import { Client } from '@helium/http'
+import { Client, PendingTransaction } from '@helium/http'
 import * as express from "express"
 import * as http from "http"
 import { PaymentV2Json, PaymentJson } from './transaction_types'
@@ -191,6 +191,16 @@ app.post('/derive', function(req: express.Request, res: express.Response) {
     res.status(500).send({ error: e });
   }
 });
+
+app.post('/submit-tx', asyncHandler(async function(req: express.Request, res: express.Response) {
+  const unsignedTransaction: string = req.body["unsigned_transaction"];
+  const client = new Client();
+
+  const pendingTransaction: PendingTransaction = await client.transactions.submit(unsignedTransaction);
+  res.status(200).send({
+    hash: pendingTransaction.hash
+  });
+}));
 
 http.createServer(app).listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
