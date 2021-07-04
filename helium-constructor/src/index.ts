@@ -41,12 +41,14 @@ app.post('/create-tx', function(req: express.Request, res: express.Response) {
           })
         });
 
+        // Create helium-js transaction
         const unsignedPaymentV2Txn:PaymentV2 = new PaymentV2({
           payer: Address.fromB58(req.body["options"]["helium_metadata"]["payer"]),
           payments: payments,
           nonce: req.body["get_nonce_for"]["nonce"] + 1
         });
 
+        // Construct protobuf payload from helium-js transaction
         const Payment = proto.helium.payment
         const paymentsProto = unsignedPaymentV2Txn.payments.map(({ payee, amount, memo }) => {
           const memoBuffer = memo ? Buffer.from(memo, 'base64') : undefined
@@ -65,6 +67,7 @@ app.post('/create-tx', function(req: express.Request, res: express.Response) {
             nonce: unsignedPaymentV2Txn.nonce
         })
 
+        // Enocde protobuf payload for signing and convert to hex string
         const serialized = proto.helium.blockchain_txn_payment_v2.encode(paymentV2Proto).finish();
         const hex_bytes:string = Buffer.from(serialized).toString("hex");
 
