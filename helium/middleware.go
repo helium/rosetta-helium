@@ -34,6 +34,11 @@ type hashRequest struct {
 	Transaction string `json:"txn"`
 }
 
+type deriveRequest struct {
+	CurveType string `json:"curve_type"`
+	PublicKey string `json:"public_key"`
+}
+
 func CurrentBlockHeight() *int64 {
 	var result int64
 
@@ -128,6 +133,30 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 	}
 
 	return transaction, nil
+}
+
+func GetAddress(curveType types.CurveType, publicKey []byte) (*string, *types.Error) {
+	jsonObject, jErr := json.Marshal(deriveRequest{
+		CurveType: string(curveType),
+		PublicKey: hex.EncodeToString(publicKey),
+	})
+	if jErr != nil {
+		return nil, WrapErr(ErrUnableToParseTxn, errors.New(`unable to decode transaction object into json`))
+	}
+
+	var payload map[string]interface{}
+	resp, ctErr := http.Post("http://localhost:3000/derive", "application/json", bytes.NewBuffer(jsonObject))
+	if ctErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, ctErr)
+	}
+	defer resp.Body.Close()
+	dErr := json.NewDecoder(resp.Body).Decode(&payload)
+	if dErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, dErr)
+	}
+
+	response := payload["address"].(string)
+	return &response, nil
 }
 
 func GetBalance(address string) ([]*types.Amount, *types.Error) {

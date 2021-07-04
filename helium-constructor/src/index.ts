@@ -20,9 +20,10 @@ app.set('port', process.env.PORT || 3000);
 app.post('/create-tx', function(req: express.Request, res: express.Response) {
   try {
     const vars = req.body["chain_vars"];
+    const transactionType = req.body["options"]["transaction_type"];
     Transaction.config(vars); 
 
-    switch (req.body["options"]["transaction_type"]) {
+    switch (transactionType) {
       case "payment_v2":
         const payments = []
         req.body["options"]["helium_metadata"]["payments"].forEach(payment => {
@@ -30,7 +31,7 @@ app.post('/create-tx', function(req: express.Request, res: express.Response) {
           // Ensure 8-byte base64 encoded memo is available for each payment to generate proper signature
           const memo = payment["memo"] ? payment["memo"] : "MDAwMDAwMDA=";
           if (Buffer.from(memo, "base64").length != 8) {
-            res.status(200).send({"error": "invalid memo" });
+            res.status(200).send({ error: "invalid memo" });
           }
 
           payments.push({
@@ -51,11 +52,11 @@ app.post('/create-tx', function(req: express.Request, res: express.Response) {
         res.status(200).send({"unsigned_txn": unsignedPaymentV2Txn.toString(), "type": "payment_v2", "payload": hex_bytes });
         break;
       default:
-        res.status(500);
+        res.status(500).send({ error: "Unrecognized transaction type: " +  transactionType });
         break;
     }
   } catch(e:any) {
-    res.status(500).send(e);
+    res.status(500).send({ error: e });
   }
 });
 
@@ -69,22 +70,20 @@ app.post('/combine-tx', function(req: express.Request, res: express.Response) {
         const signature:string = req.body["signatures"][0]["hex_bytes"];
         const payment:PaymentV2 = PaymentV2.fromString(rawUnsignedTxn);
         payment.signature = Uint8Array.from(Buffer.from(signature, "hex"));
-        res.status(200).send({"signed_transaction": payment.toString()});
+        res.status(200).send({ signed_transaction: payment.toString() });
         break;
       default:
-        res.status(500).send({"error": "error"});
+        res.status(500).send({ error: "unrecognized transaction type: " + unsignedTxnType });
         break;
     }
-    // res.status(200);
   } catch(e:any) {
-    res.status(500).send(e);
+    res.status(500).send({ error: e });
   }
 });
 
 app.post('/parse-tx', function(req: express.Request, res: express.Response) {
   try {
     const rawTxn:string = req.body["raw_transaction"];
-    const signed:boolean = req.body["signed"];
     const txnType:string = Transaction.stringType(rawTxn);
 
     switch (txnType) {
@@ -96,21 +95,8 @@ app.post('/parse-tx', function(req: express.Request, res: express.Response) {
         res.status(500);
     }
 
-
-
-    // switch (unsignedTxnType) {
-    //   case "paymentV2":
-    //     const signature:string = req.body["signatures"][0]["hex_bytes"];
-    //     const payment:PaymentV2 = PaymentV2.fromString(rawUnsignedTxn);
-    //     payment.signature = Uint8Array.from(Buffer.from(signature, "hex"));
-    //     res.status(200).send({"signed_transaction": payment.toString()});
-    //     break;
-    //   default:
-    //     res.status(500).send({"error": "error"});
-    //     break;
-    // }
   } catch(e:any) {
-    res.status(500).send(e);
+    res.status(500).send({ error: e });
   }
 });
 
@@ -120,46 +106,70 @@ app.get('/chain-vars', asyncHandler(async function(req: express.Request, res: ex
   res.status(200).send(vars);
 }));
 
-http.createServer(app).listen(app.get('port'), function() {
-  console.log('Express server listening on port ' + app.get('port'));
+app.post('/hash', function(req: express.Request, res: express.Response){
+  try {
+    const txnString:string = req.body["txn"];
+    const txnType:string = Transaction.stringType(txnString);
+    
+    switch (txnType) {
+      case "paymentV2":
+        const p = PaymentV2.fromString(req.body["txn"]);
+        p.signature = undefined;
+
+        const Payment = proto.helium.payment
+        const payments = p.payments.map(({ payee, amount, memo }) => {
+          const memoBuffer = memo ? Buffer.from(memo, 'base64') : undefined
+          return Payment.create({
+            payee: Uint8Array.from(Buffer.from(payee.bin)),
+            amount,
+            memo: memoBuffer ? JSLong.fromBytes(Array.from(memoBuffer), true, true) : undefined,
+          })
+        });
+
+        const PaymentTxn = proto.helium.blockchain_txn_payment_v2 
+        const PaymentTxnPB = PaymentTxn.create({
+            payer: Uint8Array.from(Buffer.from(p.payer.bin)),
+            payments,
+            fee: p.fee,
+            nonce: p.nonce
+        })
+        const serializedPaymentTxnPB = proto.helium.blockchain_txn_payment_v2.encode(PaymentTxnPB);
+        
+        res.status(200).send({ 
+          hash: base64url.fromBase64(crypto.createHash("sha256").update(serializedPaymentTxnPB.finish()).digest("base64")) 
+        });
+        break;
+      default:
+        res.status(500).send({
+          error: "Transaction not recognized"
+        });
+        break;
+    }
+  } catch(e:any) {
+    res.status(500).send({ error: e });
+  }
 });
 
-app.post('/hash', function(req: express.Request, res: express.Response){
-  const txnString:string = req.body["txn"];
-  const txnType:string = Transaction.stringType(txnString);
-  
-  switch (txnType) {
-    case "paymentV2":
-      const p = PaymentV2.fromString(req.body["txn"]);
-      p.signature = undefined;
+app.post('/derive', function(req: express.Request, res: express.Response) {
+  try {
+    const curveType: string = req.body["curve_type"];
+    const publicKey: string = req.body["public_key"];
 
-      const Payment = proto.helium.payment
-      const payments = p.payments.map(({ payee, amount, memo }) => {
-        const memoBuffer = memo ? Buffer.from(memo, 'base64') : undefined
-        return Payment.create({
-          payee: Uint8Array.from(Buffer.from(payee.bin)),
-          amount,
-          memo: memoBuffer ? JSLong.fromBytes(Array.from(memoBuffer), true, true) : undefined,
-        })
-      });
+    if (curveType != "edwards25519") {
+      throw "curve type " + curveType + " not surrported";
+    }
 
-      const PaymentTxn = proto.helium.blockchain_txn_payment_v2 
-      const PaymentTxnPB = PaymentTxn.create({
-          payer: Uint8Array.from(Buffer.from(p.payer.bin)),
-          payments,
-          fee: p.fee,
-          nonce: p.nonce
-      })
-      const serializedPaymentTxnPB = proto.helium.blockchain_txn_payment_v2.encode(PaymentTxnPB);
-      
-      res.status(200).send({ 
-        hash: base64url.fromBase64(crypto.createHash("sha256").update(serializedPaymentTxnPB.finish()).digest("base64")) 
-      });
-      break;
-    default:
-      res.status(500).send({
-        error: "Transaction not recognized"
-      });
-      break;
+    console.log(Address.fromBin(Buffer.from(publicKey, "hex")).b58);
+
+    res.status(200).send({ 
+      address: Address.fromBin(Buffer.from(publicKey, "hex")).b58
+    });
+    
+  } catch(e:any) {
+    res.status(500).send({ error: e });
   }
+});
+
+http.createServer(app).listen(app.get('port'), function() {
+  console.log('Express server listening on port ' + app.get('port'));
 });

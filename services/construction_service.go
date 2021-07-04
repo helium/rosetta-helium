@@ -37,7 +37,18 @@ func (s *ConstructionAPIService) ConstructionDerive(
 	ctx context.Context,
 	request *types.ConstructionDeriveRequest,
 ) (*types.ConstructionDeriveResponse, *types.Error) {
-	return nil, nil
+	derivedAddress, dErr := helium.GetAddress(request.PublicKey.CurveType, request.PublicKey.Bytes)
+	if dErr != nil {
+		return nil, dErr
+	}
+
+	deriveResponse := &types.ConstructionDeriveResponse{
+		AccountIdentifier: &types.AccountIdentifier{
+			Address: *derivedAddress,
+		},
+	}
+
+	return deriveResponse, nil
 }
 
 func (s *ConstructionAPIService) ConstructionHash(
