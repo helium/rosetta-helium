@@ -47,7 +47,26 @@ app.post('/create-tx', function(req: express.Request, res: express.Response) {
           nonce: req.body["get_nonce_for"]["nonce"] + 1
         });
 
-        const hex_bytes:string = Buffer.from(unsignedPaymentV2Txn.serialize()).toString('hex');
+        const Payment = proto.helium.payment
+        const paymentsProto = unsignedPaymentV2Txn.payments.map(({ payee, amount, memo }) => {
+          const memoBuffer = memo ? Buffer.from(memo, 'base64') : undefined
+          return Payment.create({
+            payee: Uint8Array.from(Buffer.from(payee.bin)),
+            amount,
+            memo: memoBuffer ? JSLong.fromBytes(Array.from(memoBuffer), true, true) : undefined,
+          })
+        })
+
+        const PaymentV2Txn = proto.helium.blockchain_txn_payment_v2
+        const paymentV2Proto = PaymentV2Txn.create({
+            payer: unsignedPaymentV2Txn.payer ? Uint8Array.from(Buffer.from(unsignedPaymentV2Txn.payer.bin)) : undefined,
+            payments: paymentsProto,
+            fee: unsignedPaymentV2Txn.fee,
+            nonce: unsignedPaymentV2Txn.nonce
+        })
+
+        const serialized = proto.helium.blockchain_txn_payment_v2.encode(paymentV2Proto).finish();
+        const hex_bytes:string = Buffer.from(serialized).toString("hex");
 
         res.status(200).send({"unsigned_txn": unsignedPaymentV2Txn.toString(), "type": "payment_v2", "payload": hex_bytes });
         break;
