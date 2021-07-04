@@ -193,10 +193,10 @@ app.post('/derive', function(req: express.Request, res: express.Response) {
 });
 
 app.post('/submit-tx', asyncHandler(async function(req: express.Request, res: express.Response) {
-  const unsignedTransaction: string = req.body["unsigned_transaction"];
+  const signedTransaction: string = req.body["signed_transaction"];
   const client = new Client();
 
-  const pendingTransaction: PendingTransaction = await client.transactions.submit(unsignedTransaction);
+  const pendingTransaction: PendingTransaction = await client.transactions.submit(signedTransaction);
   res.status(200).send({
     hash: pendingTransaction.hash
   });
