@@ -30,6 +30,10 @@ type combination struct {
 	Signatures          []*types.Signature `json:"signatures"`
 }
 
+type hashRequest struct {
+	Transaction string `json:"txn"`
+}
+
 func CurrentBlockHeight() *int64 {
 	var result int64
 
@@ -156,6 +160,29 @@ func GetBalance(address string) ([]*types.Amount, *types.Error) {
 	balances = append(balances, amountHNT, amountHST)
 
 	return balances, nil
+}
+
+func GetHash(signedTransaction string) (*string, *types.Error) {
+	jsonObject, jErr := json.Marshal(hashRequest{
+		Transaction: signedTransaction,
+	})
+	if jErr != nil {
+		return nil, WrapErr(ErrUnableToParseTxn, errors.New(`unable to decode transaction object into json`))
+	}
+
+	var payload map[string]interface{}
+	resp, ctErr := http.Post("http://localhost:3000/hash", "application/json", bytes.NewBuffer(jsonObject))
+	if ctErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, ctErr)
+	}
+	defer resp.Body.Close()
+	dErr := json.NewDecoder(resp.Body).Decode(&payload)
+	if dErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, dErr)
+	}
+
+	hash := payload["hash"].(string)
+	return &hash, nil
 }
 
 func GetNonce(address string) (*int64, *types.Error) {

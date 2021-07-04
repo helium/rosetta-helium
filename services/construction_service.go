@@ -44,7 +44,19 @@ func (s *ConstructionAPIService) ConstructionHash(
 	ctx context.Context,
 	request *types.ConstructionHashRequest,
 ) (*types.TransactionIdentifierResponse, *types.Error) {
-	return nil, nil
+	transaction := request.SignedTransaction
+	hash, hErr := helium.GetHash(transaction)
+	if hErr != nil {
+		return nil, hErr
+	}
+
+	response := &types.TransactionIdentifierResponse{
+		TransactionIdentifier: &types.TransactionIdentifier{
+			Hash: *hash,
+		},
+	}
+
+	return response, nil
 }
 
 func (s *ConstructionAPIService) ConstructionMetadata(

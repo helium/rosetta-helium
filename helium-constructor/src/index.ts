@@ -6,6 +6,9 @@ import { Client } from '@helium/http'
 import * as express from "express"
 import * as http from "http"
 import { PaymentV2Json, PaymentJson } from './transaction_types'
+import * as JSLong from "long"
+import * as crypto from "crypto"
+import base64url from "base64url"
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -119,4 +122,44 @@ app.get('/chain-vars', asyncHandler(async function(req: express.Request, res: ex
 
 http.createServer(app).listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
+});
+
+app.post('/hash', function(req: express.Request, res: express.Response){
+  const txnString:string = req.body["txn"];
+  const txnType:string = Transaction.stringType(txnString);
+  
+  switch (txnType) {
+    case "paymentV2":
+      const p = PaymentV2.fromString(req.body["txn"]);
+      p.signature = undefined;
+
+      const Payment = proto.helium.payment
+      const payments = p.payments.map(({ payee, amount, memo }) => {
+        const memoBuffer = memo ? Buffer.from(memo, 'base64') : undefined
+        return Payment.create({
+          payee: Uint8Array.from(Buffer.from(payee.bin)),
+          amount,
+          memo: memoBuffer ? JSLong.fromBytes(Array.from(memoBuffer), true, true) : undefined,
+        })
+      });
+
+      const PaymentTxn = proto.helium.blockchain_txn_payment_v2 
+      const PaymentTxnPB = PaymentTxn.create({
+          payer: Uint8Array.from(Buffer.from(p.payer.bin)),
+          payments,
+          fee: p.fee,
+          nonce: p.nonce
+      })
+      const serializedPaymentTxnPB = proto.helium.blockchain_txn_payment_v2.encode(PaymentTxnPB);
+      
+      res.status(200).send({ 
+        hash: base64url.fromBase64(crypto.createHash("sha256").update(serializedPaymentTxnPB.finish()).digest("base64")) 
+      });
+      break;
+    default:
+      res.status(500).send({
+        error: "Transaction not recognized"
+      });
+      break;
+  }
 });
