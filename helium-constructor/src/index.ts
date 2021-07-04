@@ -1,11 +1,11 @@
-import { Keypair, Address } from '@helium/crypto'
+import { Address } from '@helium/crypto'
 import proto from '@helium/proto'
 import * as utils from './utils'
 import { PaymentV2, PaymentV1, Transaction } from '@helium/transactions'
 import { Client, PendingTransaction } from '@helium/http'
 import * as express from "express"
 import * as http from "http"
-import { PaymentV2Json, PaymentJson } from './transaction_types'
+import { PaymentV2Json } from './transaction_types'
 import * as JSLong from "long"
 import * as crypto from "crypto"
 import base64url from "base64url"
