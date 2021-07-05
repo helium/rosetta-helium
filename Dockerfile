@@ -18,7 +18,7 @@ WORKDIR /usr/src
 # Add our code
 RUN git clone https://github.com/syuan100/blockchain-node \
    && cd blockchain-node \
-   && git checkout 52586988fb4ed4ce81333bf5d4cedcf17fa86292
+   && git checkout syuan100-fee-differentiator
 
 WORKDIR /usr/src/blockchain-node
 
@@ -36,7 +36,7 @@ ENV PATH="/usr/local/go/bin:$PATH" \
 WORKDIR /app/builder
 RUN git clone https://github.com/syuan100/rosetta-helium \
     && cd rosetta-helium \
-    && git checkout 3c302059246badbe51c2adb5007b6e0ea3287bef \
+    && git checkout main \
     && go build -o rosetta-helium
 RUN cd rosetta-helium \
     && mv rosetta-helium /app \
