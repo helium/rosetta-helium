@@ -290,9 +290,11 @@ var (
 	// OperationTypes are all supported base operations
 	// that make up a transaction
 	OperationTypes = []string{
+		AddGatewayOp,
+		AssertLocationOp,
+		CreateHTLCOp,
 		CreditOp,
 		DebitOp,
-		CreateHTLCOp,
 		RedeemHTLCOp,
 	}
 
