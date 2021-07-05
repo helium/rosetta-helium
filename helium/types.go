@@ -322,6 +322,13 @@ type Block struct {
 	Transactions []string `json:"transactions"`
 }
 
+type Peer struct {
+	Local  string `json:"local"`
+	Name   string `json:"name"`
+	P2P    string `json:"p2p"`
+	Remote string `json:"remote"`
+}
+
 type Transaction struct {
 	Hash string `json:"hash"`
 	Type string `json:"type"`

@@ -11,6 +11,7 @@ import (
 	"reflect"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/mitchellh/mapstructure"
 	"github.com/syuan100/rosetta-helium/utils"
 	"github.com/ybbus/jsonrpc"
 )
@@ -353,6 +354,32 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 	}
 
 	return &metadataResponse, nil
+}
+
+func GetPeers() ([]*types.Peer, *types.Error) {
+	var result []map[string]interface{}
+	if err := NodeClient.CallFor(&result, "peer_book_self"); err != nil {
+		return nil, WrapErr(
+			ErrNotFound,
+			err,
+		)
+	}
+
+	peers := result[0]["sessions"].([]interface{})
+	var convertedPeers []*types.Peer
+
+	for _, peer := range peers {
+		var cPeer *Peer
+		cErr := mapstructure.Decode(peer, &cPeer)
+		if cErr != nil {
+			return nil, WrapErr(ErrUnclearIntent, cErr)
+		}
+		convertedPeers = append(convertedPeers, &types.Peer{
+			PeerID: cPeer.P2P,
+		})
+	}
+
+	return convertedPeers, nil
 }
 
 func CombineTransaction(unsignedTxn string, signatures []*types.Signature) (*types.ConstructionCombineResponse, *types.Error) {

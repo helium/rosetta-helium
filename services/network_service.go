@@ -68,6 +68,11 @@ func (s *NetworkAPIService) NetworkStatus(
 		return nil, lbErr
 	}
 
+	peers, pErr := helium.GetPeers()
+	if pErr != nil {
+		return nil, pErr
+	}
+
 	return &types.NetworkStatusResponse{
 		CurrentBlockIdentifier: &types.BlockIdentifier{
 			Index: currentBlock.BlockIdentifier.Index,
@@ -82,7 +87,7 @@ func (s *NetworkAPIService) NetworkStatus(
 			Index: lastBlessedBlock.BlockIdentifier.Index,
 			Hash:  lastBlessedBlock.BlockIdentifier.Hash,
 		},
-		Peers: nil,
+		Peers: peers,
 	}, nil
 }
 
