@@ -9,6 +9,15 @@
   "tip_delay": 300,
   "max_retries": 10,
   "max_sync_concurrency": 2,
+  "construction": {
+    "stale_depth": 3,
+    "broadcast_limit": 5,
+    "constructor_dsl_file": "helium.ros",
+    "end_conditions": {
+      "create_account": 10,
+      "transfer": 20
+    }
+  },
   "data": {
     "historical_balance_enabled": false,
     "reconciliation_disabled": true,
