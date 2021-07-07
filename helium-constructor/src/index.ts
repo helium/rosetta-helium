@@ -128,6 +128,12 @@ app.get('/chain-vars', asyncHandler(async function(req: express.Request, res: ex
   res.status(200).send(vars);
 }));
 
+app.get('/current-height', asyncHandler(async function(req: express.Request, res: express.Response) {
+  const client:Client = new Client();
+  const currentHeight = await client.blocks.getHeight();
+  res.status(200).send({ current_height: currentHeight});
+}));
+
 app.post('/hash', function(req: express.Request, res: express.Response){
   try {
     const txnString:string = req.body["txn"];

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"reflect"
 
@@ -40,14 +39,14 @@ type deriveRequest struct {
 	PublicKey string `json:"public_key"`
 }
 
-func CurrentBlockHeight() *int64 {
+func GetCurrentHeight() (*int64, *types.Error) {
 	var result int64
 
 	if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
-		log.Fatal(err)
+		return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
 	}
 
-	return &result
+	return &result, nil
 }
 
 func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *types.Error) {
@@ -380,6 +379,44 @@ func GetPeers() ([]*types.Peer, *types.Error) {
 	}
 
 	return convertedPeers, nil
+}
+
+func GetSyncStatus() (*types.SyncStatus, *types.Error) {
+	currentHeight, chErr := GetCurrentHeight()
+	if chErr != nil {
+		return nil, chErr
+	}
+
+	targetHeight, thErr := GetTargetHeight()
+	if thErr != nil {
+		return nil, thErr
+	}
+
+	// Consider blockchain syced if the local head is < 100 blocks from remote head
+	synced := (int(*currentHeight) > int(*targetHeight)-100)
+
+	syncStatus := &types.SyncStatus{
+		CurrentIndex: currentHeight,
+		TargetIndex:  targetHeight,
+		Synced:       &synced,
+	}
+	return syncStatus, nil
+}
+
+func GetTargetHeight() (*int64, *types.Error) {
+	var response map[string]interface{}
+	resp, rErr := http.Get("http://localhost:3000/current-height")
+	if rErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, rErr)
+	}
+	defer resp.Body.Close()
+	dErr := json.NewDecoder(resp.Body).Decode(&response)
+	if dErr != nil {
+		return nil, WrapErr(ErrUnclearIntent, dErr)
+	}
+
+	currentHeight := int64(response["current_height"].(float64))
+	return &currentHeight, nil
 }
 
 func CombineTransaction(unsignedTxn string, signatures []*types.Signature) (*types.ConstructionCombineResponse, *types.Error) {

@@ -39,8 +39,13 @@ func (s *AccountAPIService) AccountBalance(
 	ctx context.Context,
 	request *types.AccountBalanceRequest,
 ) (*types.AccountBalanceResponse, *types.Error) {
+	currentHeight, chErr := helium.GetCurrentHeight()
+	if chErr != nil {
+		return nil, chErr
+	}
+
 	currentBlock, cErr := helium.GetBlock(&types.PartialBlockIdentifier{
-		Index: helium.CurrentBlockHeight(),
+		Index: currentHeight,
 	})
 	if cErr != nil {
 		return nil, cErr

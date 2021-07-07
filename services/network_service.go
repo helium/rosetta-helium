@@ -52,8 +52,13 @@ func (s *NetworkAPIService) NetworkStatus(
 	ctx context.Context,
 	request *types.NetworkRequest,
 ) (*types.NetworkStatusResponse, *types.Error) {
+	currentHeight, chErr := helium.GetCurrentHeight()
+	if chErr != nil {
+		return nil, chErr
+	}
+
 	currentBlock, cbErr := helium.GetBlock(&types.PartialBlockIdentifier{
-		Index: helium.CurrentBlockHeight(),
+		Index: currentHeight,
 	})
 
 	if cbErr != nil {
@@ -73,6 +78,11 @@ func (s *NetworkAPIService) NetworkStatus(
 		return nil, pErr
 	}
 
+	syncStatus, sErr := helium.GetSyncStatus()
+	if sErr != nil {
+		return nil, sErr
+	}
+
 	return &types.NetworkStatusResponse{
 		CurrentBlockIdentifier: &types.BlockIdentifier{
 			Index: currentBlock.BlockIdentifier.Index,
@@ -87,7 +97,8 @@ func (s *NetworkAPIService) NetworkStatus(
 			Index: lastBlessedBlock.BlockIdentifier.Index,
 			Hash:  lastBlessedBlock.BlockIdentifier.Hash,
 		},
-		Peers: peers,
+		Peers:      peers,
+		SyncStatus: syncStatus,
 	}, nil
 }
 
