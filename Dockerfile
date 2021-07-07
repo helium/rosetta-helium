@@ -18,7 +18,7 @@ WORKDIR /usr/src
 # Add our code
 RUN git clone https://github.com/syuan100/blockchain-node \
    && cd blockchain-node \
-   && git checkout syuan100-fee-differentiator
+   && git checkout syuan100-rosetta-api
 
 WORKDIR /usr/src/blockchain-node
 
