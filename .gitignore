@@ -1,5 +1,6 @@
 .DS_Store
 helium-data
+helium-logs
 cli-data
 rosetta-helium
 lbs.txt
