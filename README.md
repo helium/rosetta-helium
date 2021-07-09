@@ -68,38 +68,38 @@ Transactions support for reading from the Data API
 
 | API | Implemented |
 |----|-----------|
-| `payment_v1` | [X] |
-| `payment_v2` | [X] |
-| `reward_v1` | [X] |
-| `reward_v2` | [X] |
-| `security_coinbase_v1` | [X] |
-| `security_exchange_v1` | [X] |
-| `token_burn_v1` | [] |
-| `transfer_hotspot_v1` | [] |
-|  `stake_validator_v1` | [] |
-|  `unstake_validator_v1` | [] |
-|  `transfer_validator_v1` | [] |
-| `create_htlc_v1`* | [] |
-|  `redeem_htlc_v1`* | [] |
+| `payment_v1` | :white_check_mark: |
+| `payment_v2` | :white_check_mark: |
+| `reward_v1` | :white_check_mark: |
+| `reward_v2` | :white_check_mark: |
+| `security_coinbase_v1` | :white_check_mark: |
+| `security_exchange_v1` | :white_check_mark: |
+| `token_burn_v1` | TODO |
+| `transfer_hotspot_v1` | TODO |
+|  `stake_validator_v1` | TODO |
+|  `unstake_validator_v1` | TODO |
+|  `transfer_validator_v1` | TODO |
+| `create_htlc_v1`* | TODO |
+|  `redeem_htlc_v1`* | TODO |
 
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
 
 | API | Implemented |
 | --- |-----------|
-| `add_gateway_v1` | [X] |
-| `assert_location_v1` | [X] |
-| `assert_location_v2` | [X] |
-| `oui_v1` | [] |
-| `routing_v1` | [] |
-| `state_channel_open_v1` | [] |
+| `add_gateway_v1` | :white_check_mark: |
+| `assert_location_v1` | :white_check_mark: |
+| `assert_location_v2` | :white_check_mark: |
+| `oui_v1` | TODO |
+| `routing_v1` | TODO |
+| `state_channel_open_v1` | TODO |
 
 ## Construction API transactions
 Transaction support for creation via the construction API
 
 | API | Implemented |
 |-----|-----------|
-| `payment_v2` | [X] |
-| `security_exchange_v1` | [] |
+| `payment_v2` | :white_check_mark: |
+| `security_exchange_v1` | TODO |
 | `create_htlc_v1`* | CONSIDERED |
 | `redeem_htlc_v1`* | CONSIDERED |
 | `stake_validator_v1`* | CONSIDERED |
