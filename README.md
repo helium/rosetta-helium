@@ -68,38 +68,38 @@ Transactions support for reading from the Data API
 
 | API | Implemented |
 |----|-----------|
-| `payment_v1` | [x] |
-| `payment_v2` | [x] |
-| `reward_v1` | [x] |
-| `reward_v2` | [x] |
-| `security_coinbase_v1` | [x] |
-| `security_exchange_v1` | [x] |
-| `token_burn_v1` | [ ] |
-| `transfer_hotspot_v1` | [ ] |
-|  `stake_validator_v1` | [ ] |
-|  `unstake_validator_v1` | [ ] |
-|  `transfer_validator_v1` | [ ] |
-| `create_htlc_v1`* | [ ] |
-|  `redeem_htlc_v1`* | [ ] |
+| `payment_v1` | [X] |
+| `payment_v2` | [X] |
+| `reward_v1` | [X] |
+| `reward_v2` | [X] |
+| `security_coinbase_v1` | [X] |
+| `security_exchange_v1` | [X] |
+| `token_burn_v1` | [] |
+| `transfer_hotspot_v1` | [] |
+|  `stake_validator_v1` | [] |
+|  `unstake_validator_v1` | [] |
+|  `transfer_validator_v1` | [] |
+| `create_htlc_v1`* | [] |
+|  `redeem_htlc_v1`* | [] |
 
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
 
 | API | Implemented |
 | --- |-----------|
-| `add_gateway_v1` | [x] |
-| `assert_location_v1` | [x] |
-| `assert_location_v2` | [x] |
-| `oui_v1` | [ ] |
-| `routing_v1` | [ ] |
-| `state_channel_open_v1` | [ ] |
+| `add_gateway_v1` | [X] |
+| `assert_location_v1` | [X] |
+| `assert_location_v2` | [X] |
+| `oui_v1` | [] |
+| `routing_v1` | [] |
+| `state_channel_open_v1` | [] |
 
 ## Construction API transactions
 Transaction support for creation via the construction API
 
 | API | Implemented |
 |-----|-----------|
-| `payment_v2` | [x] |
-| `security_exchange_v1` | [ ] |
+| `payment_v2` | [X] |
+| `security_exchange_v1` | [] |
 | `create_htlc_v1`* | CONSIDERED |
 | `redeem_htlc_v1`* | CONSIDERED |
 | `stake_validator_v1`* | CONSIDERED |
