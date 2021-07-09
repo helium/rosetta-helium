@@ -76,6 +76,9 @@ Transactions support for reading from the Data API
 | `security_exchange_v1` | DONE | | |
 | `token_burn_v1` | | TODO | |
 | `transfer_hotspot_v1` | | TODO | |
+|  `stake_validator_v1` | | TODO | |
+|  `unstake_validator_v1` | | TODO | |
+|  `transfer_validator_v1` | | TODO | |
 | `create_htlc_v1`* | | TODO | |
 |  `redeem_htlc_v1`* | | TODO | |
 
@@ -95,10 +98,13 @@ Transaction support for creation via the construction API
 
 | API | Implemented | TODO | Notes |
 |-----|:-----------:|:----:|-------|
-| `payment_v2` | | IN PROGRESS | |
+| `payment_v2` | | DONE | |
 | `security_exchange_v1` | | TODO | |
-| `create_htlc_v1`* | | TODO | |
-| `redeem_htlc_v1`* | | TODO | |
+| `create_htlc_v1`* | | CONSIDERED | |
+| `redeem_htlc_v1`* | | CONSIDERED | |
+| `stake_validator_v1`* | | CONSIDERED | |
+| `unstake_validator_v1`* | | CONSIDERED | |
+| `transfer_validator_v1`* | | CONSIDERED | |
 
 ## No Plans to Implement
 
