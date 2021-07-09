@@ -66,45 +66,45 @@ At this point you should be able to run the `rosetta-cli` check from above and g
 ## Data API transactions
 Transactions support for reading from the Data API
 
-| API | Implemented | TODO | Notes |
-|----|:-----------:|:----:|-------|
-| `payment_v1` | DONE | | |
-| `payment_v2` | DONE | | |
-| `reward_v1` | DONE | | |
-| `reward_v2` | DONE | | |
-| `security_coinbase_v1` | DONE | | |
-| `security_exchange_v1` | DONE | | |
-| `token_burn_v1` | | TODO | |
-| `transfer_hotspot_v1` | | TODO | |
-|  `stake_validator_v1` | | TODO | |
-|  `unstake_validator_v1` | | TODO | |
-|  `transfer_validator_v1` | | TODO | |
-| `create_htlc_v1`* | | TODO | |
-|  `redeem_htlc_v1`* | | TODO | |
+| API | Implemented |
+|----|-----------|
+| `payment_v1` | [x] |
+| `payment_v2` | [x] |
+| `reward_v1` | [x] |
+| `reward_v2` | [x] |
+| `security_coinbase_v1` | [x] |
+| `security_exchange_v1` | [x] |
+| `token_burn_v1` | [ ] |
+| `transfer_hotspot_v1` | [ ] |
+|  `stake_validator_v1` | [ ] |
+|  `unstake_validator_v1` | [ ] |
+|  `transfer_validator_v1` | [ ] |
+| `create_htlc_v1`* | [ ] |
+|  `redeem_htlc_v1`* | [ ] |
 
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
 
-| API | Implemented | TODO | Notes |
-| --- |:-----------:|:----:|-------|
-| `add_gateway_v1` | DONE | | |
-| `assert_location_v1` | DONE | | |
-| `assert_location_v2` | DONE | | |
-| `oui_v1` | | TODO | |
-| `routing_v1` | | TODO | |
-| `state_channel_open_v1` | | TODO | |
+| API | Implemented |
+| --- |-----------|
+| `add_gateway_v1` | [x] |
+| `assert_location_v1` | [x] |
+| `assert_location_v2` | [x] |
+| `oui_v1` | [ ] |
+| `routing_v1` | [ ] |
+| `state_channel_open_v1` | [ ] |
 
 ## Construction API transactions
 Transaction support for creation via the construction API
 
-| API | Implemented | TODO | Notes |
-|-----|:-----------:|:----:|-------|
-| `payment_v2` | | DONE | |
-| `security_exchange_v1` | | TODO | |
-| `create_htlc_v1`* | | CONSIDERED | |
-| `redeem_htlc_v1`* | | CONSIDERED | |
-| `stake_validator_v1`* | | CONSIDERED | |
-| `unstake_validator_v1`* | | CONSIDERED | |
-| `transfer_validator_v1`* | | CONSIDERED | |
+| API | Implemented |
+|-----|-----------|
+| `payment_v2` | [x] |
+| `security_exchange_v1` | [ ] |
+| `create_htlc_v1`* | CONSIDERED |
+| `redeem_htlc_v1`* | CONSIDERED |
+| `stake_validator_v1`* | CONSIDERED |
+| `unstake_validator_v1`* | CONSIDERED |
+| `transfer_validator_v1`* | CONSIDERED |
 
 ## No Plans to Implement
 
