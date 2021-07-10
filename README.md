@@ -1,5 +1,7 @@
 **THIS IS NOT PRODUCTION READY. USE AT YOUR OWN RISK.**
 
+[Read the wiki!](https://github.com/syuan100/rosetta-helium/wiki)
+
 # Overview
 Dockerized [Rosetta API](https://www.rosetta-api.org/) implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
 - Rosetta specs: [https://www.rosetta-api.org/](rosetta-api.org)
