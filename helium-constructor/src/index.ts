@@ -187,10 +187,9 @@ app.post('/derive', function(req: express.Request, res: express.Response) {
       throw "curve type " + curveType + " not surrported";
     }
 
-    console.log(Address.fromBin(Buffer.from(publicKey, "hex")).b58);
-
+    // Add '01' as part of hex string for netType (0) and keyType (1)
     res.status(200).send({ 
-      address: Address.fromBin(Buffer.from(publicKey, "hex")).b58
+      address: Address.fromBin(Buffer.from('01'+publicKey, "hex")).b58
     });
     
   } catch(e:any) {
