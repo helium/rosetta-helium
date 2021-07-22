@@ -155,6 +155,9 @@ func GetAddress(curveType types.CurveType, publicKey []byte) (*string, *types.Er
 		return nil, WrapErr(ErrUnclearIntent, dErr)
 	}
 
+	if payload["address"] != nil {
+		return nil, WrapErr(ErrUnableToDerive, errors.New("constructor unable to process"))
+	}
 	response := payload["address"].(string)
 	return &response, nil
 }
