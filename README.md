@@ -112,7 +112,7 @@ Transaction support for creation via the construction API
 
 | API | Implemented | Notes |
 |-----|:-----------:|-------|
-| `payment_v1` | NEVER | Deprecated transactions (construction API only) |
+| `payment_v1` | NEVER | Deprecated transaction (read-only reference in Data API) |
 | `dc_coinbase_v1` | NEVER | DC only transaction |
 | `state_channel_close_v1` | NEVER | DC only transaction |
 | `gen_gateway_v1` | NEVER | Internal blockchain only |
