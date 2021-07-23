@@ -199,9 +199,29 @@ const (
 	// associating a new gateway with an owner
 	AddGatewayOp = "add_gateway_op"
 
-	// AddGatewayOp is used to describe
-	// associating a new gateway with an owner
+	// AssertLocationOp is used to describe
+	// asserting the location of a hotspot
 	AssertLocationOp = "assert_location_op"
+
+	// TransferHotspotOp is used to describe
+	// transferring a hotspot to a new owner
+	TransferHotspotOp = "transfer_hotspot_op"
+
+	// TokenBurnOp is used to describe
+	// a burn of HNT for DC
+	TokenBurnOp = "token_burn_op"
+
+	// StakeValidatorOp is used to describe
+	// staking a new validator
+	StakeValidatorOp = "stake_validator_op"
+
+	// UnstakeValidatorOp is used to describe
+	// unstaking a validator
+	UnstakeValidatorOp = "unstake_validator_op"
+
+	// TransferValidatorOp is used to describe
+	// transferring a validator to a new owner and/or address
+	TransferValidatorOp = "transfer_validator_op"
 
 	// CreateHTLCOp is used to describe
 	// creating an HTLC transaction
@@ -228,6 +248,10 @@ var (
 	// SuccessStatus is the status of any
 	// Helium operation considered successful.
 	SuccessStatus = "SUCCESS"
+
+	// PendingStatus is the status of any
+	// Helium operation considered unsuccessful.
+	PendingStatus = "PENDING"
 
 	// FailureStatus is the status of any
 	// Helium operation considered unsuccessful.
@@ -303,6 +327,10 @@ var (
 		{
 			Status:     SuccessStatus,
 			Successful: true,
+		},
+		{
+			Status:     PendingStatus,
+			Successful: false,
 		},
 		{
 			Status:     FailureStatus,

@@ -141,3 +141,96 @@ func CreateAssertLocationOp(gateway, owner, location string, opIndex int64, meta
 		Metadata: metadata,
 	}, nil
 }
+
+func CreateTransferHotspotOp(buyer, seller, gateway string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	metadata["buyer"] = buyer
+	metadata["seller"] = seller
+	metadata["gateway"] = gateway
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Type:     TransferHotspotOp,
+		Status:   &SuccessStatus,
+		Metadata: metadata,
+	}, nil
+}
+
+func CreateTokenBurnOp(payer, payee string, amount int64, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	metadata["payee"] = payee
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Account: &types.AccountIdentifier{
+			Address: payer,
+		},
+		Amount: &types.Amount{
+			Value:    "-" + fmt.Sprint(amount),
+			Currency: HNT,
+		},
+		Type:     TokenBurnOp,
+		Status:   &SuccessStatus,
+		Metadata: metadata,
+	}, nil
+}
+
+func CreateStakeValidatorOp(owner, ownerSignature, address string, stake int64, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	metadata["owner"] = owner
+	metadata["owner_signature"] = ownerSignature
+	metadata["address"] = address
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Account: &types.AccountIdentifier{
+			Address: owner,
+		},
+		Amount: &types.Amount{
+			Value:    "-" + fmt.Sprint(stake),
+			Currency: HNT,
+		},
+		Type:     StakeValidatorOp,
+		Status:   &SuccessStatus,
+		Metadata: metadata,
+	}, nil
+}
+
+func CreateUnstakeValidatorOp(owner, ownerSignature, address string, stake int64, stakeStatus string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	metadata["owner"] = owner
+	metadata["owner_signature"] = ownerSignature
+	metadata["address"] = address
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Account: &types.AccountIdentifier{
+			Address: owner,
+		},
+		Amount: &types.Amount{
+			Value:    fmt.Sprint(stake),
+			Currency: HNT,
+		},
+		Type:     UnstakeValidatorOp,
+		Status:   &stakeStatus,
+		Metadata: metadata,
+	}, nil
+}
+
+func CreateTransferValidatorOp(newOwner, oldOwner, newAddress, oldAddress, newOwnerSignature, oldOwnerSignature string, stakeAmount, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	metadata["new_owner"] = newOwner
+	metadata["old_owner"] = oldOwner
+	metadata["new_address"] = newAddress
+	metadata["old_address"] = oldAddress
+	metadata["new_owner_signature"] = newOwnerSignature
+	metadata["old_owner_signature"] = oldOwnerSignature
+	metadata["stake_amount"] = stakeAmount
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Type:     TransferValidatorOp,
+		Status:   &SuccessStatus,
+		Metadata: metadata,
+	}, nil
+}

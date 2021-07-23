@@ -210,3 +210,177 @@ func SecurityExchangeV1(payer, payee string, fee int64, feeType string, amount i
 		Fee,
 	}, nil
 }
+
+func TransferHotspotV1(
+	amountToSeller int64,
+	buyer string,
+	fee int64,
+	feeType string,
+	gateway string,
+	seller string,
+) ([]*types.Operation, *types.Error) {
+	ops := []*types.Operation{}
+	index := int64(0)
+
+	TransferHotspot, tErr := CreateTransferHotspotOp(buyer, seller, gateway, index, map[string]interface{}{})
+	if tErr != nil {
+		return nil, tErr
+	}
+	index++
+	ops = append(ops, TransferHotspot)
+
+	if amountToSeller > 0 {
+		Debit, dErr := CreateDebitOp(buyer, amountToSeller, HNT, index, map[string]interface{}{})
+		if dErr != nil {
+			return nil, dErr
+		}
+		index++
+
+		Credit, cErr := CreateCreditOp(seller, amountToSeller, HNT, index, map[string]interface{}{})
+		if cErr != nil {
+			return nil, cErr
+		}
+		index++
+
+		ops = append(ops, Debit, Credit)
+	}
+
+	Fee, fErr := CreateFeeOp(buyer, fee, feeType, index, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	ops = append(ops, Fee)
+
+	return ops, nil
+}
+
+func TokenBurnV1(
+	payer string,
+	payee string,
+	memo string,
+	amount int64,
+	fee int64,
+	feeType string,
+) ([]*types.Operation, *types.Error) {
+	TokenBurn, tErr := CreateTokenBurnOp(payer, payee, amount, 0, map[string]interface{}{})
+	if tErr != nil {
+		return nil, tErr
+	}
+
+	Fee, fErr := CreateFeeOp(payer, fee, feeType, 1, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	return []*types.Operation{
+		TokenBurn,
+		Fee,
+	}, nil
+}
+
+func StakeValidatorV1(
+	owner string,
+	ownerSignature string,
+	address string,
+	stake int64,
+	fee int64,
+	feeType string,
+) ([]*types.Operation, *types.Error) {
+	StakeValidator, sErr := CreateStakeValidatorOp(owner, ownerSignature, address, stake, 0, map[string]interface{}{})
+	if sErr != nil {
+		return nil, sErr
+	}
+
+	Fee, fErr := CreateFeeOp(owner, fee, feeType, 1, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	return []*types.Operation{
+		StakeValidator,
+		Fee,
+	}, nil
+}
+
+func UnstakeValidatorV1(
+	owner string,
+	ownerSignature string,
+	address string,
+	stake int64,
+	releaseHeight int64,
+	fee int64,
+	feeType string,
+) ([]*types.Operation, *types.Error) {
+	stakeStatus := PendingStatus
+	currentHeight, cErr := GetCurrentHeight()
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	if releaseHeight >= *currentHeight {
+		stakeStatus = SuccessStatus
+	}
+
+	Unstake, uErr := CreateUnstakeValidatorOp(owner, ownerSignature, address, stake, stakeStatus, 0, map[string]interface{}{})
+	if uErr != nil {
+		return nil, uErr
+	}
+
+	Fee, fErr := CreateFeeOp(owner, fee, feeType, 1, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	return []*types.Operation{
+		Unstake,
+		Fee,
+	}, nil
+}
+
+func TransferValidatorStakeV1(
+	newOwner string,
+	oldOwner string,
+	newAddress string,
+	oldAddress string,
+	newOwnerSignature string,
+	oldOwnerSignature string,
+	stakeAmount int64,
+	paymentAmount int64,
+	fee int64,
+	feeType string,
+) ([]*types.Operation, *types.Error) {
+	ops := []*types.Operation{}
+	index := int64(0)
+	TransferValidator, tErr := CreateTransferValidatorOp(newOwner, oldOwner, newAddress, oldAddress, newOwnerSignature, oldOwnerSignature, stakeAmount, index, map[string]interface{}{})
+	if tErr != nil {
+		return nil, tErr
+	}
+	index++
+	ops = append(ops, TransferValidator)
+
+	if paymentAmount > int64(0) {
+		Debit, dErr := CreateDebitOp(newOwner, paymentAmount, HNT, index, map[string]interface{}{})
+		if dErr != nil {
+			return nil, dErr
+		}
+		index++
+
+		Credit, cErr := CreateCreditOp(oldOwner, paymentAmount, HNT, index, map[string]interface{}{})
+		if cErr != nil {
+			return nil, cErr
+		}
+		index++
+
+		ops = append(ops, Debit, Credit)
+	}
+
+	Fee, fErr := CreateFeeOp(oldOwner, fee, feeType, index, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	ops = append(ops, Fee)
+
+	return ops, nil
+}
