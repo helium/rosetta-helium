@@ -373,7 +373,6 @@ type Payment struct {
 
 type Fee struct {
 	Amount   int64
-	Payer    string
 	Currency *types.Currency
 	Estimate bool
 }

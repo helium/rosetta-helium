@@ -263,7 +263,6 @@ func GetFee(hash *string, fee int64, payer string) *Fee {
 	if hash == nil {
 		return &Fee{
 			Amount:   fee,
-			Payer:    payer,
 			Currency: DC,
 			Estimate: true,
 		}
@@ -279,7 +278,6 @@ func GetFee(hash *string, fee int64, payer string) *Fee {
 	if err := NodeClient.CallFor(&result, "implicit_burn_get", req); err != nil {
 		return &Fee{
 			Amount:   fee,
-			Payer:    payer,
 			Currency: DC,
 			Estimate: false,
 		}
@@ -287,7 +285,6 @@ func GetFee(hash *string, fee int64, payer string) *Fee {
 
 	feeResult := &Fee{
 		Amount:   int64(result["fee"].(float64)),
-		Payer:    fmt.Sprint(result["payer"]),
 		Currency: HNT,
 	}
 
