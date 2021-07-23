@@ -223,6 +223,10 @@ const (
 	// transferring a validator to a new owner and/or address
 	TransferValidatorOp = "transfer_validator_op"
 
+	// OUIOp is used to describe
+	// creating a new OUI
+	OUIOp = "oui_op"
+
 	// CreateHTLCOp is used to describe
 	// creating an HTLC transaction
 	CreateHTLCOp = "create_htlc_op"

@@ -169,6 +169,9 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			int64(txn["amount"].(float64)),
 		)
 
+	// case TokenBurnV1Txn:
+	// 	feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
 	}

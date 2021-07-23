@@ -111,19 +111,24 @@ func AddGatewayV1(
 	feeType,
 	gateway,
 	owner string,
-	metaBaseFee,
-	metaStakingFee int64,
+	baseFee,
+	stakingFee int64,
 ) ([]*types.Operation, *types.Error) {
 	var AddGatewayOps []*types.Operation
-
-	feeOp, feeErr := CreateFeeOp(payer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": metaBaseFee, "staking_fee": metaStakingFee})
-	if feeErr != nil {
-		return nil, feeErr
-	}
 
 	agwOp, agwErr := CreateAddGatewayOp(gateway, owner, 1, map[string]interface{}{})
 	if agwErr != nil {
 		return nil, agwErr
+	}
+
+	feePayer := owner
+	if (payer != owner) && (payer != "1Wh4bh") && (payer != "") {
+		feePayer = payer
+	}
+
+	feeOp, feeErr := CreateFeeOp(feePayer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": baseFee, "staking_fee": stakingFee})
+	if feeErr != nil {
+		return nil, feeErr
 	}
 
 	AddGatewayOps = append(AddGatewayOps, feeOp, agwOp)
@@ -132,51 +137,51 @@ func AddGatewayV1(
 }
 
 func AssertLocationV1(
-	metaBaseFee int64,
+	baseFee int64,
 	gateway,
 	location string,
 	owner,
 	payer string,
-	metaStakingFee,
+	stakingFee,
 	feeTotal int64,
 	feeType string,
 ) ([]*types.Operation, *types.Error) {
 	var AssertLocationOps []*types.Operation
-
-	feeOp, feeErr := CreateFeeOp(payer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": metaBaseFee, "staking_fee": metaStakingFee})
-	if feeErr != nil {
-		return nil, feeErr
-	}
 
 	alOp, alErr := CreateAssertLocationOp(gateway, owner, location, 1, map[string]interface{}{})
 	if alErr != nil {
 		return nil, alErr
 	}
 
-	AssertLocationOps = append(AssertLocationOps, feeOp, alOp)
+	feePayer := owner
+	if (payer != owner) && (payer != "1Wh4bh") && (payer != "") {
+		feePayer = payer
+	}
+
+	feeOp, feeErr := CreateFeeOp(feePayer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": baseFee, "staking_fee": stakingFee})
+	if feeErr != nil {
+		return nil, feeErr
+	}
+
+	AssertLocationOps = append(AssertLocationOps, alOp, feeOp)
 	return AssertLocationOps, nil
 }
 
 func AssertLocationV2(
 	elevation,
-	metaBaseFee,
+	baseFee,
 	gain int64,
 	gateway,
 	location string,
 	owner,
 	payer string,
-	metaStakingFee,
+	stakingFee,
 	feeTotal int64,
 	feeType string,
 ) ([]*types.Operation, *types.Error) {
 	var AssertLocationOps []*types.Operation
 
-	feeOp, feeErr := CreateFeeOp(payer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": metaBaseFee, "staking_fee": metaStakingFee})
-	if feeErr != nil {
-		return nil, feeErr
-	}
-
-	alOp, alErr := CreateAssertLocationOp(gateway, owner, location, 1, map[string]interface{}{
+	alOp, alErr := CreateAssertLocationOp(gateway, owner, location, 0, map[string]interface{}{
 		"elevation": elevation,
 		"gain":      gain,
 	})
@@ -184,7 +189,17 @@ func AssertLocationV2(
 		return nil, alErr
 	}
 
-	AssertLocationOps = append(AssertLocationOps, feeOp, alOp)
+	feePayer := owner
+	if (payer != owner) && (payer != "1Wh4bh") && (payer != "") {
+		feePayer = payer
+	}
+
+	feeOp, feeErr := CreateFeeOp(feePayer, feeTotal, feeType, 1, map[string]interface{}{"base_fee": baseFee, "staking_fee": stakingFee})
+	if feeErr != nil {
+		return nil, feeErr
+	}
+
+	AssertLocationOps = append(AssertLocationOps, alOp, feeOp)
 	return AssertLocationOps, nil
 }
 
@@ -381,6 +396,39 @@ func TransferValidatorStakeV1(
 	}
 
 	ops = append(ops, Fee)
+
+	return ops, nil
+}
+
+func OUIV1(
+	oui int64,
+	owner string,
+	payer string,
+	filter string,
+	addresses []string,
+	baseFee int64,
+	stakingFee int64,
+	requestedSubnetSize int64,
+	fee int64,
+	feeType string,
+) ([]*types.Operation, *types.Error) {
+	ops := []*types.Operation{}
+	OUI, oErr := CreateOUIOp(oui, owner, payer, filter, addresses, requestedSubnetSize, 0, map[string]interface{}{})
+	if oErr != nil {
+		return nil, oErr
+	}
+
+	feePayer := owner
+	if (payer != owner) && (payer != "1Wh4bh") && (payer != "") {
+		feePayer = payer
+	}
+
+	Fee, fErr := CreateFeeOp(feePayer, fee, feeType, 1, map[string]interface{}{"base_fee": baseFee, "staking_fee": stakingFee})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	ops = append(ops, OUI, Fee)
 
 	return ops, nil
 }

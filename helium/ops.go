@@ -234,3 +234,30 @@ func CreateTransferValidatorOp(newOwner, oldOwner, newAddress, oldAddress, newOw
 		Metadata: metadata,
 	}, nil
 }
+
+func CreateOUIOp(
+	oui int64,
+	owner string,
+	payer string,
+	filter string,
+	addresses []string,
+	requestedSubnetSize int64,
+	opIndex int64,
+	metadata map[string]interface{},
+) (*types.Operation, *types.Error) {
+	metadata["oui"] = oui
+	metadata["owner"] = owner
+	metadata["payer"] = payer
+	metadata["filter"] = filter
+	metadata["addresses"] = addresses
+	metadata["requested_subnet_size"] = requestedSubnetSize
+
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Type:     OUIOp,
+		Status:   &SuccessStatus,
+		Metadata: metadata,
+	}, nil
+}
