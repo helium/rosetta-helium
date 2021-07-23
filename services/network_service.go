@@ -88,7 +88,7 @@ func (s *NetworkAPIService) NetworkStatus(
 			Index: currentBlock.BlockIdentifier.Index,
 			Hash:  currentBlock.BlockIdentifier.Hash,
 		},
-		CurrentBlockTimestamp: currentBlock.Timestamp * 1000,
+		CurrentBlockTimestamp: currentBlock.Timestamp,
 		GenesisBlockIdentifier: &types.BlockIdentifier{
 			Index: lastBlessedBlock.BlockIdentifier.Index,
 			Hash:  lastBlessedBlock.BlockIdentifier.Hash,

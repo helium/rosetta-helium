@@ -95,7 +95,7 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 			Index: result.Height,
 			Hash:  result.Hash,
 		},
-		Timestamp:    result.Time,
+		Timestamp:    result.Time * 1000,
 		Transactions: processedTxs,
 		Metadata:     nil,
 	}

@@ -6,7 +6,7 @@
   "online_url": "http://localhost:8080",
   "data_directory": "helium-data",
   "http_timeout": 2000,
-  "tip_delay": 300,
+  "tip_delay": 1200,
   "max_retries": 10,
   "max_sync_concurrency": 2,
   "construction": {

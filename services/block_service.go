@@ -18,7 +18,6 @@ import (
 	"context"
 	"errors"
 	"strconv"
-	"time"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -82,7 +81,7 @@ func (s *BlockAPIService) Block(
 				Index: previousBlockIndex,
 				Hash:  previousBlock.BlockIdentifier.Hash,
 			},
-			Timestamp:    time.Now().UnixNano() / 1000000,
+			Timestamp:    requestedBlock.Timestamp,
 			Transactions: requestedBlock.Transactions,
 		},
 	}, nil
