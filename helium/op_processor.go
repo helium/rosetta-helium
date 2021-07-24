@@ -235,6 +235,13 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		)
 
 	default:
+		for _, types := range TransactionTypes {
+			if fmt.Sprint(txn["type"]) == types {
+				return PassthroughTxn(
+					txn,
+				)
+			}
+		}
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found: "+fmt.Sprint(txn["type"])))
 	}
 }

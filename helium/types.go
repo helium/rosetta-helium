@@ -263,6 +263,10 @@ const (
 	// creating an HTLC transaction
 	RedeemHTLCOp = "redeem_htlc_op"
 
+	// PassthroughOp is used to describe
+	// passthrough transactions
+	PassthroughOp = "passthrough_op"
+
 	// HistoricalBalanceSupported is whether
 	// historical balance is supported.
 	HistoricalBalanceSupported = false
@@ -367,6 +371,7 @@ var (
 		TransferValidatorStakeOp,
 		StateChannelOpenOp,
 		OUIOp,
+		PassthroughOp,
 	}
 
 	// OperationStatuses are all supported operation statuses.

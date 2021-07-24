@@ -405,3 +405,13 @@ func FeeOnlyTxn(
 
 	return ops, nil
 }
+
+func PassthroughTxn(metadata map[string]interface{}) ([]*types.Operation, *types.Error) {
+	MainOp, mErr := CreateGenericOp(PassthroughOp, SuccessStatus, 0, metadata)
+	if mErr != nil {
+		return nil, mErr
+	}
+	return []*types.Operation{
+		MainOp,
+	}, nil
+}
