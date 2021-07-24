@@ -111,6 +111,10 @@ const (
 	// the election of a new consensus group
 	ConsensusGroupV1Txn = "consensus_group_v1"
 
+	// ConsensusGroupFailiureV1Txn is used to describe
+	// the failure to elect a new consensus group
+	ConsensusGroupFailureV1Txn = "consensus_group_failure_v1"
+
 	// CreateHTLCV1Txn is used to describe
 	// creating a hashed timelock
 	CreateHTLCV1Txn = "create_htlc_v1"
@@ -319,6 +323,7 @@ var (
 		CoinbaseTxn,
 		DCCoinbaseV1Txn,
 		ConsensusGroupV1Txn,
+		ConsensusGroupFailureV1Txn,
 		CreateHTLCV1Txn,
 		POCRequestV1Txn,
 		TokenBurnV1Txn,
@@ -338,6 +343,9 @@ var (
 		StakeValidatorV1Txn,
 		PriceOracleV1Txn,
 		TransferHotspotV1Txn,
+		StakeValidatorV1Txn,
+		UnstakeValidatorV1Txn,
+		TransferValidatorStakeV1Txn,
 	}
 
 	// OperationTypes are all supported base operations
@@ -349,6 +357,16 @@ var (
 		CreditOp,
 		DebitOp,
 		RedeemHTLCOp,
+		RewardOp,
+		RoutingOp,
+		FeeOp,
+		TransferHotspotOp,
+		TokenBurnOp,
+		StakeValidatorOp,
+		UnstakeValidatorOp,
+		TransferValidatorStakeOp,
+		StateChannelOpenOp,
+		OUIOp,
 	}
 
 	// OperationStatuses are all supported operation statuses.
