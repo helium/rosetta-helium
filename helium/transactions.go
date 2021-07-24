@@ -130,7 +130,7 @@ func AddGatewayV1(
 		return nil, feeErr
 	}
 
-	AddGatewayOps = append(AddGatewayOps, feeOp, agwOp)
+	AddGatewayOps = append(AddGatewayOps, agwOp, feeOp)
 
 	return AddGatewayOps, nil
 }
