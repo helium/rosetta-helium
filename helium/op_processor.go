@@ -204,7 +204,37 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			txn,
 		)
 
+	case OUIV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return FeeOnlyTxn(
+			OUIOp,
+			fmt.Sprint(txn["payer"]),
+			fmt.Sprint(txn["owner"]),
+			feeDetails,
+			txn,
+		)
+
+	case RoutingV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return FeeOnlyTxn(
+			RoutingOp,
+			"",
+			fmt.Sprint(txn["owner"]),
+			feeDetails,
+			txn,
+		)
+
+	case StateChannelOpenV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return FeeOnlyTxn(
+			StateChannelOpenOp,
+			"",
+			fmt.Sprint(txn["owner"]),
+			feeDetails,
+			txn,
+		)
+
 	default:
-		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))
+		return nil, WrapErr(ErrNotFound, errors.New("txn type not found: "+fmt.Sprint(txn["type"])))
 	}
 }

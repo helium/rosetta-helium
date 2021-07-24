@@ -207,6 +207,10 @@ const (
 	// a debit from an account (HNT, HST, or DC)
 	RewardOp = "reward_op"
 
+	// RoutingOp is used to describe
+	// routing packets on the network
+	RoutingOp = "routing_op"
+
 	// FeeOp is used to describe
 	// a transaction fee (Negative HNT or DC)
 	FeeOp = "fee_op"
@@ -238,6 +242,10 @@ const (
 	// TransferValidatorStakeOp is used to describe
 	// transferring a validator to a new owner and/or address
 	TransferValidatorStakeOp = "transfer_validator_op"
+
+	// StateChannelOpenOp is used to describe
+	// opening a state channel
+	StateChannelOpenOp = "state_channel_open_op"
 
 	// OUIOp is used to describe
 	// creating a new OUI

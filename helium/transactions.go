@@ -378,14 +378,15 @@ func TransferValidatorStakeV1(
 	return ops, nil
 }
 
-func OUIV1(
+func FeeOnlyTxn(
+	opType,
 	payer,
 	owner string,
 	fee *Fee,
 	metadata map[string]interface{},
 ) ([]*types.Operation, *types.Error) {
 	ops := []*types.Operation{}
-	OUI, oErr := CreateGenericOp(OUIOp, SuccessStatus, 0, metadata)
+	MainOp, oErr := CreateGenericOp(opType, SuccessStatus, 0, metadata)
 	if oErr != nil {
 		return nil, oErr
 	}
@@ -400,7 +401,55 @@ func OUIV1(
 		return nil, fErr
 	}
 
-	ops = append(ops, OUI, Fee)
+	ops = append(ops, MainOp, Fee)
 
 	return ops, nil
 }
+
+// func OUIV1(
+// 	payer,
+// 	owner string,
+// 	fee *Fee,
+// 	metadata map[string]interface{},
+// ) ([]*types.Operation, *types.Error) {
+// 	ops := []*types.Operation{}
+// 	OUI, oErr := CreateGenericOp(OUIOp, SuccessStatus, 0, metadata)
+// 	if oErr != nil {
+// 		return nil, oErr
+// 	}
+
+// 	feePayer := owner
+// 	if (payer != owner) && (payer != "1Wh4bh") && (payer != "") {
+// 		feePayer = payer
+// 	}
+
+// 	Fee, fErr := CreateFeeOp(feePayer, fee, 1, map[string]interface{}{})
+// 	if fErr != nil {
+// 		return nil, fErr
+// 	}
+
+// 	ops = append(ops, OUI, Fee)
+
+// 	return ops, nil
+// }
+
+// func RoutingV1(
+// 	owner string,
+// 	fee *Fee,
+// 	metadata map[string]interface{},
+// ) ([]*types.Operation, *types.Error) {
+// 	Routing, oErr := CreateGenericOp(RoutingOp, SuccessStatus, 0, metadata)
+// 	if oErr != nil {
+// 		return nil, oErr
+// 	}
+
+// 	Fee, fErr := CreateFeeOp(owner, fee, 1, map[string]interface{}{})
+// 	if fErr != nil {
+// 		return nil, fErr
+// 	}
+
+// 	return []*types.Operation{
+// 		Routing,
+// 		Fee,
+// 	}, nil
+// }
