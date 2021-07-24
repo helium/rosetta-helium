@@ -262,9 +262,10 @@ func GetOraclePrice(height int64) (*int64, *types.Error) {
 func GetFee(hash *string, DCFeeAmount int64) *Fee {
 	if hash == nil {
 		return &Fee{
-			Amount:   DCFeeAmount,
-			Currency: DC,
-			Estimate: true,
+			Amount:      DCFeeAmount,
+			Currency:    DC,
+			Estimate:    true,
+			DCFeeAmount: DCFeeAmount,
 		}
 	}
 
@@ -277,16 +278,18 @@ func GetFee(hash *string, DCFeeAmount int64) *Fee {
 	req := request{Hash: *hash}
 	if err := NodeClient.CallFor(&result, "implicit_burn_get", req); err != nil {
 		return &Fee{
-			Amount:   DCFeeAmount,
-			Currency: DC,
-			Estimate: false,
+			Amount:      DCFeeAmount,
+			Currency:    DC,
+			Estimate:    false,
+			DCFeeAmount: DCFeeAmount,
 		}
 	}
 
 	feeResult := &Fee{
-		Amount:   int64(result["fee"].(float64)),
-		Currency: HNT,
-		Estimate: false,
+		Amount:      int64(result["fee"].(float64)),
+		Currency:    HNT,
+		Estimate:    false,
+		DCFeeAmount: DCFeeAmount,
 	}
 
 	return feeResult

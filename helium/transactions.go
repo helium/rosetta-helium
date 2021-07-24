@@ -7,18 +7,18 @@ import (
 	"github.com/syuan100/rosetta-helium/utils"
 )
 
-func PaymentV1(payer, payee string, amount, fee int64, feeType string) ([]*types.Operation, *types.Error) {
-	PaymentDebit, pErr := CreateDebitOp(payer, amount, HNT, 0, map[string]interface{}{"credit_category": "payment"})
+func PaymentV1(payer, payee string, amount int64, fee *Fee) ([]*types.Operation, *types.Error) {
+	PaymentDebit, pErr := CreateDebitOp(payer, amount, HNT, 0, map[string]interface{}{"debit_category": "payment"})
 	if pErr != nil {
 		return nil, pErr
 	}
 
-	PaymentCredit, pcErr := CreateCreditOp(payee, amount, HNT, 1, map[string]interface{}{"debit_category": "payment"})
+	PaymentCredit, pcErr := CreateCreditOp(payee, amount, HNT, 1, map[string]interface{}{"credit_category": "payment"})
 	if pcErr != nil {
 		return nil, pcErr
 	}
 
-	Fee, fErr := CreateFeeOp(payer, fee, feeType, 2, map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(payer, fee, 2, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -30,7 +30,7 @@ func PaymentV1(payer, payee string, amount, fee int64, feeType string) ([]*types
 	}, nil
 }
 
-func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]*types.Operation, *types.Error) {
+func PaymentV2(payer string, payments []*Payment, fee *Fee) ([]*types.Operation, *types.Error) {
 	var paymentV2Operations []*types.Operation
 	indexIncrementer := 2
 	for i, p := range payments {
@@ -59,7 +59,7 @@ func PaymentV2(payer string, payments []*Payment, fee int64, feeType string) ([]
 		paymentV2Operations = append(paymentV2Operations, PaymentDebit, PaymentCredit)
 	}
 
-	Fee, fErr := CreateFeeOp(payer, fee, feeType, int64(len(paymentV2Operations)), map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(payer, fee, int64(len(paymentV2Operations)), map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -107,8 +107,7 @@ func SecurityCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.
 
 func AddGatewayV1(
 	payer string,
-	feeTotal int64,
-	feeType,
+	fee *Fee,
 	gateway,
 	owner string,
 	baseFee,
@@ -126,7 +125,7 @@ func AddGatewayV1(
 		feePayer = payer
 	}
 
-	feeOp, feeErr := CreateFeeOp(feePayer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": baseFee, "staking_fee": stakingFee})
+	feeOp, feeErr := CreateFeeOp(feePayer, fee, 0, map[string]interface{}{"fee": baseFee, "staking_fee": stakingFee})
 	if feeErr != nil {
 		return nil, feeErr
 	}
@@ -142,9 +141,8 @@ func AssertLocationV1(
 	location string,
 	owner,
 	payer string,
-	stakingFee,
-	feeTotal int64,
-	feeType string,
+	stakingFee int64,
+	fee *Fee,
 ) ([]*types.Operation, *types.Error) {
 	var AssertLocationOps []*types.Operation
 
@@ -158,7 +156,7 @@ func AssertLocationV1(
 		feePayer = payer
 	}
 
-	feeOp, feeErr := CreateFeeOp(feePayer, feeTotal, feeType, 0, map[string]interface{}{"base_fee": baseFee, "staking_fee": stakingFee})
+	feeOp, feeErr := CreateFeeOp(feePayer, fee, 0, map[string]interface{}{"fee": baseFee, "staking_fee": stakingFee})
 	if feeErr != nil {
 		return nil, feeErr
 	}
@@ -175,9 +173,8 @@ func AssertLocationV2(
 	location string,
 	owner,
 	payer string,
-	stakingFee,
-	feeTotal int64,
-	feeType string,
+	stakingFee int64,
+	fee *Fee,
 ) ([]*types.Operation, *types.Error) {
 	var AssertLocationOps []*types.Operation
 
@@ -194,7 +191,7 @@ func AssertLocationV2(
 		feePayer = payer
 	}
 
-	feeOp, feeErr := CreateFeeOp(feePayer, feeTotal, feeType, 1, map[string]interface{}{"base_fee": baseFee, "staking_fee": stakingFee})
+	feeOp, feeErr := CreateFeeOp(feePayer, fee, 1, map[string]interface{}{"fee": baseFee, "staking_fee": stakingFee})
 	if feeErr != nil {
 		return nil, feeErr
 	}
@@ -203,7 +200,7 @@ func AssertLocationV2(
 	return AssertLocationOps, nil
 }
 
-func SecurityExchangeV1(payer, payee string, fee int64, feeType string, amount int64) ([]*types.Operation, *types.Error) {
+func SecurityExchangeV1(payer, payee string, fee *Fee, amount int64) ([]*types.Operation, *types.Error) {
 	PaymentDebit, pErr := CreateDebitOp(payer, amount, HST, 0, map[string]interface{}{"credit_category": "payment"})
 	if pErr != nil {
 		return nil, pErr
@@ -214,7 +211,7 @@ func SecurityExchangeV1(payer, payee string, fee int64, feeType string, amount i
 		return nil, pcErr
 	}
 
-	Fee, fErr := CreateFeeOp(payer, fee, feeType, 2, map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(payer, fee, 2, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -229,8 +226,7 @@ func SecurityExchangeV1(payer, payee string, fee int64, feeType string, amount i
 func TransferHotspotV1(
 	amountToSeller int64,
 	buyer string,
-	fee int64,
-	feeType string,
+	fee *Fee,
 	gateway string,
 	seller string,
 ) ([]*types.Operation, *types.Error) {
@@ -260,7 +256,7 @@ func TransferHotspotV1(
 		ops = append(ops, Debit, Credit)
 	}
 
-	Fee, fErr := CreateFeeOp(buyer, fee, feeType, index, map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(buyer, fee, index, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -275,15 +271,14 @@ func TokenBurnV1(
 	payee string,
 	memo string,
 	amount int64,
-	fee int64,
-	feeType string,
+	fee *Fee,
 ) ([]*types.Operation, *types.Error) {
 	TokenBurn, tErr := CreateTokenBurnOp(payer, payee, amount, 0, map[string]interface{}{})
 	if tErr != nil {
 		return nil, tErr
 	}
 
-	Fee, fErr := CreateFeeOp(payer, fee, feeType, 1, map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(payer, fee, 1, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -299,15 +294,14 @@ func StakeValidatorV1(
 	ownerSignature string,
 	address string,
 	stake int64,
-	fee int64,
-	feeType string,
+	fee *Fee,
 ) ([]*types.Operation, *types.Error) {
 	StakeValidator, sErr := CreateStakeValidatorOp(owner, ownerSignature, address, stake, 0, map[string]interface{}{})
 	if sErr != nil {
 		return nil, sErr
 	}
 
-	Fee, fErr := CreateFeeOp(owner, fee, feeType, 1, map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(owner, fee, 1, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -324,8 +318,7 @@ func UnstakeValidatorV1(
 	address string,
 	stake int64,
 	releaseHeight int64,
-	fee int64,
-	feeType string,
+	fee *Fee,
 ) ([]*types.Operation, *types.Error) {
 	stakeStatus := PendingStatus
 	currentHeight, cErr := GetCurrentHeight()
@@ -342,7 +335,7 @@ func UnstakeValidatorV1(
 		return nil, uErr
 	}
 
-	Fee, fErr := CreateFeeOp(owner, fee, feeType, 1, map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(owner, fee, 1, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -362,8 +355,7 @@ func TransferValidatorStakeV1(
 	oldOwnerSignature string,
 	stakeAmount int64,
 	paymentAmount int64,
-	fee int64,
-	feeType string,
+	fee *Fee,
 ) ([]*types.Operation, *types.Error) {
 	ops := []*types.Operation{}
 	index := int64(0)
@@ -390,7 +382,7 @@ func TransferValidatorStakeV1(
 		ops = append(ops, Debit, Credit)
 	}
 
-	Fee, fErr := CreateFeeOp(oldOwner, fee, feeType, index, map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(oldOwner, fee, index, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}
@@ -409,8 +401,7 @@ func OUIV1(
 	baseFee int64,
 	stakingFee int64,
 	requestedSubnetSize int64,
-	fee int64,
-	feeType string,
+	fee *Fee,
 ) ([]*types.Operation, *types.Error) {
 	ops := []*types.Operation{}
 	OUI, oErr := CreateOUIOp(oui, owner, payer, filter, addresses, requestedSubnetSize, 0, map[string]interface{}{})
@@ -423,7 +414,7 @@ func OUIV1(
 		feePayer = payer
 	}
 
-	Fee, fErr := CreateFeeOp(feePayer, fee, feeType, 1, map[string]interface{}{"base_fee": baseFee, "staking_fee": stakingFee})
+	Fee, fErr := CreateFeeOp(feePayer, fee, 1, map[string]interface{}{"fee": baseFee, "staking_fee": stakingFee})
 	if fErr != nil {
 		return nil, fErr
 	}

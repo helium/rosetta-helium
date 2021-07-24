@@ -62,38 +62,25 @@ func CreateCreditOp(
 	}, nil
 }
 
-func CreateFeeOp(payer string, fee int64, feeType string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+func CreateFeeOp(payer string, fee *Fee, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
 	var FeeOp *types.Operation
 	var FeeCurrency *types.Currency
 
-	switch feeType {
+	switch fee.Currency.Symbol {
 	case "HNT":
 		FeeCurrency = HNT
+		metadata["debit_category"] = "fee"
 		metadata["implicit_burn"] = true
+		metadata["dc_fee"] = fee.DCFeeAmount
 	case "DC":
-		// No reconciliation for DC fees, this is only an FYI
+		FeeCurrency = DC
+		metadata["debit_category"] = "fee"
 		metadata["implicit_burn"] = false
-		metadata["dc_fee"] = fee
-		return &types.Operation{
-			OperationIdentifier: &types.OperationIdentifier{
-				Index: opIndex,
-			},
-			Type:   DebitOp,
-			Status: &SuccessStatus,
-			Account: &types.AccountIdentifier{
-				Address: payer,
-			},
-			Amount: &types.Amount{
-				Value:    "0",
-				Currency: HNT,
-			},
-			Metadata: metadata,
-		}, nil
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("incorrect or missing feeType"))
 	}
 
-	if fee < 0 {
+	if fee.Amount < 0 {
 		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative fee amount not allowed"))
 	}
 
@@ -107,7 +94,7 @@ func CreateFeeOp(payer string, fee int64, feeType string, opIndex int64, metadat
 			Address: payer,
 		},
 		Amount: &types.Amount{
-			Value:    "-" + fmt.Sprint(fee),
+			Value:    "-" + fmt.Sprint(fee.Amount),
 			Currency: FeeCurrency,
 		},
 		Metadata: metadata,

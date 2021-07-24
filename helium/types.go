@@ -385,9 +385,10 @@ type Payment struct {
 }
 
 type Fee struct {
-	Amount   int64
-	Currency *types.Currency
-	Estimate bool
+	Amount      int64
+	Currency    *types.Currency
+	Estimate    bool
+	DCFeeAmount int64
 }
 
 type Reward struct {
