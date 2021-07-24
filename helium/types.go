@@ -203,6 +203,10 @@ const (
 	// a debit from an account (HNT, HST, or DC)
 	DebitOp = "debit_op"
 
+	// DebitOp is used to describe
+	// a debit from an account (HNT, HST, or DC)
+	RewardOp = "reward_op"
+
 	// FeeOp is used to describe
 	// a transaction fee (Negative HNT or DC)
 	FeeOp = "fee_op"
@@ -231,9 +235,9 @@ const (
 	// unstaking a validator
 	UnstakeValidatorOp = "unstake_validator_op"
 
-	// TransferValidatorOp is used to describe
+	// TransferValidatorStakeOp is used to describe
 	// transferring a validator to a new owner and/or address
-	TransferValidatorOp = "transfer_validator_op"
+	TransferValidatorStakeOp = "transfer_validator_op"
 
 	// OUIOp is used to describe
 	// creating a new OUI

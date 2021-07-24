@@ -89,36 +89,27 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
 		return AddGatewayV1(
 			fmt.Sprint(txn["payer"]),
-			feeDetails,
-			fmt.Sprint(txn["gateway"]),
 			fmt.Sprint(txn["owner"]),
-			utils.MapToInt64(txn["fee"]),
-			utils.MapToInt64(txn["staking_fee"]))
+			feeDetails,
+			txn,
+		)
 
 	case AssertLocationV1Txn:
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
 		return AssertLocationV1(
-			utils.MapToInt64(txn["fee"]),
-			fmt.Sprint(txn["gateway"]),
-			fmt.Sprint(txn["location"]),
-			fmt.Sprint(txn["owner"]),
 			fmt.Sprint(txn["payer"]),
-			utils.MapToInt64(txn["staking_fee"]),
+			fmt.Sprint(txn["owner"]),
 			feeDetails,
+			txn,
 		)
 
 	case AssertLocationV2Txn:
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
 		return AssertLocationV2(
-			utils.MapToInt64(txn["elevation"]),
-			utils.MapToInt64(txn["fee"]),
-			utils.MapToInt64(txn["gain"]),
-			fmt.Sprint(txn["gateway"]),
-			fmt.Sprint(txn["location"]),
-			fmt.Sprint(txn["owner"]),
 			fmt.Sprint(txn["payer"]),
-			utils.MapToInt64(txn["staking_fee"]),
+			fmt.Sprint(txn["owner"]),
 			feeDetails,
+			txn,
 		)
 
 	case PaymentV1Txn:
@@ -169,41 +160,38 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
 		return TokenBurnV1(
 			fmt.Sprint(txn["payer"]),
-			fmt.Sprint(txn["payee"]),
-			fmt.Sprint(txn["memo"]),
 			utils.MapToInt64(txn["amount"]),
 			feeDetails,
+			txn,
 		)
 
 	case TransferHotspotV1Txn:
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
 		return TransferHotspotV1(
-			utils.MapToInt64(txn["amount_to_seller"]),
 			fmt.Sprint(txn["buyer"]),
-			feeDetails,
-			fmt.Sprint(txn["gateway"]),
 			fmt.Sprint(txn["seller"]),
+			utils.MapToInt64(txn["amount_to_seller"]),
+			feeDetails,
+			txn,
 		)
 
 	case StakeValidatorV1Txn:
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
 		return StakeValidatorV1(
 			fmt.Sprint(txn["owner"]),
-			fmt.Sprint(txn["owner_signature"]),
-			fmt.Sprint(txn["address"]),
 			utils.MapToInt64(txn["stake"]),
 			feeDetails,
+			txn,
 		)
 
 	case UnstakeValidatorV1Txn:
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
 		return UnstakeValidatorV1(
 			fmt.Sprint(txn["owner"]),
-			fmt.Sprint(txn["owner_signature"]),
-			fmt.Sprint(txn["address"]),
 			utils.MapToInt64(txn["stake"]),
 			utils.MapToInt64(txn["stake_release_height"]),
 			feeDetails,
+			txn,
 		)
 
 	case TransferValidatorStakeV1Txn:
@@ -211,13 +199,9 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		return TransferValidatorStakeV1(
 			fmt.Sprint(txn["new_owner"]),
 			fmt.Sprint(txn["old_owner"]),
-			fmt.Sprint(txn["new_address"]),
-			fmt.Sprint(txn["old_address"]),
-			fmt.Sprint(txn["new_owner_signature"]),
-			fmt.Sprint(txn["old_owner_signature"]),
-			utils.MapToInt64(txn["stake_amount"]),
 			utils.MapToInt64(txn["payment_amount"]),
 			feeDetails,
+			txn,
 		)
 
 	default:

@@ -7,10 +7,23 @@ import (
 	"github.com/coinbase/rosetta-sdk-go/types"
 )
 
+func CreateGenericOp(opType string, status string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+	return &types.Operation{
+		OperationIdentifier: &types.OperationIdentifier{
+			Index: opIndex,
+		},
+		Type:     opType,
+		Status:   &status,
+		Metadata: metadata,
+	}, nil
+}
+
 func CreateDebitOp(
+	opType,
 	payer string,
 	amount int64,
 	currency *types.Currency,
+	status string,
 	opIndex int64,
 	metadata map[string]interface{},
 ) (*types.Operation, *types.Error) {
@@ -22,8 +35,8 @@ func CreateDebitOp(
 		OperationIdentifier: &types.OperationIdentifier{
 			Index: opIndex,
 		},
-		Type:   DebitOp,
-		Status: &SuccessStatus,
+		Type:   opType,
+		Status: &status,
 		Account: &types.AccountIdentifier{
 			Address: payer,
 		},
@@ -36,9 +49,11 @@ func CreateDebitOp(
 }
 
 func CreateCreditOp(
+	opType,
 	payee string,
 	amount int64,
 	currency *types.Currency,
+	status string,
 	opIndex int64,
 	metadata map[string]interface{},
 ) (*types.Operation, *types.Error) {
@@ -49,8 +64,8 @@ func CreateCreditOp(
 		OperationIdentifier: &types.OperationIdentifier{
 			Index: opIndex,
 		},
-		Type:   CreditOp,
-		Status: &SuccessStatus,
+		Type:   opType,
+		Status: &status,
 		Account: &types.AccountIdentifier{
 			Address: payee,
 		},
@@ -100,151 +115,4 @@ func CreateFeeOp(payer string, fee *Fee, opIndex int64, metadata map[string]inte
 		Metadata: metadata,
 	}
 	return FeeOp, nil
-}
-
-func CreateAddGatewayOp(gateway, owner string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
-	metadata["gateway"] = gateway
-	metadata["owner"] = owner
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: opIndex,
-		},
-		Type:     AddGatewayOp,
-		Status:   &SuccessStatus,
-		Metadata: metadata,
-	}, nil
-}
-
-func CreateAssertLocationOp(gateway, owner, location string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
-	metadata["gateway"] = gateway
-	metadata["owner"] = owner
-	metadata["location"] = location
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: opIndex,
-		},
-		Type:     AssertLocationOp,
-		Status:   &SuccessStatus,
-		Metadata: metadata,
-	}, nil
-}
-
-func CreateTransferHotspotOp(buyer, seller, gateway string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
-	metadata["buyer"] = buyer
-	metadata["seller"] = seller
-	metadata["gateway"] = gateway
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: opIndex,
-		},
-		Type:     TransferHotspotOp,
-		Status:   &SuccessStatus,
-		Metadata: metadata,
-	}, nil
-}
-
-func CreateTokenBurnOp(payer, payee string, amount int64, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
-	metadata["payee"] = payee
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: opIndex,
-		},
-		Account: &types.AccountIdentifier{
-			Address: payer,
-		},
-		Amount: &types.Amount{
-			Value:    "-" + fmt.Sprint(amount),
-			Currency: HNT,
-		},
-		Type:     TokenBurnOp,
-		Status:   &SuccessStatus,
-		Metadata: metadata,
-	}, nil
-}
-
-func CreateStakeValidatorOp(owner, ownerSignature, address string, stake int64, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
-	metadata["owner"] = owner
-	metadata["owner_signature"] = ownerSignature
-	metadata["address"] = address
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: opIndex,
-		},
-		Account: &types.AccountIdentifier{
-			Address: owner,
-		},
-		Amount: &types.Amount{
-			Value:    "-" + fmt.Sprint(stake),
-			Currency: HNT,
-		},
-		Type:     StakeValidatorOp,
-		Status:   &SuccessStatus,
-		Metadata: metadata,
-	}, nil
-}
-
-func CreateUnstakeValidatorOp(owner, ownerSignature, address string, stake int64, stakeStatus string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
-	metadata["owner"] = owner
-	metadata["owner_signature"] = ownerSignature
-	metadata["address"] = address
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: opIndex,
-		},
-		Account: &types.AccountIdentifier{
-			Address: owner,
-		},
-		Amount: &types.Amount{
-			Value:    fmt.Sprint(stake),
-			Currency: HNT,
-		},
-		Type:     UnstakeValidatorOp,
-		Status:   &stakeStatus,
-		Metadata: metadata,
-	}, nil
-}
-
-func CreateTransferValidatorOp(newOwner, oldOwner, newAddress, oldAddress, newOwnerSignature, oldOwnerSignature string, stakeAmount, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
-	metadata["new_owner"] = newOwner
-	metadata["old_owner"] = oldOwner
-	metadata["new_address"] = newAddress
-	metadata["old_address"] = oldAddress
-	metadata["new_owner_signature"] = newOwnerSignature
-	metadata["old_owner_signature"] = oldOwnerSignature
-	metadata["stake_amount"] = stakeAmount
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: opIndex,
-		},
-		Type:     TransferValidatorOp,
-		Status:   &SuccessStatus,
-		Metadata: metadata,
-	}, nil
-}
-
-func CreateOUIOp(
-	oui int64,
-	owner string,
-	payer string,
-	filter string,
-	addresses []string,
-	requestedSubnetSize int64,
-	opIndex int64,
-	metadata map[string]interface{},
-) (*types.Operation, *types.Error) {
-	metadata["oui"] = oui
-	metadata["owner"] = owner
-	metadata["payer"] = payer
-	metadata["filter"] = filter
-	metadata["addresses"] = addresses
-	metadata["requested_subnet_size"] = requestedSubnetSize
-
-	return &types.Operation{
-		OperationIdentifier: &types.OperationIdentifier{
-			Index: opIndex,
-		},
-		Type:     OUIOp,
-		Status:   &SuccessStatus,
-		Metadata: metadata,
-	}, nil
 }
