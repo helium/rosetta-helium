@@ -191,6 +191,10 @@ const (
 	// transferring a validator to a new owner and/or address
 	TransferValidatorStakeV1Txn = "transfer_validator_stake_v1"
 
+	// ValidatorHeartbeatV1Txn is used to describe
+	// when a validator provides proof of liveness
+	ValidatorHeartbeatV1Txn = "validator_heartbeat_v1"
+
 	// PriceOracleV1Txn is used to describe
 	// changing the exchange rate for burning HNT to DCs
 	PriceOracleV1Txn = "price_oracle_v1"
@@ -350,6 +354,7 @@ var (
 		StakeValidatorV1Txn,
 		UnstakeValidatorV1Txn,
 		TransferValidatorStakeV1Txn,
+		ValidatorHeartbeatV1Txn,
 	}
 
 	// OperationTypes are all supported base operations
