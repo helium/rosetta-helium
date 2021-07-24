@@ -157,7 +157,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		)
 
 	case TokenBurnV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
 		return TokenBurnV1(
 			fmt.Sprint(txn["payer"]),
 			utils.MapToInt64(txn["amount"]),
