@@ -118,10 +118,10 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		)
 	}
 
-	operations, _ := TransactionToOps(result)
-	// if oErr != nil {
-	// 	return nil, oErr
-	// }
+	operations, oErr := TransactionToOps(result)
+	if oErr != nil {
+		return nil, oErr
+	}
 
 	transaction := &types.Transaction{
 		TransactionIdentifier: &types.TransactionIdentifier{
