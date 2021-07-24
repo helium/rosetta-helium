@@ -169,8 +169,65 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			int64(txn["amount"].(float64)),
 		)
 
-	// case TokenBurnV1Txn:
-	// 	feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]), fmt.Sprint(txn["payer"]))
+	case TokenBurnV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
+		return TokenBurnV1(
+			fmt.Sprint(txn["payer"]),
+			fmt.Sprint(txn["payee"]),
+			fmt.Sprint(txn["memo"]),
+			int64(txn["amount"].(float64)),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+		)
+
+	case TransferHotspotV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return TransferHotspotV1(
+			int64(txn["amount_to_seller"].(float64)),
+			fmt.Sprint(txn["buyer"]),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+			fmt.Sprint(txn["gateway"]),
+			fmt.Sprint(txn["seller"]),
+		)
+
+	case StakeValidatorV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return StakeValidatorV1(
+			fmt.Sprint(txn["owner"]),
+			fmt.Sprint(txn["owner_signature"]),
+			fmt.Sprint(txn["address"]),
+			int64(txn["stake"].(float64)),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+		)
+
+	case UnstakeValidatorV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return UnstakeValidatorV1(
+			fmt.Sprint(txn["owner"]),
+			fmt.Sprint(txn["owner_signature"]),
+			fmt.Sprint(txn["address"]),
+			int64(txn["stake"].(float64)),
+			int64(txn["stake_release_height"].(float64)),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+		)
+
+	case TransferValidatorStakeV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return TransferValidatorStakeV1(
+			fmt.Sprint(txn["new_owner"]),
+			fmt.Sprint(txn["old_owner"]),
+			fmt.Sprint(txn["new_address"]),
+			fmt.Sprint(txn["old_address"]),
+			fmt.Sprint(txn["new_owner_signature"]),
+			fmt.Sprint(txn["old_owner_signature"]),
+			int64(txn["stake_amount"].(float64)),
+			int64(txn["payment_amount"].(float64)),
+			feeDetails.Amount,
+			feeDetails.Currency.Symbol,
+		)
 
 	default:
 		return nil, WrapErr(ErrNotFound, errors.New("txn type not found"))

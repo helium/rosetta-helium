@@ -175,6 +175,18 @@ const (
 	// closing a state channel on a Helium router
 	StateChannelCloseV1Txn = "state_channel_close_v1"
 
+	// StakeValidatorV1Txn is used to describe
+	// staking a new validator
+	StakeValidatorV1Txn = "stake_validator_v1"
+
+	// UnstakeValidatorV1Txn is used to describe
+	// unstaking a validator
+	UnstakeValidatorV1Txn = "unstake_validator_v1"
+
+	// TransferValidatorStakeV1Txn is used to describe
+	// transferring a validator to a new owner and/or address
+	TransferValidatorStakeV1Txn = "transfer_validator_stake_v1"
+
 	// PriceOracleV1Txn is used to describe
 	// changing the exchange rate for burning HNT to DCs
 	PriceOracleV1Txn = "price_oracle_v1"
@@ -311,6 +323,7 @@ var (
 		SecurityExchangeV1Txn,
 		StateChannelOpenV1Txn,
 		StateChannelCloseV1Txn,
+		StakeValidatorV1Txn,
 		PriceOracleV1Txn,
 		TransferHotspotV1Txn,
 	}
