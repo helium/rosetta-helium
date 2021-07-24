@@ -76,13 +76,13 @@ Transactions support for reading from the Data API
 | `reward_v2` | :white_check_mark: |
 | `security_coinbase_v1` | :white_check_mark: |
 | `security_exchange_v1` | :white_check_mark: |
-| `token_burn_v1` | TODO |
-| `transfer_hotspot_v1` | TODO |
-|  `stake_validator_v1` | TODO |
-|  `unstake_validator_v1` | TODO |
-|  `transfer_validator_v1` | TODO |
-| `create_htlc_v1`* | TODO |
-|  `redeem_htlc_v1`* | TODO |
+| `token_burn_v1` | :white_check_mark: |
+| `transfer_hotspot_v1` | :white_check_mark: |
+|  `stake_validator_v1` | :white_check_mark: |
+|  `unstake_validator_v1` | :white_check_mark: |
+|  `transfer_validator_v1` | :white_check_mark: |
+| `create_htlc_v1`* | Considered |
+|  `redeem_htlc_v1`* | Considered |
 
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
 
@@ -91,9 +91,9 @@ Transactions support for reading from the Data API
 | `add_gateway_v1` | :white_check_mark: |
 | `assert_location_v1` | :white_check_mark: |
 | `assert_location_v2` | :white_check_mark: |
-| `oui_v1` | TODO |
-| `routing_v1` | TODO |
-| `state_channel_open_v1` | TODO |
+| `oui_v1` | :white_check_mark: |
+| `routing_v1` | :white_check_mark: |
+| `state_channel_open_v1` | :white_check_mark: |
 
 ## Construction API transactions
 Transaction support for creation via the construction API
@@ -101,7 +101,7 @@ Transaction support for creation via the construction API
 | API | Implemented |
 |-----|-----------|
 | `payment_v2` | :white_check_mark: |
-| `security_exchange_v1` | TODO |
+| `security_exchange_v1` | CONSIDERED |
 | `create_htlc_v1`* | CONSIDERED |
 | `redeem_htlc_v1`* | CONSIDERED |
 | `stake_validator_v1`* | CONSIDERED |
@@ -119,5 +119,5 @@ Transaction support for creation via the construction API
 | `poc_request_v1`| NEVER | Internal blockchain only |
 | `poc_receipt_v1` | NEVER | Internal blockchain only | 
 | `consensus_group_v1` | NEVER | Internal blockchain only |
-| `vars_v1` | NEVER | |
+| `vars_v1` | NEVER | Internal blockchain only |
 | `price_oracle_v1` | NEVER | Oracle HNT value transactions | 
