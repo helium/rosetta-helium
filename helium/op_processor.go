@@ -126,7 +126,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		return PaymentV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),
-			int64(txn["amount"].(float64)),
+			utils.MapToInt64(txn["amount"]),
 			feeDetails)
 
 	case PaymentV2Txn:
@@ -135,7 +135,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 		for _, p := range txn["payments"].([]interface{}) {
 			payments = append(payments, &Payment{
 				Payee:  fmt.Sprint(p.(map[string]interface{})["payee"]),
-				Amount: utils.MapToInt64(int64(p.(map[string]interface{})["amount"].(float64))),
+				Amount: utils.MapToInt64(p.(map[string]interface{})["amount"]),
 			})
 		}
 		return PaymentV2(
@@ -153,7 +153,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 	case SecurityCoinbaseV1Txn:
 		return SecurityCoinbaseV1(
 			fmt.Sprint(txn["payee"]),
-			int64(txn["amount"].(float64)),
+			utils.MapToInt64(txn["amount"]),
 		)
 
 	case SecurityExchangeV1Txn:
@@ -162,7 +162,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),
 			feeDetails,
-			int64(txn["amount"].(float64)),
+			utils.MapToInt64(txn["amount"]),
 		)
 
 	case TokenBurnV1Txn:
@@ -171,14 +171,14 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),
 			fmt.Sprint(txn["memo"]),
-			int64(txn["amount"].(float64)),
+			utils.MapToInt64(txn["amount"]),
 			feeDetails,
 		)
 
 	case TransferHotspotV1Txn:
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
 		return TransferHotspotV1(
-			int64(txn["amount_to_seller"].(float64)),
+			utils.MapToInt64(txn["amount_to_seller"]),
 			fmt.Sprint(txn["buyer"]),
 			feeDetails,
 			fmt.Sprint(txn["gateway"]),
@@ -191,7 +191,7 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			fmt.Sprint(txn["owner"]),
 			fmt.Sprint(txn["owner_signature"]),
 			fmt.Sprint(txn["address"]),
-			int64(txn["stake"].(float64)),
+			utils.MapToInt64(txn["stake"]),
 			feeDetails,
 		)
 
@@ -201,8 +201,8 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			fmt.Sprint(txn["owner"]),
 			fmt.Sprint(txn["owner_signature"]),
 			fmt.Sprint(txn["address"]),
-			int64(txn["stake"].(float64)),
-			int64(txn["stake_release_height"].(float64)),
+			utils.MapToInt64(txn["stake"]),
+			utils.MapToInt64(txn["stake_release_height"]),
 			feeDetails,
 		)
 
@@ -215,8 +215,8 @@ func TransactionToOps(txn map[string]interface{}) ([]*types.Operation, *types.Er
 			fmt.Sprint(txn["old_address"]),
 			fmt.Sprint(txn["new_owner_signature"]),
 			fmt.Sprint(txn["old_owner_signature"]),
-			int64(txn["stake_amount"].(float64)),
-			int64(txn["payment_amount"].(float64)),
+			utils.MapToInt64(txn["stake_amount"]),
+			utils.MapToInt64(txn["payment_amount"]),
 			feeDetails,
 		)
 

@@ -74,7 +74,7 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 	for i, reward := range rewards {
 		rewardOp, rErr := CreateCreditOp(
 			fmt.Sprint(reward.(map[string]interface{})["account"]),
-			utils.MapToInt64(int64(reward.(map[string]interface{})["amount"].(float64))),
+			utils.MapToInt64(reward.(map[string]interface{})["amount"]),
 			HNT,
 			int64(i),
 			map[string]interface{}{

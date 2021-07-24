@@ -180,12 +180,12 @@ func GetBalance(address string) ([]*types.Amount, *types.Error) {
 	}
 
 	amountHNT := &types.Amount{
-		Value:    fmt.Sprint(int64(result["balance"].(float64))),
+		Value:    fmt.Sprint(utils.MapToInt64(result["balance"])),
 		Currency: HNT,
 	}
 
 	amountHST := &types.Amount{
-		Value:    fmt.Sprint(int64(result["sec_balance"].(float64))),
+		Value:    fmt.Sprint(utils.MapToInt64(result["sec_balance"])),
 		Currency: HST,
 	}
 
@@ -234,7 +234,7 @@ func GetNonce(address string) (*int64, *types.Error) {
 		)
 	}
 
-	nonce = int64(result["nonce"].(float64))
+	nonce = utils.MapToInt64(result["nonce"])
 
 	return &nonce, nil
 }
@@ -286,7 +286,7 @@ func GetFee(hash *string, DCFeeAmount int64) *Fee {
 	}
 
 	feeResult := &Fee{
-		Amount:      int64(result["fee"].(float64)),
+		Amount:      utils.MapToInt64(result["fee"]),
 		Currency:    HNT,
 		Estimate:    false,
 		DCFeeAmount: DCFeeAmount,
@@ -413,7 +413,7 @@ func GetTargetHeight() (*int64, *types.Error) {
 		return nil, WrapErr(ErrUnclearIntent, dErr)
 	}
 
-	currentHeight := int64(response["current_height"].(float64))
+	currentHeight := utils.MapToInt64(response["current_height"])
 	return &currentHeight, nil
 }
 
