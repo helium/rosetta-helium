@@ -118,7 +118,7 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		)
 	}
 
-	operations, oErr := TransactionToOps(result)
+	operations, oErr := TransactionToOps(result, SuccessStatus)
 	if oErr != nil {
 		return nil, oErr
 	}
@@ -155,7 +155,7 @@ func GetAddress(curveType types.CurveType, publicKey []byte) (*string, *types.Er
 		return nil, WrapErr(ErrUnclearIntent, dErr)
 	}
 
-	if payload["address"] != nil {
+	if payload["address"] == nil {
 		return nil, WrapErr(ErrUnableToDerive, errors.New("constructor unable to process"))
 	}
 	response := payload["address"].(string)
@@ -458,7 +458,7 @@ func ParseTransaction(rawTxn string, signed bool) ([]*types.Operation, *types.Er
 		return nil, WrapErr(ErrUnclearIntent, dErr)
 	}
 
-	operations, oErr := TransactionToOps(payload)
+	operations, oErr := TransactionToOps(payload, PendingStatus)
 	if oErr != nil {
 		return nil, oErr
 	}
@@ -506,7 +506,11 @@ func PayloadGenerator(operations []*types.Operation, metadata map[string]interfa
 		UnsignedTransaction: payload["unsigned_txn"].(string),
 		Payloads: []*types.SigningPayload{
 			{
-				Bytes: decodedByteArray,
+				AccountIdentifier: &types.AccountIdentifier{
+					Address: fmt.Sprint(metadata["options"].(map[string]interface{})["helium_metadata"].(map[string]interface{})["payer"]),
+				},
+				Bytes:         decodedByteArray,
+				SignatureType: types.Ed25519,
 			},
 		},
 	}, nil

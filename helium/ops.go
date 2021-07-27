@@ -31,12 +31,11 @@ func CreateDebitOp(
 		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative payment amount not allowed"))
 	}
 
-	return &types.Operation{
+	debitOp := &types.Operation{
 		OperationIdentifier: &types.OperationIdentifier{
 			Index: opIndex,
 		},
-		Type:   opType,
-		Status: &status,
+		Type: opType,
 		Account: &types.AccountIdentifier{
 			Address: payer,
 		},
@@ -45,7 +44,13 @@ func CreateDebitOp(
 			Currency: currency,
 		},
 		Metadata: metadata,
-	}, nil
+	}
+
+	if status != PendingStatus {
+		debitOp.Status = &status
+	}
+
+	return debitOp, nil
 }
 
 func CreateCreditOp(
@@ -60,12 +65,12 @@ func CreateCreditOp(
 	if amount < 0 {
 		return nil, WrapErr(ErrUnableToParseTxn, errors.New("negative payment amount not allowed"))
 	}
-	return &types.Operation{
+
+	creditOp := &types.Operation{
 		OperationIdentifier: &types.OperationIdentifier{
 			Index: opIndex,
 		},
-		Type:   opType,
-		Status: &status,
+		Type: opType,
 		Account: &types.AccountIdentifier{
 			Address: payee,
 		},
@@ -74,10 +79,16 @@ func CreateCreditOp(
 			Currency: currency,
 		},
 		Metadata: metadata,
-	}, nil
+	}
+
+	if status != PendingStatus {
+		creditOp.Status = &status
+	}
+
+	return creditOp, nil
 }
 
-func CreateFeeOp(payer string, fee *Fee, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
+func CreateFeeOp(payer string, fee *Fee, status string, opIndex int64, metadata map[string]interface{}) (*types.Operation, *types.Error) {
 	var FeeOp *types.Operation
 	var FeeCurrency *types.Currency
 
@@ -103,8 +114,7 @@ func CreateFeeOp(payer string, fee *Fee, opIndex int64, metadata map[string]inte
 		OperationIdentifier: &types.OperationIdentifier{
 			Index: opIndex,
 		},
-		Type:   DebitOp,
-		Status: &SuccessStatus,
+		Type: DebitOp,
 		Account: &types.AccountIdentifier{
 			Address: payer,
 		},
@@ -114,5 +124,10 @@ func CreateFeeOp(payer string, fee *Fee, opIndex int64, metadata map[string]inte
 		},
 		Metadata: metadata,
 	}
+
+	if status != PendingStatus {
+		FeeOp.Status = &status
+	}
+
 	return FeeOp, nil
 }
