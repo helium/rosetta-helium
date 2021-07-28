@@ -4,7 +4,7 @@
    "network": "Mainnet"
   },
   "online_url": "http://localhost:8080",
-  "data_directory": "helium-data",
+  "data_directory": "rosetta-data",
   "http_timeout": 2000,
   "tip_delay": 1200,
   "max_retries": 10,
