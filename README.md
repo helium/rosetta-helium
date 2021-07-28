@@ -31,8 +31,12 @@ docker run -d --rm --ulimit "nofile=100000:100000" -v "$(pwd)/helium-data:/data"
 #### Rosetta CLI check
 ```text
 rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.json
+
+rosetta-cli check:construction --configuration-file rosetta-cli-config/mainnet/config.json
 ```
 (Please wait a few minutes for the Helium node to initialize before running this command)
+
+[Read more on using the rosetta-cli.](https://github.com/syuan100/rosetta-helium/wiki/7.-Appendix:-Using-rosetta-cli-for-testing)
 
 # Contributing
 It's annoying to spin up a docker container for every change that you want to make. So for local development, it is recommended that you run each part of the implementation separately.
