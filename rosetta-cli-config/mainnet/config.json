@@ -14,8 +14,8 @@
     "broadcast_limit": 5,
     "constructor_dsl_file": "helium.ros",
     "end_conditions": {
-      "create_account": 10,
-      "transfer": 20
+      "create_account": 1,
+      "transfer": 1
     }
   },
   "data": {

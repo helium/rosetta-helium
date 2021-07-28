@@ -87,14 +87,22 @@ func (s *ConstructionAPIService) ConstructionParse(
 	ctx context.Context,
 	request *types.ConstructionParseRequest,
 ) (*types.ConstructionParseResponse, *types.Error) {
-	operations, err := helium.ParseTransaction(request.Transaction, request.Signed)
+	operations, signer, err := helium.ParseTransaction(request.Transaction, request.Signed)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.ConstructionParseResponse{
+	parseResponse := &types.ConstructionParseResponse{
 		Operations: operations,
-	}, nil
+	}
+
+	if signer != nil {
+		parseResponse.AccountIdentifierSigners = []*types.AccountIdentifier{
+			signer,
+		}
+	}
+
+	return parseResponse, nil
 }
 
 func (s *ConstructionAPIService) ConstructionPayloads(

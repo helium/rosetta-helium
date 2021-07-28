@@ -444,26 +444,32 @@ func CombineTransaction(unsignedTxn string, signatures []*types.Signature) (*typ
 	}, nil
 }
 
-func ParseTransaction(rawTxn string, signed bool) ([]*types.Operation, *types.Error) {
+func ParseTransaction(rawTxn string, signed bool) ([]*types.Operation, *types.AccountIdentifier, *types.Error) {
 	var jsonData = []byte(fmt.Sprintf(`{ "raw_transaction": "%s", "signed": %t }`, rawTxn, signed))
 
 	var payload map[string]interface{}
 	resp, ctErr := http.Post("http://localhost:3000/parse-tx", "application/json", bytes.NewBuffer(jsonData))
 	if ctErr != nil {
-		return nil, WrapErr(ErrUnclearIntent, ctErr)
+		return nil, nil, WrapErr(ErrUnclearIntent, ctErr)
 	}
 	defer resp.Body.Close()
 	dErr := json.NewDecoder(resp.Body).Decode(&payload)
 	if dErr != nil {
-		return nil, WrapErr(ErrUnclearIntent, dErr)
+		return nil, nil, WrapErr(ErrUnclearIntent, dErr)
 	}
 
-	operations, oErr := TransactionToOps(payload, PendingStatus)
+	operations, oErr := TransactionToOps(payload["payload"].(map[string]interface{}), PendingStatus)
 	if oErr != nil {
-		return nil, oErr
+		return nil, nil, oErr
 	}
 
-	return operations, nil
+	if signed {
+		return operations, &types.AccountIdentifier{
+			Address: fmt.Sprint(payload["signer"]),
+		}, nil
+	}
+
+	return operations, nil, nil
 }
 
 func PayloadGenerator(operations []*types.Operation, metadata map[string]interface{}) (*types.ConstructionPayloadsResponse, *types.Error) {

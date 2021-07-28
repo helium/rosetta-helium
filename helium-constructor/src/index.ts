@@ -108,15 +108,19 @@ app.post('/parse-tx', function(req: express.Request, res: express.Response) {
     const rawTxn:string = req.body["raw_transaction"];
     const txnType:string = Transaction.stringType(rawTxn);
 
-    console.log(rawTxn)
-    console.log(txnType)
-
     switch (txnType) {
       case "paymentV2":
         const paymentV2:PaymentV2 = PaymentV2.fromString(rawTxn);
         const payload:PaymentV2Json = utils.paymentV2toJson(paymentV2);
-        console.log(payload)
-        res.status(200).send(payload);
+        const resp:Object = {
+          "payload": payload          
+        }
+        
+        if (req.body["signed"]) {
+          resp["signer"] = payload.payer;
+        }
+
+        res.status(200).send(resp);
       default:
         res.status(500);
     }
