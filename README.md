@@ -1,5 +1,3 @@
-**THIS IS NOT PRODUCTION READY. USE AT YOUR OWN RISK.**
-
 [Read the wiki!](https://github.com/syuan100/rosetta-helium/wiki)
 
 # Overview
