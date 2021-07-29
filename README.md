@@ -26,6 +26,17 @@ Local data is stored in `helium-data`
 docker run -d --rm --init --ulimit "nofile=1000000:1000000" -v "$(pwd)/helium-data:/data" -p 8080:8080 -p 44158:44158 rosetta-helium:latest
 ```
 
+It's HIGHLY recommended that you set the internal/external NAT settings through environment variables for better performance:
+
+`NAT_INTERNAL_IP` -> `172.17.0.X` _X depends on how many docker containers you have_
+`NAT_INTERNAL_PORT` -> `44158` Default port for peering
+`NAT_EXTERNAL_IP` -> Your publicly accessible IP address
+`NAT_EXTERNAL_PORT` -> `44158` Generally would want to keep the same port that you exposed in the command line
+
+```text
+docker run -d --rm --init --ulimit "nofile=1000000:1000000" -v "$(pwd)/helium-data:/data" -p 8080:8080 -p 44158:44158 -e NAT_INTERNAL_IP={{docker_ip}} -e NAT_INTERNAL_PORT={{docker_port}} -e NAT_EXTERNAL_IP={{public_ip}} -e NAT_EXTERNAL_PORT={{public_port}} rosetta-helium:latest
+```
+
 #### Rosetta CLI check
 ```text
 rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.json
