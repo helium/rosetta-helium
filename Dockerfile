@@ -22,9 +22,9 @@ RUN git clone https://github.com/syuan100/blockchain-node \
 
 WORKDIR /usr/src/blockchain-node
 
-RUN ./rebar3 as docker_rosetta tar
+RUN ./rebar3 as devib tar
 RUN mkdir -p /opt/blockchain-node-build \
- && tar -zxvf _build/docker_rosetta/rel/*/*.tar.gz -C /opt/blockchain-node-build
+ && tar -zxvf _build/devib/rel/*/*.tar.gz -C /opt/blockchain-node-build
 
 ####
 FROM erlang:22.3.2-alpine as rosetta-builder
