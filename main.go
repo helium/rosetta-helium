@@ -15,6 +15,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -65,9 +66,21 @@ func NewBlockchainRouter(
 }
 
 func main() {
-	network := &types.NetworkIdentifier{
-		Blockchain: "Helium",
-		Network:    "Mainnet",
+	var testnet bool
+	var network *types.NetworkIdentifier
+
+	flag.BoolVar(&testnet, "testnet", false, "run testnet version of rosetta-helium")
+
+	if !testnet {
+		network = &types.NetworkIdentifier{
+			Blockchain: "Helium",
+			Network:    helium.MainnetNetwork,
+		}
+	} else {
+		network = &types.NetworkIdentifier{
+			Blockchain: "Helium",
+			Network:    helium.TestnetNetwork,
+		}
 	}
 
 	// The asserter automatically rejects incorrectly formatted

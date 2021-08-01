@@ -101,7 +101,7 @@ const (
 
 	// CoinbaseTxn is used to describe
 	// a coinbase transaction.
-	CoinbaseTxn = "COINBASE"
+	CoinbaseTxn = "coinbase_v1"
 
 	// DCCoinbaseV1Txn is used to describe
 	// the initial 10k credits to bring initial miners online.
