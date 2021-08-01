@@ -84,7 +84,7 @@ At this point you should be able to run the `rosetta-cli` check from above and g
 ## Data API transactions
 Transactions support for reading from the Data API
 
-| API | Implemented |
+| Transaction | Implemented |
 |----|-----------|
 | `payment_v1` | :white_check_mark: |
 | `payment_v2` | :white_check_mark: |
@@ -102,7 +102,7 @@ Transactions support for reading from the Data API
 
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
 
-| API | Implemented |
+| Transaction | Implemented |
 | --- |-----------|
 | `add_gateway_v1` | :white_check_mark: |
 | `assert_location_v1` | :white_check_mark: |
@@ -111,10 +111,23 @@ Transactions support for reading from the Data API
 | `routing_v1` | :white_check_mark: |
 | `state_channel_open_v1` | :white_check_mark: |
 
+### Pass-through transactions (No balance changes, only metadata)
+
+| Transaction | Notes |
+|-----|-------|
+| `dc_coinbase_v1` | DC only transaction |
+| `state_channel_close_v1` | DC only transaction |
+| `gen_gateway_v1` | Internal blockchain only |
+| `poc_request_v1` | Internal blockchain only |
+| `poc_receipt_v1` | Internal blockchain only | 
+| `consensus_group_v1` | Internal blockchain only |
+| `vars_v1` | Internal blockchain only |
+| `price_oracle_v1` | Oracle HNT value transactions | 
+
 ## Construction API transactions
 Transaction support for creation via the construction API
 
-| API | Implemented |
+| Transaction | Implemented |
 |-----|-----------|
 | `payment_v2` | :white_check_mark: |
 | `security_exchange_v1` | CONSIDERED |
@@ -123,17 +136,3 @@ Transaction support for creation via the construction API
 | `stake_validator_v1`* | CONSIDERED |
 | `unstake_validator_v1`* | CONSIDERED |
 | `transfer_validator_v1`* | CONSIDERED |
-
-## No Plans to Implement
-
-| API | Implemented | Notes |
-|-----|:-----------:|-------|
-| `payment_v1` | NEVER | Deprecated transaction (read-only reference in Data API) |
-| `dc_coinbase_v1` | NEVER | DC only transaction |
-| `state_channel_close_v1` | NEVER | DC only transaction |
-| `gen_gateway_v1` | NEVER | Internal blockchain only |
-| `poc_request_v1`| NEVER | Internal blockchain only |
-| `poc_receipt_v1` | NEVER | Internal blockchain only | 
-| `consensus_group_v1` | NEVER | Internal blockchain only |
-| `vars_v1` | NEVER | Internal blockchain only |
-| `price_oracle_v1` | NEVER | Oracle HNT value transactions | 
