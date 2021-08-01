@@ -29,8 +29,11 @@ docker run -d --rm --init --ulimit "nofile=1000000:1000000" -v "$(pwd)/helium-da
 It's HIGHLY recommended that you set the internal/external NAT settings through environment variables for better performance:
 
 `NAT_INTERNAL_IP` -> `172.17.0.X` _X depends on how many docker containers you have_
+
 `NAT_INTERNAL_PORT` -> `44158` Default port for peering
+
 `NAT_EXTERNAL_IP` -> Your publicly accessible IP address
+
 `NAT_EXTERNAL_PORT` -> `44158` Generally would want to keep the same port that you exposed in the command line
 
 ```text
