@@ -193,11 +193,13 @@ app.post('/derive', function(req: express.Request, res: express.Response) {
 
     if (curveType != "edwards25519") {
       throw "curve type " + curveType + " not surrported";
-    }
+    } 
 
-    // Add '01' as part of hex string for netType (0) and keyType (1)
+    // Add '11' as part of hex string for first byte
+    // NetType = testnet (1)
+    // KeyType = Ed25519 (1)
     res.status(200).send({ 
-      address: Address.fromBin(Buffer.from('01'+publicKey, "hex")).b58
+      address: Address.fromBin(Buffer.from('11'+publicKey, "hex")).b58
     });
     
   } catch(e:any) {

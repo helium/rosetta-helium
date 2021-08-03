@@ -195,7 +195,9 @@ app.post('/derive', function(req: express.Request, res: express.Response) {
       throw "curve type " + curveType + " not surrported";
     }
 
-    // Add '01' as part of hex string for netType (0) and keyType (1)
+    // Add '01' as part of hex string for first byte
+    // NetType = Mainnet (0)
+    // KeyType = Ed25519 (1)
     res.status(200).send({ 
       address: Address.fromBin(Buffer.from('01'+publicKey, "hex")).b58
     });
