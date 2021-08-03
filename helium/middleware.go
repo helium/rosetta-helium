@@ -458,7 +458,7 @@ func ParseTransaction(rawTxn string, signed bool) ([]*types.Operation, *types.Ac
 		return nil, nil, WrapErr(ErrUnclearIntent, dErr)
 	}
 
-	operations, oErr := TransactionToOps(payload["payload"].(map[string]interface{}), PendingStatus)
+	operations, oErr := TransactionToOps(payload["payload"].(map[string]interface{}), "")
 	if oErr != nil {
 		return nil, nil, oErr
 	}

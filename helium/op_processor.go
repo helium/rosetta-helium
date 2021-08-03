@@ -189,7 +189,7 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
 		return UnstakeValidatorV1(
 			fmt.Sprint(txn["owner"]),
-			utils.MapToInt64(txn["stake"]),
+			utils.MapToInt64(txn["stake_amount"]),
 			utils.MapToInt64(txn["stake_release_height"]),
 			feeDetails,
 			txn,
