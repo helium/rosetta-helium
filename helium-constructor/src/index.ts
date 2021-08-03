@@ -1,8 +1,8 @@
-import { Address } from '@helium/crypto'
+import { Address, NetType } from '@helium/crypto'
 import proto from '@helium/proto'
 import * as utils from './utils'
 import { PaymentV2, PaymentV1, Transaction } from '@helium/transactions'
-import { Client, PendingTransaction } from '@helium/http'
+import { Client, Network, PendingTransaction } from '@helium/http'
 import * as express from "express"
 import * as http from "http"
 import { PaymentV2Json } from './transaction_types'
@@ -13,8 +13,19 @@ import base64url from "base64url"
 const express = require('express');
 const bodyParser = require('body-parser');
 const asyncHandler = require('express-async-handler');
-
 var app = express();
+
+var netType:number;
+var clientType:Network;
+
+if (process.env.NETWORK == "testnet") {
+    netType = 1;
+    clientType = Network.staging;
+} else {
+    netType = 0;
+    clientType = Network.production;
+}
+
 app.use(bodyParser.json());
 app.set('port', process.env.PORT || 3000);
 app.post('/create-tx', function(req: express.Request, res: express.Response) {
@@ -131,13 +142,13 @@ app.post('/parse-tx', function(req: express.Request, res: express.Response) {
 });
 
 app.get('/chain-vars', asyncHandler(async function(req: express.Request, res: express.Response) {
-  const client:Client = new Client();
+  const client:Client = new Client(clientType);
   const vars = await client.vars.get();
   res.status(200).send(vars);
 }));
 
 app.get('/current-height', asyncHandler(async function(req: express.Request, res: express.Response) {
-  const client:Client = new Client();
+  const client:Client = new Client(clientType);
   const currentHeight = await client.blocks.getHeight();
   res.status(200).send({ current_height: currentHeight});
 }));
@@ -195,11 +206,9 @@ app.post('/derive', function(req: express.Request, res: express.Response) {
       throw "curve type " + curveType + " not surrported";
     }
 
-    // Add '01' as part of hex string for first byte
-    // NetType = Mainnet (0)
-    // KeyType = Ed25519 (1)
+    // Add nettype and keytype as part of hex string for first byte
     res.status(200).send({ 
-      address: Address.fromBin(Buffer.from('01'+publicKey, "hex")).b58
+      address: Address.fromBin(Buffer.from(netType+'1'+publicKey, "hex")).b58
     });
     
   } catch(e:any) {
@@ -209,7 +218,7 @@ app.post('/derive', function(req: express.Request, res: express.Response) {
 
 app.post('/submit-tx', asyncHandler(async function(req: express.Request, res: express.Response) {
   const signedTransaction: string = req.body["signed_transaction"];
-  const client = new Client();
+  const client = new Client(clientType);
 
   const pendingTransaction: PendingTransaction = await client.transactions.submit(signedTransaction);
   res.status(200).send({
