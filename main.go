@@ -70,13 +70,16 @@ func main() {
 	var network *types.NetworkIdentifier
 
 	flag.BoolVar(&testnet, "testnet", false, "run testnet version of rosetta-helium")
+	flag.Parse()
 
 	if !testnet {
+		fmt.Println("Initilizing mainnet node...")
 		network = &types.NetworkIdentifier{
 			Blockchain: "Helium",
 			Network:    helium.MainnetNetwork,
 		}
 	} else {
+		fmt.Println("Initilizing testnet node...")
 		network = &types.NetworkIdentifier{
 			Blockchain: "Helium",
 			Network:    helium.TestnetNetwork,

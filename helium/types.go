@@ -16,6 +16,7 @@ package helium
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -27,7 +28,9 @@ import (
 func readLBSfile() *int64 {
 	file, err := os.Open("lbs.txt")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("No lbs.txt found: attempting to set last blessed snapshot as genesis (1)...")
+		tmpLBS := int64(1)
+		return &tmpLBS
 	}
 
 	var buf bytes.Buffer
