@@ -46,7 +46,7 @@ func CreateDebitOp(
 		Metadata: metadata,
 	}
 
-	if status != PendingStatus {
+	if status != "" {
 		debitOp.Status = &status
 	}
 
@@ -81,7 +81,7 @@ func CreateCreditOp(
 		Metadata: metadata,
 	}
 
-	if status != PendingStatus {
+	if status != "" {
 		creditOp.Status = &status
 	}
 
@@ -125,7 +125,7 @@ func CreateFeeOp(payer string, fee *Fee, status string, opIndex int64, metadata 
 		Metadata: metadata,
 	}
 
-	if status != PendingStatus {
+	if status != "" {
 		FeeOp.Status = &status
 	}
 
