@@ -130,6 +130,10 @@ const (
 	// burning HNT for DCs
 	TokenBurnV1Txn = "token_burn_v1"
 
+	// TokenBurnExchangeRateV1Txn is used to describe
+	// the exchange rate for burning HNT for DCs
+	TokenBurnExchangeRateV1Txn = "token_burn_exchange_rate_v1"
+
 	// GenGatewayV1Txn is used to describe
 	// initial group of miners that bootstrapped the blockchain
 	GenGatewayV1Txn = "gen_gateway_v1"
@@ -141,6 +145,10 @@ const (
 	// OUIV1Txn is used to describe
 	// a new OUI for a new router on the network
 	OUIV1Txn = "oui_v1"
+
+	// UpdateGatewayOUIV1Txn is used to describe
+	// updating a gateway OUI
+	UpdateGatewayOUIV1Txn = "update_gatway_oui_v1"
 
 	// PaymentTxn is used to describe
 	// sending HNT from one wallet to another
@@ -201,6 +209,10 @@ const (
 	// ValidatorHeartbeatV1Txn is used to describe
 	// when a validator provides proof of liveness
 	ValidatorHeartbeatV1Txn = "validator_heartbeat_v1"
+
+	// GenPriceOracleV1Txn is used to describe
+	// a genesis price oracle
+	GenPriceOracleV1Txn = "gen_price_oracle_v1"
 
 	// PriceOracleV1Txn is used to describe
 	// changing the exchange rate for burning HNT to DCs
@@ -342,6 +354,7 @@ var (
 		CreateHTLCV1Txn,
 		POCRequestV1Txn,
 		TokenBurnV1Txn,
+		TokenBurnExchangeRateV1Txn,
 		GenGatewayV1Txn,
 		OUIV1Txn,
 		PaymentV1Txn,
@@ -356,6 +369,7 @@ var (
 		StateChannelOpenV1Txn,
 		StateChannelCloseV1Txn,
 		StakeValidatorV1Txn,
+		GenPriceOracleV1Txn,
 		PriceOracleV1Txn,
 		GenValidatorV1Txn,
 		TransferHotspotV1Txn,
