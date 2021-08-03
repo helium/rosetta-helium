@@ -182,6 +182,10 @@ const (
 	// closing a state channel on a Helium router
 	StateChannelCloseV1Txn = "state_channel_close_v1"
 
+	// GenValidatorV1Txn is used to describe
+	// genesis validators
+	GenValidatorV1Txn = "gen_validator_v1"
+
 	// StakeValidatorV1Txn is used to describe
 	// staking a new validator
 	StakeValidatorV1Txn = "stake_validator_v1"
@@ -353,6 +357,7 @@ var (
 		StateChannelCloseV1Txn,
 		StakeValidatorV1Txn,
 		PriceOracleV1Txn,
+		GenValidatorV1Txn,
 		TransferHotspotV1Txn,
 		StakeValidatorV1Txn,
 		UnstakeValidatorV1Txn,
