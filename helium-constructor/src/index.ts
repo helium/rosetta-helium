@@ -19,9 +19,11 @@ var netType:number;
 var clientType:Network;
 
 if (process.env.NETWORK == "testnet") {
+    console.log("Starting staging server");
     netType = 1;
-    clientType = Network.staging;
+    clientType = Network.testnet;
 } else {
+    console.log("Starting mainnet server");
     netType = 0;
     clientType = Network.production;
 }
@@ -150,6 +152,7 @@ app.get('/chain-vars', asyncHandler(async function(req: express.Request, res: ex
 app.get('/current-height', asyncHandler(async function(req: express.Request, res: express.Response) {
   const client:Client = new Client(clientType);
   const currentHeight = await client.blocks.getHeight();
+  console.log(client);
   res.status(200).send({ current_height: currentHeight});
 }));
 
