@@ -152,7 +152,6 @@ app.get('/chain-vars', asyncHandler(async function(req: express.Request, res: ex
 app.get('/current-height', asyncHandler(async function(req: express.Request, res: express.Response) {
   const client:Client = new Client(clientType);
   const currentHeight = await client.blocks.getHeight();
-  console.log(client);
   res.status(200).send({ current_height: currentHeight});
 }));
 
