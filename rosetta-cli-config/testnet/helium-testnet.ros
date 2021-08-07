@@ -17,7 +17,7 @@ request_funds(1){
     loaded_account = find_balance({
       "account_identifier": {{random_account.account_identifier}},
       "minimum_balance":{
-        "value": "10000000",
+        "value": "1000000000",
         "currency": {{currency}}
       }
     });
@@ -26,7 +26,7 @@ request_funds(1){
 
 create_account(1){
   create{
-    network = {"network":"Mainnet", "blockchain":"Helium"};
+    network = {"network":"Testnet", "blockchain":"Helium"};
     key = generate_key({"curve_type": "edwards25519"});
     account = derive({
       "network_identifier": {{network}},
@@ -43,11 +43,11 @@ create_account(1){
 
 transfer(10){
   transfer{
-    transfer.network = {"network":"Mainnet", "blockchain":"Helium"};
+    transfer.network = {"network":"Testnet", "blockchain":"Helium"};
     currency = {"symbol":"HNT", "decimals":8};
     sender = find_balance({
       "minimum_balance":{
-        "value": "10000000",
+        "value": "1000000000",
         "currency": {{currency}}
       }
     });

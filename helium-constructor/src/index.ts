@@ -19,7 +19,7 @@ var netType:number;
 var clientType:Network;
 
 if (process.env.NETWORK == "testnet") {
-    console.log("Starting staging server");
+    console.log("Starting testnet server");
     netType = 1;
     clientType = Network.testnet;
 } else {
