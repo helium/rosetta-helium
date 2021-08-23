@@ -357,6 +357,7 @@ var (
 		TokenBurnExchangeRateV1Txn,
 		GenGatewayV1Txn,
 		OUIV1Txn,
+		UpdateGatewayOUIV1Txn,
 		PaymentV1Txn,
 		PaymentV2Txn,
 		POCReceiptsV1,
