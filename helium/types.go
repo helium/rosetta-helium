@@ -423,11 +423,11 @@ var (
 )
 
 type Block struct {
-	Hash         string   `json:"hash"`
-	Height       int64    `json:"height"`
-	PrevHash     string   `json:"prev_hash"`
-	Time         int64    `json:"time"`
-	Transactions []string `json:"transactions"`
+	Hash         string                   `json:"hash"`
+	Height       int64                    `json:"height"`
+	PrevHash     string                   `json:"prev_hash"`
+	Time         int64                    `json:"time"`
+	Transactions []map[string]interface{} `json:"transactions"`
 }
 
 type Peer struct {

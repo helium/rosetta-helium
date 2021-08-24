@@ -78,7 +78,7 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 
 	var processedTxs []*types.Transaction
 	for _, tx := range result.Transactions {
-		ptx, txErr := GetTransaction(tx)
+		ptx, txErr := GetTransaction(fmt.Sprint(tx["hash"]))
 		if txErr != nil {
 			return nil, txErr
 		}
