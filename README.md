@@ -13,6 +13,11 @@ Dockerized [Rosetta API](https://www.rosetta-api.org/) implementation mostly bas
 
 HNT Address: [13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88](https://explorer.helium.com/accounts/13Ey7fZfdQB7C8FRiWfuNKshA8si7wgHVeMdGbdCkM5gyry7G88)
 
+#### See Also
+
+* [Rosetta Community Discussion](https://community.rosetta-api.org/t/helium-network-rosetta-gateway-implementation/529/)
+
+
 # Quick setup
 
 #### Build container
