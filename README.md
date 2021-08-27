@@ -9,6 +9,10 @@ Dockerized [Rosetta API](https://www.rosetta-api.org/) implementation mostly bas
 
 This project was created by @syuan100 and supported, in part, by the [DeWi Grants Program](https://dewialliance.medium.com/announcing-the-inaugural-dewi-grant-recipients-56b44b9b9b66).
 
+#### See Also
+
+* [Rosetta Community Discussion](https://community.rosetta-api.org/t/helium-network-rosetta-gateway-implementation/529/)
+
 # Quick setup
 
 #### Build container
