@@ -7,6 +7,11 @@ Dockerized [Rosetta API](https://www.rosetta-api.org/) implementation mostly bas
 - `blockchain-node` provides the basic blockchain that the Data API reads from
 - `./helium-constructor` implements a simple Express server written in TypeScript exposing [helium-js](https://github.com/helium/helium-js) for Construction API actions (transaction construction, signing mechanisms, etc)
 
+#### See Also
+
+* [Rosetta Community Discussion](https://community.rosetta-api.org/t/helium-network-rosetta-gateway-implementation/529/)
+
+
 # Quick setup
 
 #### Build container
