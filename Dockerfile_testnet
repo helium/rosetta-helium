@@ -34,10 +34,8 @@ ENV PATH="/usr/local/go/bin:$PATH" \
     PATH=$PATH:$GOPATH/bin 
 
 WORKDIR /app/builder
-RUN git clone https://github.com/syuan100/rosetta-helium \
+RUN git clone https://github.com/helium/rosetta-helium \
     && cd rosetta-helium \
-    # UPDATE CHECKOUT AFTER MERGE
-    && git checkout testnet-node \
     && go build -o rosetta-helium
 RUN cd rosetta-helium \
     && mv rosetta-helium /app \
