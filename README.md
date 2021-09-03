@@ -58,7 +58,7 @@ It's annoying to spin up a docker container for every change that you want to ma
 2. At the root directory, run `go run .` to start the rosetta server at port `:8080`
 
 ### blockchain-node
-1. Checkout my [custom version of blockchain-node](https://github.com/syuan100/blockchain-node/tree/syuan100-rosetta-api) that accounts for [implicit burn](https://docs.helium.com/blockchain/transaction-fees/) events.
+1. Checkout my [custom version of blockchain-node](https://github.com/syuan100/blockchain-node/tree/rosetta-api) that accounts for [implicit burn](https://docs.helium.com/blockchain/transaction-fees/) events.
 2. Run `make && make release PROFILE=devib` to build a release
 3. Run `make start PROFILE=devib` to start blockchain-node at port `:4467`
 
