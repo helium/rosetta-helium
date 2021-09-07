@@ -16,9 +16,9 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 WORKDIR /usr/src
 
 # Add our code
-RUN git clone https://github.com/syuan100/blockchain-node \
+RUN git clone https://github.com/helium/blockchain-node \
    && cd blockchain-node \
-   && git checkout rosetta-api
+   && git checkout master
 
 WORKDIR /usr/src/blockchain-node
 
@@ -34,7 +34,7 @@ ENV PATH="/usr/local/go/bin:$PATH" \
     PATH=$PATH:$GOPATH/bin 
 
 WORKDIR /app/builder
-RUN git clone https://github.com/syuan100/rosetta-helium \
+RUN git clone https://github.com/helium/rosetta-helium \
     && cd rosetta-helium \
     && git checkout main \
     && go build -o rosetta-helium

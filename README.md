@@ -1,4 +1,4 @@
-[Read the wiki!](https://github.com/syuan100/rosetta-helium/wiki)
+[Read the wiki!](https://github.com/helium/rosetta-helium/wiki)
 
 # Overview
 Dockerized [Rosetta API](https://www.rosetta-api.org/) implementation mostly based off of [blockchain-node](https://github.com/helium/blockchain-node):
@@ -48,7 +48,7 @@ rosetta-cli check:construction --configuration-file rosetta-cli-config/mainnet/c
 ```
 (Please wait a few minutes for the Helium node to initialize before running this command)
 
-[Read more on using the rosetta-cli.](https://github.com/syuan100/rosetta-helium/wiki/7.-Appendix:-Using-rosetta-cli-for-testing)
+[Read more on using the rosetta-cli.](https://github.com/helium/rosetta-helium/wiki/7.-Appendix:-Using-rosetta-cli-for-testing)
 
 # Contributing
 It's annoying to spin up a docker container for every change that you want to make. So for local development, it is recommended that you run each part of the implementation separately.
@@ -58,9 +58,9 @@ It's annoying to spin up a docker container for every change that you want to ma
 2. At the root directory, run `go run .` to start the rosetta server at port `:8080`
 
 ### blockchain-node
-1. Checkout my [custom version of blockchain-node](https://github.com/syuan100/blockchain-node/tree/rosetta-api) that accounts for [implicit burn](https://docs.helium.com/blockchain/transaction-fees/) events.
-2. Run `make && make release PROFILE=devib` to build a release
-3. Run `make start PROFILE=devib` to start blockchain-node at port `:4467`
+1. Checkout [blockchain-node](https://github.com/helium/blockchain-node/).
+2. Run `make && make release` to build a release
+3. Run `make start` to start blockchain-node at port `:4467`
 
 ### helium-constructor
 1. Install `node`. I prefer [nvm](https://github.com/nvm-sh/nvm).
