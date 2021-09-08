@@ -6,7 +6,7 @@ import (
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
-	"github.com/syuan100/rosetta-helium/helium"
+	"github.com/helium/rosetta-helium/helium"
 )
 
 // ConstructionAPIService implements the server.ConstructionAPIServicer interface.

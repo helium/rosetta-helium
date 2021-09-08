@@ -17,7 +17,7 @@ package services
 import (
 	"context"
 
-	"github.com/syuan100/rosetta-helium/helium"
+	"github.com/helium/rosetta-helium/helium"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"

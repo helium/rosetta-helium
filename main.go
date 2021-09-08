@@ -20,8 +20,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/syuan100/rosetta-helium/helium"
-	"github.com/syuan100/rosetta-helium/services"
+	"github.com/helium/rosetta-helium/helium"
+	"github.com/helium/rosetta-helium/services"
 
 	"github.com/coinbase/rosetta-sdk-go/asserter"
 	"github.com/coinbase/rosetta-sdk-go/server"
