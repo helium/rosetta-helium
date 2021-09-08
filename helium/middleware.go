@@ -10,8 +10,8 @@ import (
 	"reflect"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/helium/rosetta-helium/utils"
 	"github.com/mitchellh/mapstructure"
-	"github.com/syuan100/rosetta-helium/utils"
 	"github.com/ybbus/jsonrpc"
 )
 

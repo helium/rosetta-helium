@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
-	"github.com/syuan100/rosetta-helium/utils"
+	"github.com/helium/rosetta-helium/utils"
 )
 
 func PaymentV1(payer, payee string, amount int64, fee *Fee) ([]*types.Operation, *types.Error) {

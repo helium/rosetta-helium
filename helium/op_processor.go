@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
-	"github.com/syuan100/rosetta-helium/utils"
+	"github.com/helium/rosetta-helium/utils"
 )
 
 func OpsToTransaction(operations []*types.Operation) (*MetadataOptions, *types.Error) {
