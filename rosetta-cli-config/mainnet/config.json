@@ -9,20 +9,11 @@
   "tip_delay": 1200,
   "max_retries": 10,
   "max_sync_concurrency": 2,
-  "construction": {
-    "stale_depth": 3,
-    "broadcast_limit": 5,
-    "constructor_dsl_file": "helium.ros",
-    "end_conditions": {
-      "create_account": 1,
-      "transfer": 1
-    }
-  },
   "data": {
     "historical_balance_enabled": false,
-    "reconciliation_disabled": true,
-    "inactive_discrepency_search_disabled": true,
-    "balance_tracking_disabled": true,
+    "reconciliation_disabled": false,
+    "inactive_discrepency_search_disabled": false,
+    "balance_tracking_disabled": false,
     "end_conditions": {
       "tip": true
     }
