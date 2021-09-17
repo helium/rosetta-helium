@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as node-builder
+FROM ubuntu:bionic as node-builder
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV PATH /root/.cargo/bin:${PATH}
