@@ -52,7 +52,7 @@ RUN cd rosetta-helium \
 RUN rm -rf /app/builder/rosetta-helium
 
 ####
-FROM ubuntu:18.04 as runner
+FROM ubuntu:bionic as runner
 RUN apt-get update && apt-get install -y libsodium-dev gcc
 RUN apt-get install -y openssl grep dbus libgmp3-dev npm
 
