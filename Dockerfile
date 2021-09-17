@@ -1,7 +1,6 @@
 FROM ubuntu:bionic as node-builder
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV PATH /root/.cargo/bin:${PATH}
 ENV CC=gcc CXX=g++ CFLAGS="-U__sun__" \
     ERLANG_ROCKSDB_OPTS="-DWITH_BUNDLE_SNAPPY=ON -DWITH_BUNDLE_LZ4=ON" \
     ERL_COMPILER_OPTIONS="[deterministic]" \
@@ -9,7 +8,7 @@ ENV CC=gcc CXX=g++ CFLAGS="-U__sun__" \
     RUSTFLAGS="-C target-feature=-crt-static"
 
 # install erlang
-RUN apt-get update && apt-get install -y build-essential cmake autoconf automake bison flex libtool libsodium-dev libssl-dev libdbus-1-dev libgmp-dev libbz2-dev liblz4-dev
+RUN apt-get update && apt-get install -y curl git wget build-essential cmake autoconf automake bison flex libtool libsodium-dev libssl-dev libdbus-1-dev libgmp-dev libbz2-dev liblz4-dev
 RUN wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && dpkg -i erlang-solutions_2.0_all.deb
 RUN apt-get update && apt-get install -y esl-erlang=1:22.3.4.1-1
 
