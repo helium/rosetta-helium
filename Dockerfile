@@ -32,7 +32,7 @@ RUN mkdir -p /opt/blockchain-node-build \
  && tar -zxvf _build/docker_rosetta/rel/*/*.tar.gz -C /opt/blockchain-node-build
 
 ####
-FROM ubuntu:18.04 as rosetta-builder
+FROM ubuntu:bionic as rosetta-builder
 RUN apt-get update && apt-get install -y curl make gcc g++ git gnupg2 wget software-properties-common \
     && add-apt-repository ppa:longsleep/golang-backports && apt-get install -y golang-go
 ENV PATH="/usr/local/go/bin:$PATH" \
