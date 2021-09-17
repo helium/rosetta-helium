@@ -239,7 +239,7 @@ const (
 	RoutingOp = "routing_op"
 
 	// FeeOp is used to describe
-	// a transaction fee (Negative HNT or DC)
+	// a transaction fee
 	FeeOp = "fee_op"
 
 	// AddGatewayOp is used to describe
