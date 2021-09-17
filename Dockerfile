@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y esl-erlang=1:22.3.4.1-1
 
 # install rust toolchain
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 WORKDIR /usr/src
 
