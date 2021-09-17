@@ -1,16 +1,21 @@
-FROM erlang:22.3.2-alpine as node-builder
-RUN apk add --no-cache --update \
-    git tar build-base linux-headers autoconf automake libtool pkgconfig \
-    dbus-dev bzip2 bison flex gmp-dev cmake lz4 libsodium-dev openssl-dev \
-    sed wget curl
+FROM ubuntu:18.04 as node-builder
 
+ENV DEBIAN_FRONTEND noninteractive
+ENV PATH /root/.cargo/bin:${PATH}
 ENV CC=gcc CXX=g++ CFLAGS="-U__sun__" \
     ERLANG_ROCKSDB_OPTS="-DWITH_BUNDLE_SNAPPY=ON -DWITH_BUNDLE_LZ4=ON" \
     ERL_COMPILER_OPTIONS="[deterministic]" \
     PATH="/root/.cargo/bin:$PATH" \
     RUSTFLAGS="-C target-feature=-crt-static"
 
-# install Rust toolchain
+# install erlang
+RUN apt-get update && apt-get install -y libsodium-dev gcc
+RUN apt-get install -y libssl-dev build-essential curl make g++ git gnupg2 wget cmake
+RUN wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && dpkg -i erlang-solutions_2.0_all.deb
+RUN apt-get update && apt-get install -y esl-erlang=1:22.3.4.1-1
+
+# install rust toolchain
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 WORKDIR /usr/src
@@ -27,8 +32,9 @@ RUN mkdir -p /opt/blockchain-node-build \
  && tar -zxvf _build/docker_rosetta/rel/*/*.tar.gz -C /opt/blockchain-node-build
 
 ####
-FROM erlang:22.3.2-alpine as rosetta-builder
-RUN apk add --no-cache --virtual .build-deps --update git bash gcc musl-dev openssl go
+FROM ubuntu:18.04 as rosetta-builder
+RUN apt-get update && apt-get install -y curl make gcc g++ git gnupg2 wget software-properties-common \
+    && add-apt-repository ppa:longsleep/golang-backports && apt-get install -y golang-go
 ENV PATH="/usr/local/go/bin:$PATH" \
     GOPATH=/opt/go/ \
     PATH=$PATH:$GOPATH/bin 
@@ -46,8 +52,9 @@ RUN cd rosetta-helium \
 RUN rm -rf /app/builder/rosetta-helium
 
 ####
-FROM erlang:22.3.2-alpine as runner
-RUN apk add --no-cache --update --virtual .build-deps bash gcc openssl grep dbus gmp libsodium npm
+FROM ubuntu:18.04 as runner
+RUN apt-get update && apt-get install -y libsodium-dev gcc
+RUN apt-get install -y openssl grep dbus libgmp3-dev npm
 
 ENV COOKIE=blockchain-node \
     # Write files generated during startup to /tmp
