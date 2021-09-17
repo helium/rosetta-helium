@@ -83,6 +83,14 @@ func (s *NetworkAPIService) NetworkStatus(
 		return nil, sErr
 	}
 
+	genesisIndex := helium.MainnetGenesisBlockIndex
+	genesisHash := helium.MainnetGenesisBlockHash
+
+	if request.NetworkIdentifier.Network == helium.TestnetNetwork {
+		genesisIndex = helium.TestnetGenesisBlockIndex
+		genesisHash = helium.TestnetGenesisBlockHash
+	}
+
 	return &types.NetworkStatusResponse{
 		CurrentBlockIdentifier: &types.BlockIdentifier{
 			Index: currentBlock.BlockIdentifier.Index,
@@ -90,8 +98,8 @@ func (s *NetworkAPIService) NetworkStatus(
 		},
 		CurrentBlockTimestamp: currentBlock.Timestamp,
 		GenesisBlockIdentifier: &types.BlockIdentifier{
-			Index: lastBlessedBlock.BlockIdentifier.Index,
-			Hash:  lastBlessedBlock.BlockIdentifier.Hash,
+			Index: genesisIndex,
+			Hash:  genesisHash,
 		},
 		OldestBlockIdentifier: &types.BlockIdentifier{
 			Index: lastBlessedBlock.BlockIdentifier.Index,

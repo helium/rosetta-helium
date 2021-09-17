@@ -60,9 +60,21 @@ const (
 	// in MainnetNetworkIdentifier.
 	MainnetNetwork string = "Mainnet"
 
+	// Mainnet geneis block index
+	MainnetGenesisBlockIndex int64 = 1
+
+	// Mainnet geneis block hash
+	MainnetGenesisBlockHash string = "La6PuV80Ps9qTP0339Pwm64q3_deMTkv6JOo1251EJI"
+
 	// TestnetNetwork is the value of the network
 	// in TestnetNetworkIdentifier.
 	TestnetNetwork string = "Testnet"
+
+	// Testnet geneis block index
+	TestnetGenesisBlockIndex int64 = 1
+
+	// Testnet geneis block hash
+	TestnetGenesisBlockHash string = "edKekSj8vMmVPJ4I9vAPGVCisn7ypJ22RE8RLj6LiWk"
 
 	// Symbol is the symbol value
 	// used in Currency.
