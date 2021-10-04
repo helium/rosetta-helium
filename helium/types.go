@@ -235,15 +235,15 @@ const (
 	TransferHotspotV1Txn = "transfer_hotspot_v1"
 
 	// CreditOp is used to describe
-	// a credit to an account (HNT, HST, or DC)
+	// a credit to an account
 	CreditOp = "credit_op"
 
 	// DebitOp is used to describe
-	// a debit from an account (HNT, HST, or DC)
+	// a debit from an account
 	DebitOp = "debit_op"
 
 	// DebitOp is used to describe
-	// a debit from an account (HNT, HST, or DC)
+	// a debit from an account
 	RewardOp = "reward_op"
 
 	// RoutingOp is used to describe
@@ -251,7 +251,7 @@ const (
 	RoutingOp = "routing_op"
 
 	// FeeOp is used to describe
-	// a transaction fee (Negative HNT or DC)
+	// a transaction fee
 	FeeOp = "fee_op"
 
 	// AddGatewayOp is used to describe
