@@ -116,7 +116,7 @@ const (
 
 	// CoinbaseTxn is used to describe
 	// a coinbase transaction.
-	CoinbaseTxn = "coinbase_v1"
+	CoinbaseV1Txn = "coinbase_v1"
 
 	// DCCoinbaseV1Txn is used to describe
 	// the initial 10k credits to bring initial miners online.
@@ -234,6 +234,10 @@ const (
 	// transferring hotspots from one wallet to another
 	TransferHotspotV1Txn = "transfer_hotspot_v1"
 
+	// CoinbaseOp is used to describe
+	// the coinbase transaction at genesis (testnet only)
+	CoinbaseOp = "coinbase_op"
+
 	// CreditOp is used to describe
 	// a credit to an account
 	CreditOp = "credit_op"
@@ -242,8 +246,8 @@ const (
 	// a debit from an account
 	DebitOp = "debit_op"
 
-	// DebitOp is used to describe
-	// a debit from an account
+	// RewardOp is used to describe
+	// a blockchain rewarded to an account
 	RewardOp = "reward_op"
 
 	// RoutingOp is used to describe
@@ -359,7 +363,7 @@ var (
 		AssertLocationV1Txn,
 		AssertLocationV2Txn,
 		VarsV1Txn,
-		CoinbaseTxn,
+		CoinbaseV1Txn,
 		DCCoinbaseV1Txn,
 		ConsensusGroupV1Txn,
 		ConsensusGroupFailureV1Txn,
@@ -397,6 +401,7 @@ var (
 	OperationTypes = []string{
 		AddGatewayOp,
 		AssertLocationOp,
+		CoinbaseOp,
 		CreateHTLCOp,
 		CreditOp,
 		DebitOp,
