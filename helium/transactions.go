@@ -99,19 +99,6 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 	return rewardOps, nil
 }
 
-func SecurityCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
-	var securityCoinbaseOps []*types.Operation
-
-	secOps, secErr := CreateCreditOp(CreditOp, payee, amount, HST, SuccessStatus, 0, map[string]interface{}{"credit_category": "security_coinbase"})
-	if secErr != nil {
-		return nil, secErr
-	}
-
-	securityCoinbaseOps = append(securityCoinbaseOps, secOps)
-
-	return securityCoinbaseOps, nil
-}
-
 func AddGatewayV1(
 	payer,
 	owner string,

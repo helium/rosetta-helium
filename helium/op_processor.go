@@ -142,12 +142,6 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 			txn["rewards"].([]interface{}),
 		)
 
-	case SecurityCoinbaseV1Txn:
-		return SecurityCoinbaseV1(
-			fmt.Sprint(txn["payee"]),
-			utils.MapToInt64(txn["amount"]),
-		)
-
 	case SecurityExchangeV1Txn:
 		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
 		return SecurityExchangeV1(
