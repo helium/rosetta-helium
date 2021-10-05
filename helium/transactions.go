@@ -102,7 +102,7 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 func CoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
 	var CoinbaseOps []*types.Operation
 
-	coinbaseOps, cbErr := CreateCreditOp(CoinbaseOp, payee, amount, HST, SuccessStatus, 0, map[string]interface{}{"credit_category": "coinbase"})
+	coinbaseOps, cbErr := CreateCreditOp(CoinbaseOp, payee, amount, HNT, SuccessStatus, 0, map[string]interface{}{"credit_category": "coinbase"})
 	if cbErr != nil {
 		return nil, cbErr
 	}
