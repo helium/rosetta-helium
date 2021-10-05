@@ -107,7 +107,12 @@ func CreateHTLCV1(payer string, amount int64, fee *Fee, metadata map[string]inte
 		return nil, chErr
 	}
 
-	CreateHTLCOps = append(CreateHTLCOps, createHTLCOps)
+	Fee, fErr := CreateFeeOp(payer, fee, SuccessStatus, 1, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	CreateHTLCOps = append(CreateHTLCOps, createHTLCOps, Fee)
 
 	return CreateHTLCOps, nil
 }
@@ -120,7 +125,12 @@ func RedeemHTLCV1(payee string, amount int64, fee *Fee, metadata map[string]inte
 		return nil, rhErr
 	}
 
-	RedeemHTLCOps = append(RedeemHTLCOps, redeemHTLCOps)
+	Fee, fErr := CreateFeeOp(payee, fee, SuccessStatus, 1, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	RedeemHTLCOps = append(RedeemHTLCOps, redeemHTLCOps, Fee)
 
 	return RedeemHTLCOps, nil
 }
