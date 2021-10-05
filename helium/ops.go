@@ -106,6 +106,10 @@ func CreateFeeOp(payer string, fee *Fee, status string, opIndex int64, metadata 
 
 	switch fee.Currency.Symbol {
 	case "HNT":
+		FeeOpObject.Amount = &types.Amount{
+			Value:    "-" + fmt.Sprint(fee.Amount),
+			Currency: HNT,
+		}
 		metadata["debit_category"] = "fee"
 		metadata["implicit_burn"] = true
 		metadata["dc_fee"] = fee.DCFeeAmount
