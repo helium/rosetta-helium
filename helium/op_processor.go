@@ -235,6 +235,20 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 			txn,
 		)
 
+	case CreateHTLCV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return CreateHTLCV1(
+			fmt.Sprint(txn["payer"]),
+			utils.MapToInt64(txn["amount"]),
+			feeDetails,
+			map[string]interface{}{
+				"payee":    fmt.Sprint(txn["payee"]),
+				"address":  fmt.Sprint(txn["address"]),
+				"hashlock": fmt.Sprint(txn["hashlock"]),
+				"timelock": fmt.Sprint(txn["timelock"]),
+			},
+		)
+
 	default:
 		for _, types := range TransactionTypes {
 			if fmt.Sprint(txn["type"]) == types {

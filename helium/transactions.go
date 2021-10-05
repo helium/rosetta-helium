@@ -99,6 +99,19 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 	return rewardOps, nil
 }
 
+func CreateHTLCV1(payer string, amount int64, fee *Fee, metadata map[string]interface{}) ([]*types.Operation, *types.Error) {
+	var CreateHTLCOps []*types.Operation
+
+	createHTLCOps, chErr := CreateDebitOp(CreateHTLCOp, payer, amount, HNT, SuccessStatus, 0, metadata)
+	if chErr != nil {
+		return nil, chErr
+	}
+
+	CreateHTLCOps = append(CreateHTLCOps, createHTLCOps)
+
+	return CreateHTLCOps, nil
+}
+
 func CoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
 	var CoinbaseOps []*types.Operation
 
