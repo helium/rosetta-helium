@@ -112,6 +112,19 @@ func CreateHTLCV1(payer string, amount int64, fee *Fee, metadata map[string]inte
 	return CreateHTLCOps, nil
 }
 
+func RedeemHTLCV1(payee string, amount int64, fee *Fee, metadata map[string]interface{}) ([]*types.Operation, *types.Error) {
+	var RedeemHTLCOps []*types.Operation
+
+	redeemHTLCOps, rhErr := CreateCreditOp(RedeemHTLCOp, payee, amount, HNT, SuccessStatus, 0, metadata)
+	if rhErr != nil {
+		return nil, rhErr
+	}
+
+	RedeemHTLCOps = append(RedeemHTLCOps, redeemHTLCOps)
+
+	return RedeemHTLCOps, nil
+}
+
 func CoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
 	var CoinbaseOps []*types.Operation
 

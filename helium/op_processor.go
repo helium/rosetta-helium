@@ -249,6 +249,28 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 			},
 		)
 
+	case RedeemHTLCV1Txn:
+		address := fmt.Sprint(txn["address"])
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		htlcDetails, htlcErr := GetHTLCReceipt(address)
+		if htlcErr != nil {
+			return nil, htlcErr
+		}
+
+		return RedeemHTLCV1(
+			fmt.Sprint(txn["payee"]),
+			htlcDetails.Balance,
+			feeDetails,
+			map[string]interface{}{
+				"address":     address,
+				"payer":       htlcDetails.Payer,
+				"hashlock":    htlcDetails.Hashlock,
+				"timelock":    htlcDetails.Timelock,
+				"redeemed_at": htlcDetails.RedeemedAt,
+				"preimage":    fmt.Sprint(txn["preimage"]),
+			},
+		)
+
 	default:
 		for _, types := range TransactionTypes {
 			if fmt.Sprint(txn["type"]) == types {
