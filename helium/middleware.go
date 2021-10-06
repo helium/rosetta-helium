@@ -342,6 +342,9 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 				metadataResponse.Metadata["get_nonce_for"] = map[string]interface{}{
 					"nonce": nonce,
 				}
+
+				metadataResponse.Metadata["account_sequence"] = nonce
+
 			default:
 				return nil, WrapErr(ErrUnclearIntent, errors.New("unexpected object "+fmt.Sprint(t)+" in get_nonce_for"))
 			}
