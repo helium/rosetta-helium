@@ -35,6 +35,7 @@ COPY --from=rosetta-builder /src/rosetta-helium/helium-constructor helium-constr
 RUN cd helium-constructor \
       && npm install \
       && npm run build \
-      && chmod +x /app/start.sh
+      && chmod +x /app/start.sh \
+      && cat /opt/blockchain_node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > lbs.txt
 
 CMD ["/app/start.sh"]
