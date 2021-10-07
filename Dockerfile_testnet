@@ -1,70 +1,41 @@
-FROM erlang:22.3.2-alpine as node-builder
-RUN apk add --no-cache --update \
-    git tar build-base linux-headers autoconf automake libtool pkgconfig \
-    dbus-dev bzip2 bison flex gmp-dev cmake lz4 libsodium-dev openssl-dev \
-    sed wget curl
+ARG UBUNTU_BUILDER=ubuntu:18.04
+ARG UBUNTU_RUNNER=quay.io/team-helium/blockchain-node:2021-09-24-ubuntu18
 
-ENV CC=gcc CXX=g++ CFLAGS="-U__sun__" \
-    ERLANG_ROCKSDB_OPTS="-DWITH_BUNDLE_SNAPPY=ON -DWITH_BUNDLE_LZ4=ON" \
-    ERL_COMPILER_OPTIONS="[deterministic]" \
-    PATH="/root/.cargo/bin:$PATH" \
-    RUSTFLAGS="-C target-feature=-crt-static"
+FROM $UBUNTU_BUILDER as rosetta-builder
 
-# install Rust toolchain
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
-WORKDIR /usr/src
+WORKDIR /src
 
-# Add our code
-RUN git clone https://github.com/helium/blockchain-node \
-   && cd blockchain-node \
-   && git checkout master
+RUN apt update \
+      && apt install -y --no-install-recommends \
+         curl ca-certificates git \
+      && git clone https://github.com/helium/rosetta-helium.git \
+      && curl -L https://golang.org/dl/go1.17.1.linux-amd64.tar.gz | tar xzf -
 
-WORKDIR /usr/src/blockchain-node
-
-RUN ./rebar3 as docker_rosetta_testnet tar
-RUN mkdir -p /opt/blockchain-node-build \
- && tar -zxvf _build/docker_rosetta_testnet/rel/*/*.tar.gz -C /opt/blockchain-node-build
-
-####
-FROM erlang:22.3.2-alpine as rosetta-builder
-RUN apk add --no-cache --virtual .build-deps --update git bash gcc musl-dev openssl go
-ENV PATH="/usr/local/go/bin:$PATH" \
-    GOPATH=/opt/go/ \
-    PATH=$PATH:$GOPATH/bin 
-
-WORKDIR /app/builder
-RUN git clone https://github.com/helium/rosetta-helium \
-    && cd rosetta-helium \
-    && go build -o rosetta-helium
-RUN cd rosetta-helium \
-    && mv rosetta-helium /app \
-    && mv docker/start-testnet.sh /app \
-    && cp -R helium-constructor /app
-
-RUN rm -rf /app/builder/rosetta-helium
-
-####
-FROM erlang:22.3.2-alpine as runner
-RUN apk add --no-cache --update --virtual .build-deps bash gcc openssl grep dbus gmp libsodium npm
-
-ENV COOKIE=blockchain-node \
-    # Write files generated during startup to /tmp
-    RELX_OUT_FILE_PATH=/tmp \
-    # add miner to path, for easy interactions
-    PATH=$PATH:/app/blockchain-node/bin \
+ENV PATH="/src/go/bin:$PATH" \
     CGO_ENABLED=0
 
-COPY --from=node-builder /opt/blockchain-node-build /app/blockchain-node
-COPY --from=rosetta-builder /app/rosetta-helium /app/rosetta-helium
-COPY --from=rosetta-builder /app/start-testnet.sh /app/start-testnet.sh
-COPY --from=rosetta-builder /app/helium-constructor /app/helium-constructor
+RUN cd rosetta-helium && go build -o rosetta-helium
 
-RUN cd /app/helium-constructor \
-    && npm install \
-    && npm run build
+FROM $UBUNTU_RUNNER
 
-RUN chmod +x /app/start-testnet.sh \
- && echo '1' > lbs.txt
+EXPOSE 8080
+EXPOSE 44158
 
-CMD ["/app/start-testnet.sh"]
+RUN apt update \
+    && apt install -y --no-install-recommends \
+         ca-certificates git npm
+
+WORKDIR /app
+
+COPY --from=rosetta-builder /src/rosetta-helium/rosetta-helium rosetta-helium
+COPY --from=rosetta-builder /src/rosetta-helium/docker/start-testnet.sh start.sh
+COPY --from=rosetta-builder /src/rosetta-helium/helium-constructor helium-constructor
+
+RUN cd helium-constructor \
+      && npm install \
+      && npm run build \
+      && chmod +x /app/start.sh \
+      && cat /opt/blockchain_node/config/sys.config | grep -oP '(?<=\{blessed_snapshot_block_height\, ).*?(?=\})' > /app/lbs.txt
+
+ENTRYPOINT ["/app/start.sh"]
