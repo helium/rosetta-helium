@@ -9,11 +9,12 @@ WORKDIR /src
 RUN apt update \
       && apt install -y --no-install-recommends \
          curl ca-certificates git \
-      && git clone https://github.com/helium/rosetta-helium.git \
       && curl -L https://golang.org/dl/go1.17.1.linux-amd64.tar.gz | tar xzf -
 
 ENV PATH="/src/go/bin:$PATH" \
     CGO_ENABLED=0
+
+COPY . rosetta-helium
 
 RUN cd rosetta-helium && go build -o rosetta-helium
 
