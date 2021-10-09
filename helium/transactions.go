@@ -99,17 +99,53 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 	return rewardOps, nil
 }
 
-func SecurityCoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
-	var securityCoinbaseOps []*types.Operation
+func CreateHTLCV1(payer string, amount int64, fee *Fee, metadata map[string]interface{}) ([]*types.Operation, *types.Error) {
+	var CreateHTLCOps []*types.Operation
 
-	secOps, secErr := CreateCreditOp(CreditOp, payee, amount, HST, SuccessStatus, 0, map[string]interface{}{"credit_category": "security_coinbase"})
-	if secErr != nil {
-		return nil, secErr
+	createHTLCOps, chErr := CreateDebitOp(CreateHTLCOp, payer, amount, HNT, SuccessStatus, 0, metadata)
+	if chErr != nil {
+		return nil, chErr
 	}
 
-	securityCoinbaseOps = append(securityCoinbaseOps, secOps)
+	Fee, fErr := CreateFeeOp(payer, fee, SuccessStatus, 1, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
 
-	return securityCoinbaseOps, nil
+	CreateHTLCOps = append(CreateHTLCOps, createHTLCOps, Fee)
+
+	return CreateHTLCOps, nil
+}
+
+func RedeemHTLCV1(payee string, amount int64, fee *Fee, metadata map[string]interface{}) ([]*types.Operation, *types.Error) {
+	var RedeemHTLCOps []*types.Operation
+
+	redeemHTLCOps, rhErr := CreateCreditOp(RedeemHTLCOp, payee, amount, HNT, SuccessStatus, 0, metadata)
+	if rhErr != nil {
+		return nil, rhErr
+	}
+
+	Fee, fErr := CreateFeeOp(payee, fee, SuccessStatus, 1, map[string]interface{}{})
+	if fErr != nil {
+		return nil, fErr
+	}
+
+	RedeemHTLCOps = append(RedeemHTLCOps, redeemHTLCOps, Fee)
+
+	return RedeemHTLCOps, nil
+}
+
+func CoinbaseV1(payee string, amount int64) ([]*types.Operation, *types.Error) {
+	var CoinbaseOps []*types.Operation
+
+	coinbaseOps, cbErr := CreateCreditOp(CoinbaseOp, payee, amount, HNT, SuccessStatus, 0, map[string]interface{}{"credit_category": "coinbase"})
+	if cbErr != nil {
+		return nil, cbErr
+	}
+
+	CoinbaseOps = append(CoinbaseOps, coinbaseOps)
+
+	return CoinbaseOps, nil
 }
 
 func AddGatewayV1(

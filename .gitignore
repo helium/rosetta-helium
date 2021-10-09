@@ -3,7 +3,7 @@ helium-data
 helium-logs
 cli-data
 rosetta-helium
-rosetta-data
+rosetta-data*
 lbs.txt
 node_modules
 helium-constructor/public

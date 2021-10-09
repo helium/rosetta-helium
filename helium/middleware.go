@@ -39,6 +39,16 @@ type deriveRequest struct {
 	PublicKey string `json:"public_key"`
 }
 
+type HTLCReceipt struct {
+	Address    string `json:"address"`
+	Balance    int64  `json:"balance"`
+	Hashlock   string `json:"hashlock"`
+	Payee      string `json:"payee"`
+	Payer      string `json:"payer"`
+	RedeemedAt int64  `json:"redeemed_at"`
+	Timelock   int64  `json:"timelock"`
+}
+
 func GetCurrentHeight() (*int64, *types.Error) {
 	var result int64
 
@@ -215,6 +225,34 @@ func GetHash(signedTransaction string) (*string, *types.Error) {
 
 	hash := payload["hash"].(string)
 	return &hash, nil
+}
+
+func GetHTLCReceipt(address string) (*HTLCReceipt, *types.Error) {
+	type request struct {
+		Address string `json:"address"`
+	}
+
+	var result map[string]interface{}
+
+	req := request{Address: address}
+	if err := NodeClient.CallFor(&result, "htlc_get", req); err != nil {
+		return nil, WrapErr(
+			ErrNotFound,
+			err,
+		)
+	}
+
+	htlcReceipt := &HTLCReceipt{
+		Address:    address,
+		Balance:    utils.MapToInt64(result["balance"]),
+		Hashlock:   fmt.Sprint(result["hashlock"]),
+		Payee:      fmt.Sprint(result["payee"]),
+		Payer:      fmt.Sprint(result["payer"]),
+		RedeemedAt: utils.MapToInt64(result["redeemed_at"]),
+		Timelock:   utils.MapToInt64(result["timelock"]),
+	}
+
+	return htlcReceipt, nil
 }
 
 func GetNonce(address string) (*int64, *types.Error) {

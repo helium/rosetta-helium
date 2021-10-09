@@ -142,8 +142,8 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 			txn["rewards"].([]interface{}),
 		)
 
-	case SecurityCoinbaseV1Txn:
-		return SecurityCoinbaseV1(
+	case CoinbaseV1Txn:
+		return CoinbaseV1(
 			fmt.Sprint(txn["payee"]),
 			utils.MapToInt64(txn["amount"]),
 		)
@@ -233,6 +233,42 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 			fmt.Sprint(txn["owner"]),
 			feeDetails,
 			txn,
+		)
+
+	case CreateHTLCV1Txn:
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		return CreateHTLCV1(
+			fmt.Sprint(txn["payer"]),
+			utils.MapToInt64(txn["amount"]),
+			feeDetails,
+			map[string]interface{}{
+				"payee":    fmt.Sprint(txn["payee"]),
+				"address":  fmt.Sprint(txn["address"]),
+				"hashlock": fmt.Sprint(txn["hashlock"]),
+				"timelock": fmt.Sprint(txn["timelock"]),
+			},
+		)
+
+	case RedeemHTLCV1Txn:
+		address := fmt.Sprint(txn["address"])
+		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		htlcDetails, htlcErr := GetHTLCReceipt(address)
+		if htlcErr != nil {
+			return nil, htlcErr
+		}
+
+		return RedeemHTLCV1(
+			fmt.Sprint(txn["payee"]),
+			htlcDetails.Balance,
+			feeDetails,
+			map[string]interface{}{
+				"address":     address,
+				"payer":       htlcDetails.Payer,
+				"hashlock":    htlcDetails.Hashlock,
+				"timelock":    htlcDetails.Timelock,
+				"redeemed_at": htlcDetails.RedeemedAt,
+				"preimage":    fmt.Sprint(txn["preimage"]),
+			},
 		)
 
 	default:
