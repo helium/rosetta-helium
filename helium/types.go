@@ -312,7 +312,7 @@ const (
 
 	// Genesis is the index of the
 	// genesis block for blockchain-etl instances
-	GenesisBlockIndex = int64(0)
+	GenesisBlockIndex = int64(1)
 
 	// IncludeMempoolCoins does not apply to rosetta-ethereum as it is not UTXO-based.
 	IncludeMempoolCoins = false
