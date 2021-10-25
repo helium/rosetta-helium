@@ -19,10 +19,11 @@
     }
   },
   "data": {
-    "historical_balance_enabled": false,
-    "reconciliation_disabled": true,
-    "inactive_discrepency_search_disabled": true,
-    "balance_tracking_disabled": true,
+    "start_index": 1042562,
+    "historical_balance_enabled": true,
+    "reconciliation_disabled": false,
+    "inactive_discrepency_search_disabled": false,
+    "balance_tracking_disabled": false,
     "end_conditions": {
       "tip": true
     }
