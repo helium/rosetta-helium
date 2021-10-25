@@ -8,7 +8,6 @@
   "http_timeout": 2000,
   "tip_delay": 1200,
   "max_retries": 10,
-  "max_sync_concurrency": 2,
   "construction": {
     "stale_depth": 3,
     "broadcast_limit": 5,
