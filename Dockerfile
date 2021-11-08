@@ -1,5 +1,5 @@
 ARG UBUNTU_BUILDER=ubuntu:18.04
-ARG UBUNTU_RUNNER=quay.io/team-helium/blockchain-node:2021-09-24-ubuntu18
+ARG UBUNTU_RUNNER=quay.io/team-helium/blockchain-node:blockchain-node-ubuntu18-1.1.45
 
 FROM $UBUNTU_BUILDER as rosetta-builder
 
