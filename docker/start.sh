@@ -1,3 +1,7 @@
-#! /bin/bash
+#!/bin/bash
 
-/app/blockchain-node/bin/blockchain_node foreground& /app/rosetta-helium& node /app/helium-constructor/public/index.js;
+set -euo pipefail
+
+/opt/blockchain_node/bin/blockchain_node daemon
+/app/rosetta-helium &
+node /app/helium-constructor/public/index.js
