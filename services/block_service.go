@@ -42,9 +42,7 @@ func (s *BlockAPIService) Block(
 	request *types.BlockRequest,
 ) (*types.BlockResponse, *types.Error) {
 	previousBlockIndex := *request.BlockIdentifier.Index - 1
-	if previousBlockIndex < *helium.LBS {
-		previousBlockIndex = *helium.LBS
-	} else if previousBlockIndex == 0 {
+	if previousBlockIndex == 0 {
 		previousBlockIndex = 1
 	}
 

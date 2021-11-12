@@ -34,6 +34,11 @@ type hashRequest struct {
 	Transaction string `json:"txn"`
 }
 
+type BalanceRequest struct {
+	Address string `json:"address"`
+	Height  int64  `json:"height,omitempty"`
+}
+
 type deriveRequest struct {
 	CurveType string `json:"curve_type"`
 	PublicKey string `json:"public_key"`
@@ -172,17 +177,12 @@ func GetAddress(curveType types.CurveType, publicKey []byte) (*string, *types.Er
 	return &response, nil
 }
 
-func GetBalance(address string) ([]*types.Amount, *types.Error) {
+func GetBalance(balanceRequest BalanceRequest) ([]*types.Amount, *types.Error) {
 	var balances []*types.Amount
-
-	type request struct {
-		Address string `json:"address"`
-	}
 
 	var result map[string]interface{}
 
-	req := request{Address: address}
-	if err := NodeClient.CallFor(&result, "account_get", req); err != nil {
+	if err := NodeClient.CallFor(&result, "account_get", balanceRequest); err != nil {
 		return nil, WrapErr(
 			ErrNotFound,
 			err,

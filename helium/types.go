@@ -308,7 +308,7 @@ const (
 
 	// HistoricalBalanceSupported is whether
 	// historical balance is supported.
-	HistoricalBalanceSupported = false
+	HistoricalBalanceSupported = true
 
 	// Genesis is the index of the
 	// genesis block for blockchain-etl instances

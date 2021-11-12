@@ -16,6 +16,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -39,29 +40,62 @@ func (s *AccountAPIService) AccountBalance(
 	ctx context.Context,
 	request *types.AccountBalanceRequest,
 ) (*types.AccountBalanceResponse, *types.Error) {
-	currentHeight, chErr := helium.GetCurrentHeight()
-	if chErr != nil {
-		return nil, chErr
+
+	balanceRequest := helium.BalanceRequest{
+		Address: request.AccountIdentifier.Address,
 	}
 
-	currentBlock, cErr := helium.GetBlock(&types.PartialBlockIdentifier{
-		Index: currentHeight,
-	})
-	if cErr != nil {
-		return nil, cErr
+	if request.BlockIdentifier != nil {
+		if request.BlockIdentifier.Index == nil {
+			return nil, helium.WrapErr(
+				helium.ErrInvalidParameter,
+				errors.New("request.BlockIdentifier requires an Index"),
+			)
+		}
+		balanceRequest.Height = *request.BlockIdentifier.Index
 	}
 
-	accountBalances, aErr := helium.GetBalance(request.AccountIdentifier.Address)
+	accountBalances, aErr := helium.GetBalance(balanceRequest)
 	if aErr != nil {
 		return nil, aErr
 	}
 
-	return &types.AccountBalanceResponse{
-		BlockIdentifier: &types.BlockIdentifier{
+	var blockId types.BlockIdentifier
+
+	if request.BlockIdentifier == nil {
+		currentHeight, chErr := helium.GetCurrentHeight()
+		if chErr != nil {
+			return nil, chErr
+		}
+
+		currentBlock, cErr := helium.GetBlock(&types.PartialBlockIdentifier{
+			Index: currentHeight,
+		})
+		if cErr != nil {
+			return nil, cErr
+		}
+
+		blockId = types.BlockIdentifier{
 			Index: currentBlock.BlockIdentifier.Index,
 			Hash:  currentBlock.BlockIdentifier.Hash,
-		},
-		Balances: accountBalances,
+		}
+	} else {
+		requestedBlock, rErr := helium.GetBlock(&types.PartialBlockIdentifier{
+			Index: request.BlockIdentifier.Index,
+		})
+		if rErr != nil {
+			return nil, rErr
+		}
+
+		blockId = types.BlockIdentifier{
+			Index: requestedBlock.BlockIdentifier.Index,
+			Hash:  requestedBlock.BlockIdentifier.Hash,
+		}
+	}
+
+	return &types.AccountBalanceResponse{
+		BlockIdentifier: &blockId,
+		Balances:        accountBalances,
 	}, nil
 }
 
