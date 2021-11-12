@@ -1,0 +1,29 @@
+{
+  "network": {
+   "blockchain": "Helium",
+   "network": "Mainnet"
+  },
+  "online_url": "http://localhost:8080",
+  "data_directory": "rosetta-data",
+  "http_timeout": 2000,
+  "tip_delay": 1200,
+  "max_retries": 10,
+  "construction": {
+    "stale_depth": 3,
+    "broadcast_limit": 5,
+    "constructor_dsl_file": "helium.ros",
+    "end_conditions": {
+      "create_account": 1,
+      "transfer": 1
+    }
+  },
+  "data": {
+    "start_index": 1093732,
+    "reconciliation_disabled": true,
+    "inactive_discrepency_search_disabled": true,
+    "balance_tracking_disabled": true,
+    "end_conditions": {
+      "tip": true
+    }
+  }
+ }
