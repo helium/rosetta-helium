@@ -34,6 +34,7 @@ var (
 		ErrUnableToDecodeAddress,
 		ErrSignatureInvalid,
 		ErrEnvVariableMissing,
+		ErrNodeSync,
 	}
 
 	// ErrUnimplemented is returned when an endpoint
@@ -120,6 +121,11 @@ var (
 	ErrUnableToParseTxn = &types.Error{
 		Code:    11,
 		Message: "Unable to parse transaction into valid operations",
+	}
+
+	ErrNodeSync = &types.Error{
+		Code:    12,
+		Message: "Node is not ready",
 	}
 )
 

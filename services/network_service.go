@@ -16,6 +16,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/helium/rosetta-helium/helium"
 
@@ -63,6 +64,10 @@ func (s *NetworkAPIService) NetworkStatus(
 
 	if cbErr != nil {
 		return nil, cbErr
+	}
+
+	if currentBlock.BlockIdentifier.Index < *helium.LBS {
+		return nil, helium.WrapErr(helium.ErrNodeSync, errors.New("node is catching up to snapshot height"))
 	}
 
 	lastBlessedBlock, lbErr := helium.GetBlock(&types.PartialBlockIdentifier{
