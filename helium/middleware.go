@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
-	"strings"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
 	"github.com/helium/rosetta-helium/utils"
@@ -142,30 +141,17 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		Hash string `json:"hash"`
 	}
 
-	req := request{Hash: txHash}
-	callResult, cerr := NodeClient.Call("transaction_get", req)
-	if cerr != nil {
-		return nil, WrapErr(
-			ErrFailed,
-			cerr,
-		)
-	}
-
-	stringResult, serr := json.Marshal(callResult.Result)
-	if serr != nil {
-		return nil, WrapErr(
-			ErrNotFound,
-			serr,
-		)
-	}
-
-	d := json.NewDecoder(strings.NewReader(string(stringResult)))
-	d.UseNumber()
 	var result map[string]interface{}
-	if derr := d.Decode(&result); derr != nil {
+	req := request{Hash: txHash}
+
+	callResult, err := utils.DeocdeCallAsNumber(NodeClient.Call("transaction_get", req))
+	jsonResult, _ := json.Marshal(callResult)
+	json.Unmarshal(jsonResult, &result)
+
+	if err != nil {
 		return nil, WrapErr(
 			ErrFailed,
-			derr,
+			err,
 		)
 	}
 
