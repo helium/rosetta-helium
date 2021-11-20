@@ -41,7 +41,7 @@ func (s *AccountAPIService) AccountBalance(
 	request *types.AccountBalanceRequest,
 ) (*types.AccountBalanceResponse, *types.Error) {
 
-	balanceRequest := helium.BalanceRequest{
+	balanceRequest := helium.GetBalanceRequest{
 		Address: request.AccountIdentifier.Address,
 	}
 

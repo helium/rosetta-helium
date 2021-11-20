@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"strings"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
 	"github.com/helium/rosetta-helium/utils"
@@ -34,11 +35,6 @@ type hashRequest struct {
 	Transaction string `json:"txn"`
 }
 
-type BalanceRequest struct {
-	Address string `json:"address"`
-	Height  int64  `json:"height,omitempty"`
-}
-
 type deriveRequest struct {
 	CurveType string `json:"curve_type"`
 	PublicKey string `json:"public_key"`
@@ -52,6 +48,22 @@ type HTLCReceipt struct {
 	Payer      string `json:"payer"`
 	RedeemedAt int64  `json:"redeemed_at"`
 	Timelock   int64  `json:"timelock"`
+}
+
+type GetBalanceRequest struct {
+	Address string `json:"address"`
+	Height  int64  `json:"height,omitempty"`
+}
+
+type GetBalanceResponse struct {
+	Address    string `json:"address"`
+	Balance    int64  `json:"balance"`
+	Block      int64  `json:"block"`
+	DCBalance  int64  `json:"dc_balance"`
+	DCNonce    int64  `json:"dc_nonce"`
+	Nonce      int64  `json:"nonce"`
+	SecBalance int64  `json:"sec_balance"`
+	SecNonce   int64  `json:"sec_nonce"`
 }
 
 func GetCurrentHeight() (*int64, *types.Error) {
@@ -87,8 +99,15 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 		}
 	}
 
-	if err := NodeClient.CallFor(&result, "block_get", req); err != nil {
-		return nil, WrapErr(ErrNotFound, err)
+	callResult, err := utils.DeocdeCallAsNumber(NodeClient.Call("htlc_get", req))
+	jsonResult, _ := json.Marshal(callResult)
+	json.Unmarshal(jsonResult, &result)
+
+	if err != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			err,
+		)
 	}
 
 	var processedTxs []*types.Transaction
@@ -123,13 +142,30 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		Hash string `json:"hash"`
 	}
 
-	var result map[string]interface{}
-
 	req := request{Hash: txHash}
-	if err := NodeClient.CallFor(&result, "transaction_get", req); err != nil {
+	callResult, cerr := NodeClient.Call("transaction_get", req)
+	if cerr != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			cerr,
+		)
+	}
+
+	stringResult, serr := json.Marshal(callResult.Result)
+	if serr != nil {
 		return nil, WrapErr(
 			ErrNotFound,
-			err,
+			serr,
+		)
+	}
+
+	d := json.NewDecoder(strings.NewReader(string(stringResult)))
+	d.UseNumber()
+	var result map[string]interface{}
+	if derr := d.Decode(&result); derr != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			derr,
 		)
 	}
 
@@ -177,10 +213,10 @@ func GetAddress(curveType types.CurveType, publicKey []byte) (*string, *types.Er
 	return &response, nil
 }
 
-func GetBalance(balanceRequest BalanceRequest) ([]*types.Amount, *types.Error) {
+func GetBalance(balanceRequest GetBalanceRequest) ([]*types.Amount, *types.Error) {
 	var balances []*types.Amount
 
-	var result map[string]interface{}
+	var result GetBalanceResponse
 
 	if err := NodeClient.CallFor(&result, "account_get", balanceRequest); err != nil {
 		return nil, WrapErr(
@@ -190,12 +226,12 @@ func GetBalance(balanceRequest BalanceRequest) ([]*types.Amount, *types.Error) {
 	}
 
 	amountHNT := &types.Amount{
-		Value:    fmt.Sprint(utils.MapToInt64(result["balance"])),
+		Value:    fmt.Sprint(result.Balance),
 		Currency: HNT,
 	}
 
 	amountHST := &types.Amount{
-		Value:    fmt.Sprint(utils.MapToInt64(result["sec_balance"])),
+		Value:    fmt.Sprint(result.SecBalance),
 		Currency: HST,
 	}
 
@@ -232,24 +268,25 @@ func GetHTLCReceipt(address string) (*HTLCReceipt, *types.Error) {
 		Address string `json:"address"`
 	}
 
-	var result map[string]interface{}
-
 	req := request{Address: address}
-	if err := NodeClient.CallFor(&result, "htlc_get", req); err != nil {
+
+	result, err := utils.DeocdeCallAsNumber(NodeClient.Call("htlc_get", req))
+
+	if err != nil {
 		return nil, WrapErr(
-			ErrNotFound,
+			ErrFailed,
 			err,
 		)
 	}
 
 	htlcReceipt := &HTLCReceipt{
 		Address:    address,
-		Balance:    utils.MapToInt64(result["balance"]),
+		Balance:    utils.JsonNumberToInt64(result["balance"]),
 		Hashlock:   fmt.Sprint(result["hashlock"]),
 		Payee:      fmt.Sprint(result["payee"]),
 		Payer:      fmt.Sprint(result["payer"]),
-		RedeemedAt: utils.MapToInt64(result["redeemed_at"]),
-		Timelock:   utils.MapToInt64(result["timelock"]),
+		RedeemedAt: utils.JsonNumberToInt64(result["redeemed_at"]),
+		Timelock:   utils.JsonNumberToInt64(result["timelock"]),
 	}
 
 	return htlcReceipt, nil
@@ -262,17 +299,17 @@ func GetNonce(address string) (*int64, *types.Error) {
 		Address string `json:"address"`
 	}
 
-	var result map[string]interface{}
-
 	req := request{Address: address}
-	if err := NodeClient.CallFor(&result, "account_get", req); err != nil {
+
+	result, err := utils.DeocdeCallAsNumber(NodeClient.Call("account_get", req))
+	if err != nil {
 		return nil, WrapErr(
-			ErrNotFound,
+			ErrFailed,
 			err,
 		)
 	}
 
-	nonce = utils.MapToInt64(result["nonce"])
+	nonce = utils.JsonNumberToInt64(result["nonce"])
 
 	return &nonce, nil
 }
@@ -282,55 +319,61 @@ func GetOraclePrice(height int64) (*int64, *types.Error) {
 		Height int64 `json:"height"`
 	}
 
-	var result map[string]interface{}
-
 	req := request{Height: height}
-	if err := NodeClient.CallFor(&result, "oracle_price_get", req); err != nil {
+
+	result, err := utils.DeocdeCallAsNumber(NodeClient.Call("oracle_price_get", req))
+	if err != nil {
 		return nil, WrapErr(
-			ErrNotFound,
+			ErrFailed,
 			err,
 		)
 	}
 
-	price := utils.MapToInt64(result["price"])
+	price := utils.JsonNumberToInt64(result["price"])
 
 	return &price, nil
 }
 
-func GetFee(hash *string, DCFeeAmount int64) *Fee {
+func GetFee(hash *string, DCFeeAmount int64) (*Fee, *types.Error) {
 	if hash == nil {
 		return &Fee{
 			Amount:      DCFeeAmount,
 			Currency:    DC,
 			Estimate:    true,
 			DCFeeAmount: DCFeeAmount,
-		}
+		}, nil
 	}
 
 	type request struct {
 		Hash string `json:"hash"`
 	}
 
-	var result map[string]interface{}
-
 	req := request{Hash: *hash}
-	if err := NodeClient.CallFor(&result, "implicit_burn_get", req); err != nil {
+
+	result, err := utils.DeocdeCallAsNumber(NodeClient.Call("implicit_burn_get", req))
+	if err != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			err,
+		)
+	}
+	if result["fee"] == nil {
 		return &Fee{
 			Amount:      DCFeeAmount,
 			Currency:    DC,
-			Estimate:    false,
+			Estimate:    true,
 			DCFeeAmount: DCFeeAmount,
-		}
+		}, nil
 	}
 
 	feeResult := &Fee{
-		Amount:      utils.MapToInt64(result["fee"]),
+		Amount:      utils.JsonNumberToInt64(result["fee"]),
 		Currency:    HNT,
 		Estimate:    false,
 		DCFeeAmount: DCFeeAmount,
 	}
 
-	return feeResult
+	return feeResult, nil
 }
 
 func GetMetadata(request *types.ConstructionMetadataRequest) (*types.ConstructionMetadataResponse, *types.Error) {
@@ -454,7 +497,7 @@ func GetTargetHeight() (*int64, *types.Error) {
 		return nil, WrapErr(ErrUnclearIntent, dErr)
 	}
 
-	currentHeight := utils.MapToInt64(response["current_height"])
+	currentHeight := utils.JsonNumberToInt64(response["current_height"])
 	return &currentHeight, nil
 }
 
@@ -530,7 +573,7 @@ func PayloadGenerator(operations []*types.Operation, metadata map[string]interfa
 
 	jsonValue, jErr := json.Marshal(metadata)
 	if jErr != nil {
-		fmt.Print(jErr)
+		return nil, WrapErr(ErrFailed, jErr)
 	}
 
 	var payload map[string]interface{}

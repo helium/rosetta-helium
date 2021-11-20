@@ -80,7 +80,7 @@ func RewardsV1(rewards []interface{}) ([]*types.Operation, *types.Error) {
 		rewardOp, rErr := CreateCreditOp(
 			RewardOp,
 			fmt.Sprint(reward.(map[string]interface{})["account"]),
-			utils.MapToInt64(reward.(map[string]interface{})["amount"]),
+			utils.JsonNumberToInt64(reward.(map[string]interface{})["amount"]),
 			HNT,
 			SuccessStatus,
 			int64(i),
