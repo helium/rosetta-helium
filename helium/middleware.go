@@ -99,7 +99,7 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 		}
 	}
 
-	callResult, err := utils.DeocdeCallAsNumber(NodeClient.Call("htlc_get", req))
+	callResult, err := utils.DeocdeCallAsNumber(NodeClient.Call("block_get", req))
 	jsonResult, _ := json.Marshal(callResult)
 	json.Unmarshal(jsonResult, &result)
 
@@ -492,7 +492,9 @@ func GetTargetHeight() (*int64, *types.Error) {
 		return nil, WrapErr(ErrUnclearIntent, rErr)
 	}
 	defer resp.Body.Close()
-	dErr := json.NewDecoder(resp.Body).Decode(&response)
+	d := json.NewDecoder(resp.Body)
+	d.UseNumber()
+	dErr := d.Decode(&response)
 	if dErr != nil {
 		return nil, WrapErr(ErrUnclearIntent, dErr)
 	}
