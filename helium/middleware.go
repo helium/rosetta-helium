@@ -141,10 +141,9 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		Hash string `json:"hash"`
 	}
 
-	var result map[string]interface{}
 	req := request{Hash: txHash}
 
-	callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("transaction_get", req))
+	result, err := utils.DecodeCallAsNumber(NodeClient.Call("transaction_get", req))
 	if err != nil {
 		return nil, WrapErr(
 			ErrFailed,
@@ -152,7 +151,7 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		)
 	}
 
-	operations, oErr := TransactionToOps(callResult, SuccessStatus)
+	operations, oErr := TransactionToOps(result, SuccessStatus)
 	if oErr != nil {
 		return nil, oErr
 	}
