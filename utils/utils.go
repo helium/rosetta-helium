@@ -17,7 +17,7 @@ func JsonNumberToInt64(m interface{}) int64 {
 	return convertedInt
 }
 
-func DeocdeCallAsNumber(call *jsonrpc.RPCResponse, err error) (map[string]interface{}, error) {
+func DecodeCallAsNumber(call *jsonrpc.RPCResponse, err error) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, errors.New("unable to decode json-rpc response")
 	}

@@ -98,7 +98,7 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 		}
 	}
 
-	callResult, err := utils.DeocdeCallAsNumber(NodeClient.Call("block_get", req))
+	callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("block_get", req))
 	jsonResult, _ := json.Marshal(callResult)
 	json.Unmarshal(jsonResult, &result)
 
@@ -144,10 +144,7 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 	var result map[string]interface{}
 	req := request{Hash: txHash}
 
-	callResult, err := utils.DeocdeCallAsNumber(NodeClient.Call("transaction_get", req))
-	jsonResult, _ := json.Marshal(callResult)
-	json.Unmarshal(jsonResult, &result)
-
+	callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("transaction_get", req))
 	if err != nil {
 		return nil, WrapErr(
 			ErrFailed,
@@ -155,7 +152,7 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		)
 	}
 
-	operations, oErr := TransactionToOps(result, SuccessStatus)
+	operations, oErr := TransactionToOps(callResult, SuccessStatus)
 	if oErr != nil {
 		return nil, oErr
 	}
@@ -256,8 +253,7 @@ func GetHTLCReceipt(address string) (*HTLCReceipt, *types.Error) {
 
 	req := request{Address: address}
 
-	result, err := utils.DeocdeCallAsNumber(NodeClient.Call("htlc_get", req))
-
+	result, err := utils.DecodeCallAsNumber(NodeClient.Call("htlc_get", req))
 	if err != nil {
 		return nil, WrapErr(
 			ErrFailed,
@@ -287,7 +283,7 @@ func GetNonce(address string) (*int64, *types.Error) {
 
 	req := request{Address: address}
 
-	result, err := utils.DeocdeCallAsNumber(NodeClient.Call("account_get", req))
+	result, err := utils.DecodeCallAsNumber(NodeClient.Call("account_get", req))
 	if err != nil {
 		return nil, WrapErr(
 			ErrFailed,
@@ -307,7 +303,7 @@ func GetOraclePrice(height int64) (*int64, *types.Error) {
 
 	req := request{Height: height}
 
-	result, err := utils.DeocdeCallAsNumber(NodeClient.Call("oracle_price_get", req))
+	result, err := utils.DecodeCallAsNumber(NodeClient.Call("oracle_price_get", req))
 	if err != nil {
 		return nil, WrapErr(
 			ErrFailed,
@@ -336,7 +332,7 @@ func GetFee(hash *string, DCFeeAmount int64) (*Fee, *types.Error) {
 
 	req := request{Hash: *hash}
 
-	result, err := utils.DeocdeCallAsNumber(NodeClient.Call("implicit_burn_get", req))
+	result, err := utils.DecodeCallAsNumber(NodeClient.Call("implicit_burn_get", req))
 	if err != nil {
 		return nil, WrapErr(
 			ErrFailed,
