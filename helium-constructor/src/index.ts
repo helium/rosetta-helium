@@ -9,21 +9,28 @@ import { PaymentV2Json } from './transaction_types'
 import * as JSLong from "long"
 import * as crypto from "crypto"
 import base64url from "base64url"
+import logger from "pino"
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const asyncHandler = require('express-async-handler');
 var app = express();
 
+const logr = logger({
+  transport: {
+    target: 'pino-pretty'
+  },
+})
+
 var netType:number;
 var clientType:Network;
 
 if (process.env.NETWORK == "testnet") {
-    console.log("Starting testnet server");
+    logr.info("Starting testnet server");
     netType = 1;
     clientType = Network.testnet;
 } else {
-    console.log("Starting mainnet server");
+    logr.info("Starting mainnet server");
     netType = 0;
     clientType = Network.production;
 }
@@ -229,5 +236,5 @@ app.post('/submit-tx', asyncHandler(async function(req: express.Request, res: ex
 }));
 
 http.createServer(app).listen(app.get('port'), function() {
-  console.log('Express server listening on port ' + app.get('port'));
+  logr.info('Express server listening on port ' + app.get('port'));
 });
