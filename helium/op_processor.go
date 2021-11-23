@@ -86,7 +86,10 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 	switch txn["type"] {
 
 	case AddGatewayV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"])+utils.JsonNumberToInt64(txn["staking_fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return AddGatewayV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["owner"]),
@@ -95,7 +98,10 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 		)
 
 	case AssertLocationV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"])+utils.JsonNumberToInt64(txn["staking_fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return AssertLocationV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["owner"]),
@@ -104,7 +110,10 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 		)
 
 	case AssertLocationV2Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"])+utils.MapToInt64(txn["staking_fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"])+utils.JsonNumberToInt64(txn["staking_fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return AssertLocationV2(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["owner"]),
@@ -113,20 +122,26 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 		)
 
 	case PaymentV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return PaymentV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),
-			utils.MapToInt64(txn["amount"]),
+			utils.JsonNumberToInt64(txn["amount"]),
 			feeDetails)
 
 	case PaymentV2Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		var payments []*Payment
 		for _, p := range txn["payments"].([]interface{}) {
 			payments = append(payments, &Payment{
 				Payee:  fmt.Sprint(p.(map[string]interface{})["payee"]),
-				Amount: utils.MapToInt64(p.(map[string]interface{})["amount"]),
+				Amount: utils.JsonNumberToInt64(p.(map[string]interface{})["amount"]),
 			})
 		}
 		return PaymentV2(
@@ -145,68 +160,89 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 	case CoinbaseV1Txn:
 		return CoinbaseV1(
 			fmt.Sprint(txn["payee"]),
-			utils.MapToInt64(txn["amount"]),
+			utils.JsonNumberToInt64(txn["amount"]),
 		)
 
 	case SecurityExchangeV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return SecurityExchangeV1(
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["payee"]),
 			feeDetails,
-			utils.MapToInt64(txn["amount"]),
+			utils.JsonNumberToInt64(txn["amount"]),
 		)
 
 	case TokenBurnV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return TokenBurnV1(
 			fmt.Sprint(txn["payer"]),
-			utils.MapToInt64(txn["amount"]),
+			utils.JsonNumberToInt64(txn["amount"]),
 			feeDetails,
 			txn,
 		)
 
 	case TransferHotspotV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return TransferHotspotV1(
 			fmt.Sprint(txn["buyer"]),
 			fmt.Sprint(txn["seller"]),
-			utils.MapToInt64(txn["amount_to_seller"]),
+			utils.JsonNumberToInt64(txn["amount_to_seller"]),
 			feeDetails,
 			txn,
 		)
 
 	case StakeValidatorV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return StakeValidatorV1(
 			fmt.Sprint(txn["owner"]),
-			utils.MapToInt64(txn["stake"]),
+			utils.JsonNumberToInt64(txn["stake"]),
 			feeDetails,
 			txn,
 		)
 
 	case UnstakeValidatorV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return UnstakeValidatorV1(
 			fmt.Sprint(txn["owner"]),
-			utils.MapToInt64(txn["stake_amount"]),
-			utils.MapToInt64(txn["stake_release_height"]),
+			utils.JsonNumberToInt64(txn["stake_amount"]),
+			utils.JsonNumberToInt64(txn["stake_release_height"]),
 			feeDetails,
 			txn,
 		)
 
 	case TransferValidatorStakeV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return TransferValidatorStakeV1(
 			fmt.Sprint(txn["new_owner"]),
 			fmt.Sprint(txn["old_owner"]),
-			utils.MapToInt64(txn["payment_amount"]),
+			utils.JsonNumberToInt64(txn["payment_amount"]),
 			feeDetails,
 			txn,
 		)
 
 	case OUIV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return FeeOnlyTxn(
 			OUIOp,
 			fmt.Sprint(txn["payer"]),
@@ -216,7 +252,10 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 		)
 
 	case RoutingV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return FeeOnlyTxn(
 			RoutingOp,
 			"",
@@ -226,7 +265,10 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 		)
 
 	case StateChannelOpenV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return FeeOnlyTxn(
 			StateChannelOpenOp,
 			"",
@@ -236,10 +278,13 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 		)
 
 	case CreateHTLCV1Txn:
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		return CreateHTLCV1(
 			fmt.Sprint(txn["payer"]),
-			utils.MapToInt64(txn["amount"]),
+			utils.JsonNumberToInt64(txn["amount"]),
 			feeDetails,
 			map[string]interface{}{
 				"payee":    fmt.Sprint(txn["payee"]),
@@ -251,7 +296,10 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 
 	case RedeemHTLCV1Txn:
 		address := fmt.Sprint(txn["address"])
-		feeDetails := GetFee(&hash, utils.MapToInt64(txn["fee"]))
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
 		htlcDetails, htlcErr := GetHTLCReceipt(address)
 		if htlcErr != nil {
 			return nil, htlcErr
