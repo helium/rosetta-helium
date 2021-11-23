@@ -57,7 +57,20 @@ func (s *AccountAPIService) AccountBalance(
 
 	accountBalances, aErr := helium.GetBalance(balanceRequest)
 	if aErr != nil {
-		return nil, aErr
+		if aErr == helium.ErrNotFound {
+			accountBalances = []*types.Amount{
+				{
+					Value:    "0",
+					Currency: helium.HNT,
+				},
+				{
+					Value:    "0",
+					Currency: helium.HST,
+				},
+			}
+		} else {
+			return nil, aErr
+		}
 	}
 
 	var blockId types.BlockIdentifier
