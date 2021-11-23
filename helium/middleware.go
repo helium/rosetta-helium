@@ -13,6 +13,7 @@ import (
 	"github.com/helium/rosetta-helium/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/ybbus/jsonrpc"
+	"go.uber.org/zap"
 )
 
 var (
@@ -381,7 +382,7 @@ func GetMetadata(request *types.ConstructionMetadataRequest) (*types.Constructio
 	err := json.Unmarshal(jsonString, &options)
 	if err != nil {
 		if e, ok := err.(*json.SyntaxError); ok {
-			fmt.Printf("syntax error at byte offset %d", e.Offset)
+			zap.S().Infof("syntax error at byte offset %d", e.Offset)
 		}
 		return nil, WrapErr(ErrUnclearIntent, err)
 	}
