@@ -22,6 +22,7 @@ import (
 
 	"github.com/helium/rosetta-helium/helium"
 	"github.com/helium/rosetta-helium/services"
+	"go.uber.org/zap"
 
 	"github.com/coinbase/rosetta-sdk-go/asserter"
 	"github.com/coinbase/rosetta-sdk-go/server"
@@ -66,6 +67,12 @@ func NewBlockchainRouter(
 }
 
 func main() {
+	logger, _ := zap.NewDevelopment()
+	defer logger.Sync() // flushes buffer, if any
+
+	globalLogger := zap.ReplaceGlobals(logger)
+	defer globalLogger()
+
 	var testnet bool
 	var network *types.NetworkIdentifier
 
@@ -73,13 +80,13 @@ func main() {
 	flag.Parse()
 
 	if !testnet {
-		fmt.Println("Initilizing mainnet node...")
+		zap.S().Info("Initilizing mainnet node...")
 		network = &types.NetworkIdentifier{
 			Blockchain: "Helium",
 			Network:    helium.MainnetNetwork,
 		}
 	} else {
-		fmt.Println("Initilizing testnet node...")
+		zap.S().Info("Initilizing testnet node...")
 		network = &types.NetworkIdentifier{
 			Blockchain: "Helium",
 			Network:    helium.TestnetNetwork,
@@ -104,6 +111,6 @@ func main() {
 	router := NewBlockchainRouter(network, a)
 	loggedRouter := server.LoggerMiddleware(router)
 	corsRouter := server.CorsMiddleware(loggedRouter)
-	log.Printf("Listening on port %d\n", serverPort)
+	zap.S().Info("Listening on port ", serverPort)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", serverPort), corsRouter))
 }

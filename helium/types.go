@@ -2,19 +2,19 @@ package helium
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
+	"go.uber.org/zap"
 )
 
 func readLBSfile() *int64 {
 	file, err := os.Open("lbs.txt")
 	if err != nil {
-		fmt.Println("No lbs.txt found: attempting to set last blessed snapshot as genesis (1)...")
+		zap.S().Info("No lbs.txt found: attempting to set last blessed snapshot as genesis (1)...")
 		tmpLBS := int64(1)
 		return &tmpLBS
 	}
