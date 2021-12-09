@@ -54,7 +54,7 @@ rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.js
 rosetta-cli check:construction --configuration-file rosetta-cli-config/mainnet/config.json
 ```
 
-Testnbet:
+Testnet:
 ```text
 rosetta-cli check:data --configuration-file rosetta-cli-config/testnet/config.json
 
