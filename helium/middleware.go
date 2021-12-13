@@ -120,16 +120,24 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 		processedTxs = append(processedTxs, ptx)
 	}
 
+	var blockTime int64
+
+	if result.Time == 0 {
+		blockTime = 946684800
+	} else {
+		blockTime = result.Time
+	}
+
+	if result.Hash == "" {
+		return nil, WrapErr(ErrNotFound, errors.New("block cannot be found"))
+	}
+
 	currentBlock := &types.Block{
 		BlockIdentifier: &types.BlockIdentifier{
 			Index: result.Height,
 			Hash:  result.Hash,
 		},
-		ParentBlockIdentifier: &types.BlockIdentifier{
-			Index: result.Height,
-			Hash:  result.Hash,
-		},
-		Timestamp:    result.Time * 1000,
+		Timestamp:    blockTime * 1000,
 		Transactions: processedTxs,
 		Metadata:     nil,
 	}
