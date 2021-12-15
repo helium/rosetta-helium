@@ -105,7 +105,6 @@ ARG BUILD_TARGET=docker_rosetta_testnet
 
 WORKDIR /usr/src/blockchain-node
 
-RUN git checkout fix-historic-balance
 RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
 
 RUN mkdir -p /opt/blockchain_node \
