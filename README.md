@@ -23,7 +23,7 @@ docker build . -t rosetta-helium:latest
 
 Testnet:
 ```text
-docker build . -f Dockerfile_testnet -t rosetta-helium:latest
+docker build . -t rosetta-helium:latest --build-arg NETWORK=testnet
 ```
 
 #### Run container

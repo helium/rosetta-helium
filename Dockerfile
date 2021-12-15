@@ -1,6 +1,6 @@
-ARG UBUNTU_BUILDER=ubuntu:18.04
+ARG NETWORK=mainnet
 
-FROM $UBUNTU_BUILDER as node-builder
+FROM ubuntu:20.04 as node-builder
 
 ARG BUILD_VERSION="23.3.4.7"
 ARG BUILD_SHA256="37e39a43c495861ce69de06e1a013a7eac81d15dc6eebd2d2022fd68791f4b2d"
@@ -60,8 +60,6 @@ RUN set -xe \
 	&& apt-get purge -y --auto-remove $buildDeps $fetchDeps \
 	&& rm -rf $ERL_TOP /var/lib/apt/lists/*
 
-ARG BUILD_TARGET=docker_rosetta
-
 RUN set -xe \
 	    && apt update \
 	    && apt-get install -y --no-install-recommends \
@@ -86,14 +84,36 @@ ENV CC=gcc CXX=g++ CFLAGS="-U__sun__" \
 WORKDIR /usr/src/
 
 # Add our code
-RUN git clone https://github.com/helium/blockchain-node.git
+RUN git clone https://github.com/syuan100/blockchain-node.git
+
+
+FROM node-builder AS node-mainnet
+
+ARG BUILD_TARGET=docker_rosetta
 
 WORKDIR /usr/src/blockchain-node
 
+RUN git checkout fix-historic-balance
 RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
 
 RUN mkdir -p /opt/blockchain_node \
 	&& tar -zxvf _build/${BUILD_TARGET}/rel/*/*.tar.gz -C /opt/blockchain_node
+
+
+FROM node-builder AS node-testnet
+
+ARG BUILD_TARGET=docker_rosetta_testnet
+
+WORKDIR /usr/src/blockchain-node
+
+RUN git checkout fix-historic-balance
+RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
+
+RUN mkdir -p /opt/blockchain_node \
+	&& tar -zxvf _build/${BUILD_TARGET}/rel/*/*.tar.gz -C /opt/blockchain_node
+
+
+FROM ubuntu:20.04 AS rosetta-builder
 
 RUN set -xe \
 	&& ulimit -n 100000 \
@@ -109,8 +129,6 @@ ENV COOKIE=blockchain_node \
     # add to path, for easy exec interaction
     PATH=/sbin:/bin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH:/opt/blockchain_node/bin
 
-FROM $UBUNTU_BUILDER as rosetta-builder
-
 WORKDIR /src
 
 RUN apt update \
@@ -125,7 +143,11 @@ COPY . rosetta-helium
 
 RUN cd rosetta-helium && go build -o rosetta-helium
 
-FROM node-builder
+
+FROM node-${NETWORK} as rosetta-helium-final
+
+ARG NETWORK
+ARG DEBIAN_FRONTEND=noninteractive
 
 EXPOSE 8080
 EXPOSE 44158
@@ -137,7 +159,7 @@ RUN apt update \
 WORKDIR /app
 
 COPY --from=rosetta-builder /src/rosetta-helium/rosetta-helium rosetta-helium
-COPY --from=rosetta-builder /src/rosetta-helium/docker/start.sh start.sh
+COPY --from=rosetta-builder /src/rosetta-helium/docker/${NETWORK}.sh start.sh
 COPY --from=rosetta-builder /src/rosetta-helium/helium-constructor helium-constructor
 
 RUN cd helium-constructor \
