@@ -15,7 +15,7 @@ This project was created by [@syuan100](https://github.com/syuan100) and support
 
 # Quick setup
 
-#### Build container
+#### Build container from source
 Mainnet:
 ```text
 DOCKER_BUILDKIT=1 docker build . -t rosetta-helium:latest
@@ -27,6 +27,17 @@ DOCKER_BUILDKIT=1 docker build . -t rosetta-helium:latest --build-arg NETWORK=te
 ```
 
 *Note: `DOCKER_BUILDKIT=1` is not necessary but including it may reduce the image size due to the nature of the conditional build.*
+
+#### Build container using pre-built Helium images
+Mainnet:
+```text
+DOCKER_BUILDKIT=1 docker build . -f Dockerfile_quick -t rosetta-helium:latest
+```
+
+Testnet:
+```text
+DOCKER_BUILDKIT=1 docker build . -f Dockerfile_quick -t rosetta-helium:latest --build-arg NETWORK=testnet
+```
 
 #### Run container
 Local data is stored in `helium-data`

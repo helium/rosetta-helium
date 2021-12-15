@@ -1,0 +1,56 @@
+ARG UBUNTU_BUILDER=ubuntu:20.04
+ARG MAINNET_RUNNER=quay.io/team-helium/blockchain-node:blockchain-node-ubuntu18-1.1.53
+ARG TESTNET_RUNNER=quay.io/team-helium/blockchain-node:blockchain-node-testnet-ubuntu18-1.1.53
+ARG NETWORK=mainnet
+
+
+FROM $UBUNTU_BUILDER as rosetta-builder
+
+WORKDIR /src
+
+RUN apt update \
+      && apt install -y --no-install-recommends \
+         curl ca-certificates git \
+      && curl -L https://golang.org/dl/go1.17.1.linux-amd64.tar.gz | tar xzf -
+
+ENV PATH="/src/go/bin:$PATH" \
+    CGO_ENABLED=0
+
+COPY . rosetta-helium
+
+RUN cd rosetta-helium && go build -o rosetta-helium
+
+
+FROM ${MAINNET_RUNNER} as runner-mainnet
+
+WORKDIR /app
+
+COPY --from=rosetta-builder /src/rosetta-helium/rosetta-helium rosetta-helium
+COPY --from=rosetta-builder /src/rosetta-helium/docker/mainnet.sh start.sh
+COPY --from=rosetta-builder /src/rosetta-helium/helium-constructor helium-constructor
+
+
+FROM ${TESTNET_RUNNER} as runner-testnet
+
+WORKDIR /app
+
+COPY --from=rosetta-builder /src/rosetta-helium/rosetta-helium rosetta-helium
+COPY --from=rosetta-builder /src/rosetta-helium/docker/testnet.sh start.sh
+COPY --from=rosetta-builder /src/rosetta-helium/helium-constructor helium-constructor
+
+
+FROM runner-${NETWORK} as rosetta-helium-final
+
+EXPOSE 8080
+EXPOSE 44158
+
+RUN apt update \
+    && apt install -y --no-install-recommends \
+         ca-certificates git npm
+
+RUN cd helium-constructor \
+      && npm install \
+      && npm run build \
+      && chmod +x /app/start.sh
+
+ENTRYPOINT ["/app/start.sh"]
