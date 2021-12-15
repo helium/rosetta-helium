@@ -18,13 +18,15 @@ This project was created by [@syuan100](https://github.com/syuan100) and support
 #### Build container
 Mainnet:
 ```text
-docker build . -t rosetta-helium:latest
+DOCKER_BUILDKIT=1 docker build . -t rosetta-helium:latest
 ```
 
 Testnet:
 ```text
-docker build . -t rosetta-helium:latest --build-arg NETWORK=testnet
+DOCKER_BUILDKIT=1 docker build . -t rosetta-helium:latest --build-arg NETWORK=testnet
 ```
+
+*Note: `DOCKER_BUILDKIT=1` is not necessary but including it may reduce the image size due to the nature of the conditional build.*
 
 #### Run container
 Local data is stored in `helium-data`
