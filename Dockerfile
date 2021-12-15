@@ -84,7 +84,7 @@ ENV CC=gcc CXX=g++ CFLAGS="-U__sun__" \
 WORKDIR /usr/src/
 
 # Add our code
-RUN git clone https://github.com/syuan100/blockchain-node.git
+RUN git clone https://github.com/helium/blockchain-node.git
 
 
 FROM node-builder AS node-mainnet
@@ -93,7 +93,6 @@ ARG BUILD_TARGET=docker_rosetta
 
 WORKDIR /usr/src/blockchain-node
 
-RUN git checkout fix-historic-balance
 RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
 
 RUN mkdir -p /opt/blockchain_node \
