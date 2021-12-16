@@ -18,11 +18,8 @@
     }
   },
   "data": {
-    "start_index": 1093732,
+    "start_index": 1108082,
     "historical_balance_enabled": true,
-    "reconciliation_disabled": false,
-    "inactive_discrepency_search_disabled": false,
-    "balance_tracking_disabled": false,
     "end_conditions": {
       "tip": true
     }

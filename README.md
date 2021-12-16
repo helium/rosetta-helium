@@ -15,9 +15,28 @@ This project was created by [@syuan100](https://github.com/syuan100) and support
 
 # Quick setup
 
-#### Build container
+#### Build container from source
+Mainnet:
 ```text
-docker build . -t rosetta-helium:latest
+DOCKER_BUILDKIT=1 docker build . -t rosetta-helium:latest
+```
+
+Testnet:
+```text
+DOCKER_BUILDKIT=1 docker build . -t rosetta-helium:latest --build-arg NETWORK=testnet
+```
+
+*Note: `DOCKER_BUILDKIT=1` is not necessary but including it may reduce the image size due to the nature of the conditional build.*
+
+#### Build container using pre-built Helium images
+Mainnet:
+```text
+DOCKER_BUILDKIT=1 docker build . -f Dockerfile_quick -t rosetta-helium:latest
+```
+
+Testnet:
+```text
+DOCKER_BUILDKIT=1 docker build . -f Dockerfile_quick -t rosetta-helium:latest --build-arg NETWORK=testnet
 ```
 
 #### Run container
@@ -41,10 +60,18 @@ docker run -d --rm --init --ulimit "nofile=1000000:1000000" -v "$(pwd)/helium-da
 ```
 
 #### Rosetta CLI check
+Mainnet:
 ```text
 rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.json
 
 rosetta-cli check:construction --configuration-file rosetta-cli-config/mainnet/config.json
+```
+
+Testnet:
+```text
+rosetta-cli check:data --configuration-file rosetta-cli-config/testnet/config.json
+
+rosetta-cli check:construction --configuration-file rosetta-cli-config/testnet/config.json
 ```
 (Please wait a few minutes for the Helium node to initialize before running this command)
 
@@ -97,8 +124,8 @@ Transactions support for reading from the Data API
 |  `stake_validator_v1` | :white_check_mark: |
 |  `unstake_validator_v1` | :white_check_mark: |
 |  `transfer_validator_v1` | :white_check_mark: |
-| `create_htlc_v1`* | Considered |
-|  `redeem_htlc_v1`* | Considered |
+| `create_htlc_v1` | :white_check_mark: |
+|  `redeem_htlc_v1` | :white_check_mark: |
 
 ### Fee-only transactions (Only recording implicit_burns for HNT deductions)
 
@@ -130,9 +157,9 @@ Transaction support for creation via the construction API
 | Transaction | Implemented |
 |-----|-----------|
 | `payment_v2` | :white_check_mark: |
-| `security_exchange_v1` | CONSIDERED |
-| `create_htlc_v1`* | CONSIDERED |
-| `redeem_htlc_v1`* | CONSIDERED |
-| `stake_validator_v1`* | CONSIDERED |
-| `unstake_validator_v1`* | CONSIDERED |
-| `transfer_validator_v1`* | CONSIDERED |
+| `security_exchange_v1` | :x: |
+| `create_htlc_v1` | :x: |
+| `redeem_htlc_v1` | :x: |
+| `stake_validator_v1` | :x: |
+| `unstake_validator_v1` | :x: |
+| `transfer_validator_v1` | :x: |
