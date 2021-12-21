@@ -27,6 +27,8 @@ import (
 	"github.com/coinbase/rosetta-sdk-go/asserter"
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
+
+	badger "github.com/dgraph-io/badger/v3"
 )
 
 const (
@@ -72,6 +74,12 @@ func main() {
 
 	globalLogger := zap.ReplaceGlobals(logger)
 	defer globalLogger()
+
+	db, err := badger.Open(badger.DefaultOptions("badger"))
+	if err != nil {
+		zap.S().Fatal(err)
+	}
+	defer db.Close()
 
 	var testnet bool
 	var network *types.NetworkIdentifier
