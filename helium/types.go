@@ -294,6 +294,10 @@ const (
 	// creating an HTLC transaction
 	RedeemHTLCOp = "redeem_htlc_op"
 
+	// UpdateGatewayOUIOp is used to describe
+	// updating a gateway's OUI
+	UpdateGatewayOUIOp = "update_gateway_oui_op"
+
 	// PassthroughOp is used to describe
 	// passthrough transactions
 	PassthroughOp = "passthrough_op"
@@ -394,6 +398,7 @@ var (
 		UnstakeValidatorV1Txn,
 		TransferValidatorStakeV1Txn,
 		ValidatorHeartbeatV1Txn,
+		UpdateGatewayOUIV1Txn,
 	}
 
 	// OperationTypes are all supported base operations
@@ -417,6 +422,7 @@ var (
 		StateChannelOpenOp,
 		OUIOp,
 		PassthroughOp,
+		UpdateGatewayOUIOp,
 	}
 
 	// OperationStatuses are all supported operation statuses.
