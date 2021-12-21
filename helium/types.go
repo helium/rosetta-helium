@@ -220,6 +220,12 @@ const (
 	// transferring hotspots from one wallet to another
 	TransferHotspotV1Txn = "transfer_hotspot_v1"
 
+	// GhostTxn is used to describe
+	// a placeholder transaction that does not actually
+	// exist on the Helium blockchain but is required
+	// for account reconciliation
+	GhostTxn = "ghost_txn"
+
 	// CoinbaseOp is used to describe
 	// the coinbase transaction at genesis (testnet only)
 	CoinbaseOp = "coinbase_op"
