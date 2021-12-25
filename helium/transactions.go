@@ -377,7 +377,7 @@ func UnstakeValidatorV1(
 		return nil, WrapErr(ErrFailed, gErr)
 	}
 
-	Fee, fErr := CreateFeeOp(owner, fee, SuccessStatus, 1, map[string]interface{}{})
+	Fee, fErr := CreateFeeOp(owner, fee, SuccessStatus, 0, map[string]interface{}{})
 	if fErr != nil {
 		return nil, fErr
 	}

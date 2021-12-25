@@ -57,7 +57,7 @@ func (s *AccountAPIService) AccountBalance(
 
 	accountBalances, aErr := helium.GetBalance(balanceRequest)
 	if aErr != nil {
-		if aErr == helium.ErrNotFound {
+		if aErr.Code == 1 {
 			accountBalances = []*types.Amount{
 				{
 					Value:    "0",
