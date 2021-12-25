@@ -120,6 +120,16 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 		processedTxs = append(processedTxs, ptx)
 	}
 
+	ghostTxns, gtErr := utils.SeekGhostTxnsInBlock(CurrentNetwork, result.Height)
+	if gtErr != nil {
+		return nil, WrapErr(ErrFailed, gtErr)
+	}
+
+	if len(ghostTxns) > 0 {
+		zap.S().Info("Adding " + fmt.Sprint(len(ghostTxns)) + " ghost txns.")
+		processedTxs = append(processedTxs, ghostTxns...)
+	}
+
 	var blockTime int64
 
 	if result.Time == 0 {

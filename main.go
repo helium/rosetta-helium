@@ -22,6 +22,7 @@ import (
 
 	"github.com/helium/rosetta-helium/helium"
 	"github.com/helium/rosetta-helium/services"
+	"github.com/helium/rosetta-helium/utils"
 	"go.uber.org/zap"
 
 	"github.com/coinbase/rosetta-sdk-go/asserter"
@@ -75,11 +76,13 @@ func main() {
 	globalLogger := zap.ReplaceGlobals(logger)
 	defer globalLogger()
 
-	db, err := badger.Open(badger.DefaultOptions("badger"))
+	bdb, err := badger.Open(badger.DefaultOptions("badger"))
 	if err != nil {
 		zap.S().Fatal(err)
 	}
-	defer db.Close()
+	defer bdb.Close()
+
+	utils.DB = bdb
 
 	var testnet bool
 	var network *types.NetworkIdentifier
@@ -100,6 +103,8 @@ func main() {
 			Network:    helium.TestnetNetwork,
 		}
 	}
+
+	helium.CurrentNetwork = network
 
 	// The asserter automatically rejects incorrectly formatted
 	// requests.

@@ -312,6 +312,14 @@ const (
 
 var (
 
+	// MainnetNetworkBytes is the value of the
+	// mainnet network in bytes
+	MainnetNetworkBytes = []byte{0}
+
+	// TestnetNetworkBytes is the value of the
+	// testnet network in bytes
+	TestnetNetworkBytes = []byte{1}
+
 	// SuccessStatus is the status of any
 	// Helium operation considered successful.
 	SuccessStatus = "SUCCESS"

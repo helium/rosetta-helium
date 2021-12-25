@@ -4,8 +4,11 @@ import (
 	"fmt"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
+	"github.com/dgraph-io/badger/v3"
 	"github.com/helium/rosetta-helium/utils"
 )
+
+var CurrentNetwork *types.NetworkIdentifier
 
 func PaymentV1(payer, payee string, amount int64, fee *Fee) ([]*types.Operation, *types.Error) {
 	PaymentDebit, pErr := CreateDebitOp(DebitOp, payer, amount, HNT, SuccessStatus, 0, map[string]interface{}{"debit_category": "payment"})
@@ -347,19 +350,31 @@ func UnstakeValidatorV1(
 	fee *Fee,
 	metadata map[string]interface{},
 ) ([]*types.Operation, *types.Error) {
-	stakeStatus := PendingStatus
-	currentHeight, cErr := GetCurrentHeight()
-	if cErr != nil {
-		return nil, cErr
-	}
 
-	if stakeReleaseHeight >= *currentHeight {
-		stakeStatus = SuccessStatus
-	}
-
-	Unstake, uErr := CreateCreditOp(UnstakeValidatorOp, owner, stake, HNT, stakeStatus, 0, metadata)
+	Unstake, uErr := CreateCreditOp(UnstakeValidatorOp, owner, stake, HNT, SuccessStatus, 0, metadata)
 	if uErr != nil {
 		return nil, uErr
+	}
+
+	gErr := utils.CreateGhostTxn(
+		&utils.GhostTxnKey{
+			Network: CurrentNetwork,
+			Block: &types.BlockIdentifier{
+				Index: stakeReleaseHeight,
+			},
+			Transaction: &types.TransactionIdentifier{
+				Hash: fmt.Sprint(metadata["hash"]),
+			},
+		},
+		&utils.GhostTxnMetadata{
+			Operations: []*types.Operation{
+				Unstake,
+			},
+		},
+	)
+
+	if gErr != nil && gErr != badger.ErrBannedKey {
+		return nil, WrapErr(ErrFailed, gErr)
 	}
 
 	Fee, fErr := CreateFeeOp(owner, fee, SuccessStatus, 1, map[string]interface{}{})
@@ -368,7 +383,6 @@ func UnstakeValidatorV1(
 	}
 
 	return []*types.Operation{
-		Unstake,
 		Fee,
 	}, nil
 }
