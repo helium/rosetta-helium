@@ -93,9 +93,9 @@ ARG BUILD_TARGET=docker_rosetta
 
 WORKDIR /usr/src/blockchain-node
 
-RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
-
 RUN git fetch --all --tags && git checkout tags/1.1.53
+
+RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
 
 RUN mkdir -p /opt/blockchain_node \
 	&& tar -zxvf _build/${BUILD_TARGET}/rel/*/*.tar.gz -C /opt/blockchain_node
