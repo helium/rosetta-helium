@@ -459,6 +459,16 @@ type Transaction struct {
 	Type string `json:"type"`
 }
 
+type UnstakeTransaction struct {
+	Address            string `json:"address"`
+	Fee                int64  `json:"fee"`
+	Hash               string `json:"hash"`
+	Owner              string `json:"owner"`
+	OwnerSignature     string `json:"owner_signature"`
+	StakeAmount        int64  `json:"stake_amount"`
+	StakeReleaseHeight int64  `json:"stake_release_height"`
+}
+
 type Payment struct {
 	Payee  string `json:"payee"`
 	Amount int64  `json:"amount"`

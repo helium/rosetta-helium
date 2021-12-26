@@ -15,10 +15,15 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/helium/rosetta-helium/helium"
 	"github.com/helium/rosetta-helium/services"
@@ -69,6 +74,69 @@ func NewBlockchainRouter(
 	return server.NewRouter(networkAPIController, blockAPIController, accountAPIController, constructionAPIController)
 }
 
+func LoadGhostTxns(network *types.NetworkIdentifier, db *badger.DB) error {
+	if werr := filepath.Walk("ghost-transactions", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			zap.S().Error(err.Error())
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		jsonFile, jerr := os.Open("ghost-transactions/" + info.Name())
+		if jerr != nil {
+			return jerr
+		}
+		defer jsonFile.Close()
+
+		byteValue, _ := ioutil.ReadAll(jsonFile)
+
+		var result []map[string]interface{}
+		json.Unmarshal([]byte(byteValue), &result)
+
+		for _, txn := range result {
+			var txnMetadata helium.UnstakeTransaction
+			var txnMetadataMap map[string]interface{}
+			json.Unmarshal([]byte(fmt.Sprint(txn["Fields"])), &txnMetadata)
+			json.Unmarshal([]byte(fmt.Sprint(txn["Fields"])), &txnMetadataMap)
+
+			dbKey := &utils.GhostTxnKey{
+				Network: network,
+				Block: &types.BlockIdentifier{
+					Index: txnMetadata.StakeReleaseHeight,
+				},
+				Transaction: &types.TransactionIdentifier{
+					Hash: txnMetadata.Hash,
+				},
+			}
+
+			Unstake, uErr := helium.CreateCreditOp(helium.UnstakeValidatorOp, txnMetadata.Address, txnMetadata.StakeAmount, helium.HNT, helium.SuccessStatus, 0, txnMetadataMap)
+			if uErr != nil {
+				return errors.New(fmt.Sprint(uErr))
+			}
+
+			cerr := utils.CreateGhostTxn(dbKey, &utils.GhostTxnMetadata{
+				Operations: []*types.Operation{
+					Unstake,
+				},
+				Metadata: txnMetadataMap,
+			})
+
+			if cerr != nil && cerr != badger.ErrBannedKey {
+				return cerr
+			}
+		}
+
+		zap.S().Info("Loaded " + fmt.Sprint(len(result)) + " ghost txns from file " + info.Name())
+		return nil
+
+	}); werr != nil {
+		return werr
+	}
+
+	return nil
+}
+
 func main() {
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync() // flushes buffer, if any
@@ -96,6 +164,12 @@ func main() {
 			Blockchain: "Helium",
 			Network:    helium.MainnetNetwork,
 		}
+
+		if lerr := LoadGhostTxns(network, bdb); lerr != nil {
+			zap.S().Error("Cannot load ghost transactions: " + lerr.Error())
+			os.Exit(1)
+		}
+
 	} else {
 		zap.S().Info("Initilizing testnet node...")
 		network = &types.NetworkIdentifier{
