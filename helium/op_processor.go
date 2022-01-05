@@ -200,6 +200,19 @@ func TransactionToOps(txn map[string]interface{}, status string, block *types.Bl
 			txn,
 		)
 
+	case TransferHotspotV2Txn:
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
+		return FeeOnlyTxn(
+			TransferHotspotOp,
+			fmt.Sprint(txn["new_owner"]),
+			fmt.Sprint(txn["new_owner"]),
+			feeDetails,
+			txn,
+		)
+
 	case StakeValidatorV1Txn:
 		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
 		if feeErr != nil {
