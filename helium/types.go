@@ -220,6 +220,12 @@ const (
 	// transferring hotspots from one wallet to another
 	TransferHotspotV1Txn = "transfer_hotspot_v1"
 
+	// GhostTxn is used to describe
+	// a placeholder transaction that does not actually
+	// exist on the Helium blockchain but is required
+	// for account reconciliation
+	GhostTxn = "ghost_txn"
+
 	// CoinbaseOp is used to describe
 	// the coinbase transaction at genesis (testnet only)
 	CoinbaseOp = "coinbase_op"
@@ -305,6 +311,14 @@ const (
 )
 
 var (
+
+	// MainnetNetworkBytes is the value of the
+	// mainnet network in bytes
+	MainnetNetworkBytes = []byte{0}
+
+	// TestnetNetworkBytes is the value of the
+	// testnet network in bytes
+	TestnetNetworkBytes = []byte{1}
 
 	// SuccessStatus is the status of any
 	// Helium operation considered successful.
@@ -443,6 +457,16 @@ type Peer struct {
 type Transaction struct {
 	Hash string `json:"hash"`
 	Type string `json:"type"`
+}
+
+type UnstakeTransaction struct {
+	Address            string `json:"address"`
+	Fee                int64  `json:"fee"`
+	Hash               string `json:"hash"`
+	Owner              string `json:"owner"`
+	OwnerSignature     string `json:"owner_signature"`
+	StakeAmount        int64  `json:"stake_amount"`
+	StakeReleaseHeight int64  `json:"stake_release_height"`
 }
 
 type Payment struct {
