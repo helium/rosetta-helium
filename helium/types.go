@@ -146,7 +146,7 @@ const (
 
 	// UpdateGatewayOUIV1Txn is used to describe
 	// updating a gateway OUI
-	UpdateGatewayOUIV1Txn = "update_gatway_oui_v1"
+	UpdateGatewayOUIV1Txn = "update_gateway_oui_v1"
 
 	// PaymentTxn is used to describe
 	// sending HNT from one wallet to another
@@ -219,6 +219,10 @@ const (
 	// TransferHotspotV1Txn is used to describe
 	// transferring hotspots from one wallet to another
 	TransferHotspotV1Txn = "transfer_hotspot_v1"
+
+	// TransferHotspotV1Txn is used to describe
+	// transferring hotspots from one wallet to another
+	TransferHotspotV2Txn = "transfer_hotspot_v2"
 
 	// GhostTxn is used to describe
 	// a placeholder transaction that does not actually
@@ -398,7 +402,7 @@ var (
 		UnstakeValidatorV1Txn,
 		TransferValidatorStakeV1Txn,
 		ValidatorHeartbeatV1Txn,
-		UpdateGatewayOUIV1Txn,
+		TransferHotspotV2Txn,
 	}
 
 	// OperationTypes are all supported base operations

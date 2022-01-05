@@ -121,6 +121,7 @@ Transactions support for reading from the Data API
 | `security_exchange_v1` | :white_check_mark: |
 | `token_burn_v1` | :white_check_mark: |
 | `transfer_hotspot_v1` | :white_check_mark: |
+| `transfer_hotspot_v2` | :white_check_mark: |
 |  `stake_validator_v1` | :white_check_mark: |
 |  `unstake_validator_v1` | :white_check_mark: |
 |  `transfer_validator_v1` | :white_check_mark: |
@@ -135,6 +136,7 @@ Transactions support for reading from the Data API
 | `assert_location_v1` | :white_check_mark: |
 | `assert_location_v2` | :white_check_mark: |
 | `oui_v1` | :white_check_mark: |
+| `update_gateway_oui_v1` | :white_check_mark: |
 | `routing_v1` | :white_check_mark: |
 | `state_channel_open_v1` | :white_check_mark: |
 
