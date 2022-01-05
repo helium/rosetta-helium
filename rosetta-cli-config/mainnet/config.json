@@ -18,7 +18,7 @@
     }
   },
   "data": {
-    "start_index": 1139762,
+    "start_index": 1156322,
     "historical_balance_enabled": true,
     "end_conditions": {
       "tip": true
