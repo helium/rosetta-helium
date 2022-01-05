@@ -81,7 +81,7 @@ func OpsToTransaction(operations []*types.Operation) (*MetadataOptions, *types.E
 	}
 }
 
-func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Operation, *types.Error) {
+func TransactionToOps(txn map[string]interface{}, status string, block *types.BlockIdentifier) ([]*types.Operation, *types.Error) {
 	hash := fmt.Sprint(txn["hash"])
 	switch txn["type"] {
 
@@ -247,6 +247,25 @@ func TransactionToOps(txn map[string]interface{}, status string) ([]*types.Opera
 			OUIOp,
 			fmt.Sprint(txn["payer"]),
 			fmt.Sprint(txn["owner"]),
+			feeDetails,
+			txn,
+		)
+
+	case UpdateGatewayOUIV1Txn:
+		feeDetails, feeErr := GetFee(&hash, utils.JsonNumberToInt64(txn["fee"]))
+		if feeErr != nil {
+			return nil, feeErr
+		}
+
+		owner, oErr := GetGatewayOwner(fmt.Sprint(txn["address"]), block.Index)
+		if oErr != nil {
+			return nil, oErr
+		}
+
+		return FeeOnlyTxn(
+			OUIOp,
+			*owner,
+			*owner,
 			feeDetails,
 			txn,
 		)

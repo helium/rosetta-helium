@@ -92,7 +92,7 @@ func (s *BlockAPIService) BlockTransaction(
 	ctx context.Context,
 	request *types.BlockTransactionRequest,
 ) (*types.BlockTransactionResponse, *types.Error) {
-	txn, txErr := helium.GetTransaction(request.TransactionIdentifier.Hash)
+	txn, txErr := helium.GetTransaction(request.TransactionIdentifier.Hash, request.BlockIdentifier)
 	if txErr != nil {
 		return nil, txErr
 	}

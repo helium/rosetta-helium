@@ -66,6 +66,10 @@ type GetBalanceResponse struct {
 	SecNonce   int64  `json:"sec_nonce"`
 }
 
+type GetGatewayOwnerResponse struct {
+	Owner string `json:"owner_address"`
+}
+
 func GetCurrentHeight() (*int64, *types.Error) {
 	var result int64
 
@@ -112,7 +116,7 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 
 	var processedTxs []*types.Transaction
 	for _, tx := range result.Transactions {
-		ptx, txErr := GetTransaction(fmt.Sprint(tx["hash"]))
+		ptx, txErr := GetTransaction(fmt.Sprint(tx["hash"]), nil)
 		if txErr != nil {
 			return nil, txErr
 		}
@@ -155,7 +159,7 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 	return currentBlock, nil
 }
 
-func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
+func GetTransaction(txHash string, block *types.BlockIdentifier) (*types.Transaction, *types.Error) {
 	type request struct {
 		Hash string `json:"hash"`
 	}
@@ -170,7 +174,7 @@ func GetTransaction(txHash string) (*types.Transaction, *types.Error) {
 		)
 	}
 
-	operations, oErr := TransactionToOps(result, SuccessStatus)
+	operations, oErr := TransactionToOps(result, SuccessStatus, block)
 	if oErr != nil {
 		return nil, oErr
 	}
@@ -239,6 +243,27 @@ func GetBalance(balanceRequest GetBalanceRequest) ([]*types.Amount, *types.Error
 	balances = append(balances, amountHNT, amountHST)
 
 	return balances, nil
+}
+
+func GetGatewayOwner(address string, height int64) (*string, *types.Error) {
+	type request struct {
+		Address string `json:"address"`
+		Height  int64  `json:"height"`
+	}
+
+	req := request{Address: address, Height: height}
+
+	result, err := utils.DecodeCallAsNumber(NodeClient.Call("gateway_info_get", req))
+	if err != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			err,
+		)
+	}
+
+	owner := fmt.Sprint(result["owner_address"])
+
+	return &owner, nil
 }
 
 func GetHash(signedTransaction string) (*string, *types.Error) {
@@ -544,7 +569,7 @@ func ParseTransaction(rawTxn string, signed bool) ([]*types.Operation, *types.Ac
 		return nil, nil, WrapErr(ErrUnclearIntent, dErr)
 	}
 
-	operations, oErr := TransactionToOps(payload["payload"].(map[string]interface{}), "")
+	operations, oErr := TransactionToOps(payload["payload"].(map[string]interface{}), "", nil)
 	if oErr != nil {
 		return nil, nil, oErr
 	}
