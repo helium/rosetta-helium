@@ -163,3 +163,15 @@ Transaction support for creation via the construction API
 | `stake_validator_v1` | :x: |
 | `unstake_validator_v1` | :x: |
 | `transfer_validator_v1` | :x: |
+
+## Additional notes
+### Unstake Transaction Oddities
+
+The `unstake_validator_v1` transaction is unique in that the balance changing portion of the transaction doesn't happen until the specified cooldown has passed. At that point, there is a callback on the ledger that records the balance change. Unfortunately, there is no way for `blockchain-node` to surface information about this balance change when inspecting a block at a particular height. This is especially important for the rosetta-cli `check:data` command to pass.
+
+To mitigate this, we decided to store what we are calling "ghost transactions" that will be triggered when Rosetta queries a particular block. That way, Rosetta can notice the balance change and properly credit the appropriate account for reconciliation purposes.
+
+**Example:**
+- Unstake transaction dectected at block 5 with a cool down of 10 blocks (transaction fee is deducted here)
+- We store a "ghost transaction" in our local BadgerDB at block 15 (current block + cool down) with the appropriate credit to the appropriate account
+- When we query block 15, Rosetta will check BadgerDB for any ghost transactions and include them in the query response.
