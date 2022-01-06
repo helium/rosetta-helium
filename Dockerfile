@@ -157,6 +157,7 @@ RUN apt update \
 WORKDIR /app
 
 COPY --from=rosetta-builder /src/rosetta-helium/rosetta-helium rosetta-helium
+COPY --from=rosetta-builder /src/rosetta-helium/ghost-transactions ghost-transactions
 COPY --from=rosetta-builder /src/rosetta-helium/docker/${NETWORK}.sh start.sh
 COPY --from=rosetta-builder /src/rosetta-helium/helium-constructor helium-constructor
 
