@@ -81,29 +81,23 @@ func (s *AccountAPIService) AccountBalance(
 			return nil, chErr
 		}
 
-		currentBlock, cErr := helium.GetBlock(&types.PartialBlockIdentifier{
+		currentBlock, cErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
 			Index: currentHeight,
 		})
 		if cErr != nil {
 			return nil, cErr
 		}
 
-		blockId = types.BlockIdentifier{
-			Index: currentBlock.BlockIdentifier.Index,
-			Hash:  currentBlock.BlockIdentifier.Hash,
-		}
+		blockId = *currentBlock
 	} else {
-		requestedBlock, rErr := helium.GetBlock(&types.PartialBlockIdentifier{
+		requestedBlock, rErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
 			Index: request.BlockIdentifier.Index,
 		})
 		if rErr != nil {
 			return nil, rErr
 		}
 
-		blockId = types.BlockIdentifier{
-			Index: requestedBlock.BlockIdentifier.Index,
-			Hash:  requestedBlock.BlockIdentifier.Hash,
-		}
+		blockId = *requestedBlock
 	}
 
 	return &types.AccountBalanceResponse{
