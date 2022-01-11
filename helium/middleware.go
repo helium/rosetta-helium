@@ -114,7 +114,7 @@ func GetBlockTimestamp(blockIdentifier *types.PartialBlockIdentifier) (*int64, *
 		)
 	}
 
-	timestamp := result.Time
+	timestamp := result.Time * 1000
 
 	return &timestamp, nil
 }
