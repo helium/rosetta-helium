@@ -28,6 +28,10 @@ func readLBSfile() *int64 {
 
 	lbs, err := strconv.ParseInt(s, 10, 64)
 
+	// Increment last blessed snapshot block in order to account
+	// for previous_block query in /network/status
+	lbs = lbs + 1
+
 	if err != nil {
 		log.Fatal(err)
 	}

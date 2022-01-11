@@ -80,6 +80,45 @@ func GetCurrentHeight() (*int64, *types.Error) {
 	return &result, nil
 }
 
+func GetBlockTimestamp(blockIdentifier *types.PartialBlockIdentifier) (*int64, *types.Error) {
+	type request struct {
+		Height int64  `json:"height,omitempty"`
+		Hash   string `json:"hash,omitempty"`
+	}
+
+	var result Block
+	var req request
+
+	if blockIdentifier.Index != nil && blockIdentifier.Hash != nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	} else if blockIdentifier.Index == nil && blockIdentifier.Hash != nil {
+		req = request{
+			Hash: *blockIdentifier.Hash,
+		}
+	} else if blockIdentifier.Index != nil && blockIdentifier.Hash == nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	}
+
+	callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("block_get", req))
+	jsonResult, _ := json.Marshal(callResult)
+	json.Unmarshal(jsonResult, &result)
+
+	if err != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			err,
+		)
+	}
+
+	timestamp := result.Time
+
+	return &timestamp, nil
+}
+
 func GetBlockIdentifier(blockIdentifier *types.PartialBlockIdentifier) (*types.BlockIdentifier, *types.Error) {
 	type request struct {
 		Height int64  `json:"height,omitempty"`
