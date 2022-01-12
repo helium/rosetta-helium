@@ -84,6 +84,7 @@ ENV CC=gcc CXX=g++ CFLAGS="-U__sun__" \
 WORKDIR /usr/src/
 
 # Add our code
+# TODO: git checkout specific release when ready
 RUN git clone https://github.com/helium/blockchain-node.git
 
 
@@ -137,6 +138,7 @@ RUN apt update \
 ENV PATH="/src/go/bin:$PATH" \
     CGO_ENABLED=0
 
+# TODO: git clone from url instead of direct copy
 COPY . rosetta-helium
 
 RUN cd rosetta-helium && go build -o rosetta-helium
