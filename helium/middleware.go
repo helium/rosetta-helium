@@ -114,9 +114,22 @@ func GetBlockTimestamp(blockIdentifier *types.PartialBlockIdentifier) (*int64, *
 		)
 	}
 
-	timestamp := result.Time * 1000
+	var blockTime int64
 
-	return &timestamp, nil
+	if result.Time == 0 {
+		if CurrentNetwork.Network == MainnetNetwork {
+			blockTime = 1564436673
+		} else {
+			// Assumed to be testnet
+			blockTime = 1624398097
+		}
+	} else {
+		blockTime = result.Time
+	}
+
+	blockTime = result.Time * 1000
+
+	return &blockTime, nil
 }
 
 func GetBlockIdentifier(blockIdentifier *types.PartialBlockIdentifier) (*types.BlockIdentifier, *types.Error) {
@@ -218,7 +231,12 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 	var blockTime int64
 
 	if result.Time == 0 {
-		blockTime = 1624398097
+		if CurrentNetwork.Network == MainnetNetwork {
+			blockTime = 1564436673
+		} else {
+			// Assumed to be testnet
+			blockTime = 1624398097
+		}
 	} else {
 		blockTime = result.Time
 	}
