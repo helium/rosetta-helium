@@ -218,7 +218,7 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 	var blockTime int64
 
 	if result.Time == 0 {
-		blockTime = 946684800
+		blockTime = 1624398097
 	} else {
 		blockTime = result.Time
 	}
