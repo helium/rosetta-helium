@@ -12,7 +12,10 @@
     "start_index": 1156322,
     "historical_balance_enabled": true,
     "end_conditions": {
-      "tip": true
+      "reconciliation_coverage": {
+        "coverage": 0.95,
+        "from_tip": true
+      }
     }
   }
  }
