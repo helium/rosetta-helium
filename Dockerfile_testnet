@@ -86,13 +86,11 @@ WORKDIR /usr/src/
 RUN git clone https://github.com/syuan100/blockchain-node.git
 
 
-FROM node-builder AS node-mainnet
+FROM node-builder AS node-testnet
 
-ARG BUILD_TARGET=docker_rosetta
+ARG BUILD_TARGET=docker_rosetta_testnet
 
 WORKDIR /usr/src/blockchain-node
-
-RUN git checkout commit-hooks-with-heights
 
 RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
 
@@ -132,7 +130,7 @@ COPY . rosetta-helium
 RUN cd rosetta-helium && go build -o rosetta-helium
 
 
-FROM node-mainnet as rosetta-helium-final
+FROM node-testnet as rosetta-helium-final
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -147,7 +145,7 @@ WORKDIR /app
 
 COPY --from=rosetta-builder /src/rosetta-helium/rosetta-helium rosetta-helium
 COPY --from=rosetta-builder /src/rosetta-helium/ghost-transactions ghost-transactions
-COPY --from=rosetta-builder /src/rosetta-helium/docker/mainnet.sh start.sh
+COPY --from=rosetta-builder /src/rosetta-helium/docker/testnet.sh start.sh
 COPY --from=rosetta-builder /src/rosetta-helium/helium-constructor helium-constructor
 
 RUN cd helium-constructor \

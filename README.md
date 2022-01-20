@@ -18,12 +18,12 @@ This project was created by [@syuan100](https://github.com/syuan100) and support
 #### Build container from source
 Mainnet:
 ```text
-DOCKER_BUILDKIT=1 docker build . -t rosetta-helium:latest
+docker build . -t rosetta-helium:latest
 ```
 
 Testnet:
 ```text
-DOCKER_BUILDKIT=1 docker build . -t rosetta-helium:latest --build-arg NETWORK=testnet
+docker build . -f Dockerfile_testnet -t rosetta-helium:latest
 ```
 
 *Note: `DOCKER_BUILDKIT=1` is not necessary but including it may reduce the image size due to the nature of the conditional build.*
@@ -63,8 +63,6 @@ docker run -d --rm --init --ulimit "nofile=1000000:1000000" -v "$(pwd)/helium-da
 Mainnet:
 ```text
 rosetta-cli check:data --configuration-file rosetta-cli-config/mainnet/config.json
-
-rosetta-cli check:construction --configuration-file rosetta-cli-config/mainnet/config.json
 ```
 
 Testnet:
