@@ -8,15 +8,6 @@
   "http_timeout": 2000,
   "tip_delay": 1200,
   "max_retries": 10,
-  "construction": {
-    "stale_depth": 3,
-    "broadcast_limit": 5,
-    "constructor_dsl_file": "helium.ros",
-    "end_conditions": {
-      "create_account": 1,
-      "transfer": 1
-    }
-  },
   "data": {
     "start_index": 1156322,
     "historical_balance_enabled": true,
