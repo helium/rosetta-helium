@@ -92,6 +92,8 @@ ARG BUILD_TARGET=docker_rosetta_testnet
 
 WORKDIR /usr/src/blockchain-node
 
+RUN git checkout commit-hooks-with-heights
+
 RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
 
 RUN mkdir -p /opt/blockchain_node \
