@@ -58,21 +58,20 @@ func (s *NetworkAPIService) NetworkStatus(
 		return nil, chErr
 	}
 
-	currentBlockID, cbiErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
+	currentBlock, cbErr := helium.GetBlockMeta(&types.PartialBlockIdentifier{
 		Index: currentHeight,
 	})
 
-	if cbiErr != nil {
-		return nil, cbiErr
+	if cbErr != nil {
+		return nil, cbErr
 	}
 
-	currentBlockTimestamp, cbtErr := helium.GetBlockTimestamp(&types.PartialBlockIdentifier{
-		Index: currentHeight,
-	})
-
-	if cbtErr != nil {
-		return nil, cbtErr
+	currentBlockID := &types.BlockIdentifier{
+		Index: currentBlock.Height,
+		Hash:  currentBlock.Hash,
 	}
+
+	currentBlockTimestamp := currentBlock.Time
 
 	if currentBlockID.Index < *helium.LBS {
 		return nil, helium.WrapErr(helium.ErrNodeSync, errors.New("node is catching up to snapshot height"))
@@ -91,10 +90,13 @@ func (s *NetworkAPIService) NetworkStatus(
 		return nil, pErr
 	}
 
-	syncStatus, sErr := helium.GetSyncStatus()
-	if sErr != nil {
-		return nil, sErr
-	}
+	// Removing syncStatus for now since currentBlock is
+	// retrieved from external API which is not ideal.
+	//
+	// syncStatus, sErr := helium.GetSyncStatus()
+	// if sErr != nil {
+	// 	return nil, sErr
+	// }
 
 	genesisIndex := helium.MainnetGenesisBlockIndex
 	genesisHash := helium.MainnetGenesisBlockHash
@@ -106,14 +108,14 @@ func (s *NetworkAPIService) NetworkStatus(
 
 	return &types.NetworkStatusResponse{
 		CurrentBlockIdentifier: currentBlockID,
-		CurrentBlockTimestamp:  *currentBlockTimestamp,
+		CurrentBlockTimestamp:  currentBlockTimestamp,
 		GenesisBlockIdentifier: &types.BlockIdentifier{
 			Index: genesisIndex,
 			Hash:  genesisHash,
 		},
 		OldestBlockIdentifier: lastBlessedBlock,
 		Peers:                 peers,
-		SyncStatus:            syncStatus,
+		// SyncStatus:            syncStatus,
 	}, nil
 }
 

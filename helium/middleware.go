@@ -174,6 +174,47 @@ func GetBlockIdentifier(blockIdentifier *types.PartialBlockIdentifier) (*types.B
 	return identifier, nil
 }
 
+func GetBlockMeta(blockIdentifier *types.PartialBlockIdentifier) (*Block, *types.Error) {
+	type request struct {
+		Height int64  `json:"height,omitempty"`
+		Hash   string `json:"hash,omitempty"`
+	}
+
+	var result Block
+	var req request
+
+	if blockIdentifier.Index != nil && blockIdentifier.Hash != nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	} else if blockIdentifier.Index == nil && blockIdentifier.Hash != nil {
+		req = request{
+			Hash: *blockIdentifier.Hash,
+		}
+	} else if blockIdentifier.Index != nil && blockIdentifier.Hash == nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	}
+
+	callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("block_get", req))
+	jsonResult, _ := json.Marshal(callResult)
+	json.Unmarshal(jsonResult, &result)
+
+	if err != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			err,
+		)
+	}
+
+	// Must multiply time by 1000 since Helium response is
+	// in seconds not miliseconds
+	result.Time = result.Time * 1000
+
+	return &result, nil
+}
+
 func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *types.Error) {
 	type request struct {
 		Height int64  `json:"height,omitempty"`
