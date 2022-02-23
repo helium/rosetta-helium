@@ -83,7 +83,7 @@ WORKDIR /usr/src/
 
 # Add our code
 # TODO: git checkout specific release when ready
-RUN git clone https://github.com/syuan100/blockchain-node.git
+RUN git clone https://github.com/syuan100/blockchain-node.git && echo ''
 
 
 FROM node-builder AS node-mainnet
@@ -92,7 +92,7 @@ ARG BUILD_TARGET=docker_rosetta
 
 WORKDIR /usr/src/blockchain-node
 
-RUN git checkout commit-hooks-with-heights
+RUN git checkout bump_snap_sy
 
 RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
 
