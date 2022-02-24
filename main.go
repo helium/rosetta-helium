@@ -75,7 +75,14 @@ func NewBlockchainRouter(
 }
 
 func LoadGhostTxns(network *types.NetworkIdentifier, db *badger.DB) error {
-	if werr := filepath.Walk("ghost-transactions", func(path string, info os.FileInfo, err error) error {
+	// Assume mainnet
+	networkDir := "mainnet"
+
+	if network.Network == helium.TestnetNetwork {
+		networkDir = "testnet"
+	}
+
+	if werr := filepath.Walk("ghost-transactions/"+networkDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			zap.S().Error(err.Error())
 		}
@@ -83,7 +90,7 @@ func LoadGhostTxns(network *types.NetworkIdentifier, db *badger.DB) error {
 			return nil
 		}
 
-		jsonFile, jerr := os.Open("ghost-transactions/" + info.Name())
+		jsonFile, jerr := os.Open("ghost-transactions/" + networkDir + "/" + info.Name())
 		if jerr != nil {
 			return jerr
 		}
@@ -166,7 +173,7 @@ func main() {
 		}
 
 		if lerr := LoadGhostTxns(network, bdb); lerr != nil {
-			zap.S().Error("Cannot load ghost transactions: " + lerr.Error())
+			zap.S().Error("Cannot load mainnet ghost transactions: " + lerr.Error())
 			os.Exit(1)
 		}
 
@@ -175,6 +182,11 @@ func main() {
 		network = &types.NetworkIdentifier{
 			Blockchain: "Helium",
 			Network:    helium.TestnetNetwork,
+		}
+
+		if lerr := LoadGhostTxns(network, bdb); lerr != nil {
+			zap.S().Error("Cannot load testnet ghost transactions: " + lerr.Error())
+			os.Exit(1)
 		}
 	}
 
