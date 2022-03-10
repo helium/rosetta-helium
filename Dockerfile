@@ -124,13 +124,29 @@ RUN apt update \
       && curl -L https://golang.org/dl/go1.17.1.linux-amd64.tar.gz | tar xzf -
 
 ENV PATH="/src/go/bin:$PATH" \
-    CGO_ENABLED=0
+    CGO_ENABLED=1
+
+WORKDIR /app
+RUN apt install -y git
+RUN git clone https://github.com/facebook/rocksdb.git
+
+WORKDIR /app/rocksdb
+RUN git checkout tags/v6.20.3
+RUN apt install -y --no-install-recommends \
+	build-essential make libgflags-dev \
+	zlib1g-dev libbz2-dev liblz4-dev libsnappy-dev \
+	libzstd-dev libgflags-dev
+
+RUN make shared_lib
+RUN make install
+
+WORKDIR /src
 
 # TODO: git clone from url instead of direct copy
 COPY . rosetta-helium
 
-RUN cd rosetta-helium && go build -o rosetta-helium
-
+WORKDIR /src/rosetta-helium
+RUN go build -o rosetta-helium
 
 FROM node-mainnet as rosetta-helium-final
 
@@ -141,7 +157,18 @@ EXPOSE 44158
 
 RUN apt update \
     && apt install -y --no-install-recommends \
-         ca-certificates git npm
+         ca-certificates git npm 
+
+WORKDIR /app
+COPY --from=rosetta-builder /app/rocksdb rocksdb
+
+WORKDIR /app/rocksdb
+RUN apt install -y --no-install-recommends \
+	build-essential make libgflags-dev \
+	zlib1g-dev libbz2-dev liblz4-dev libsnappy-dev \
+	libzstd-dev
+
+RUN make install
 
 WORKDIR /app
 

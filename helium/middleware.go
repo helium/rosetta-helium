@@ -73,8 +73,29 @@ type GetGatewayOwnerResponse struct {
 func GetCurrentHeight() (*int64, *types.Error) {
 	var result int64
 
-	if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
-		return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
+	if NodeBalancesDB != nil {
+		balancesHeight, bErr := RocksDBBalancesHeightGet()
+		if bErr != nil {
+			return nil, WrapErr(ErrUnclearIntent, bErr)
+		}
+
+		transactionHeight, tErr := RocksDBTransactionsHeightGet()
+		if tErr != nil {
+			return nil, WrapErr(ErrUnclearIntent, tErr)
+		}
+
+		zap.S().Info("balance height: " + fmt.Sprint(*balancesHeight) + " transaction height: " + fmt.Sprint(*transactionHeight))
+
+		if *balancesHeight > *transactionHeight {
+			result = *transactionHeight
+		} else {
+			result = *balancesHeight
+		}
+
+	} else {
+		if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
+			return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
+		}
 	}
 
 	return &result, nil

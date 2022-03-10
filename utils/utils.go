@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"errors"
+	"math/big"
 	"strings"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
@@ -211,4 +212,35 @@ func StringInSlice(a string, list []string) bool {
 		}
 	}
 	return false
+}
+
+func Num64(n interface{}) int64 {
+	switch n := n.(type) {
+	case int:
+		return int64(n)
+	case int8:
+		return int64(n)
+	case int16:
+		return int64(n)
+	case int32:
+		return int64(n)
+	case int64:
+		return int64(n)
+	case uint:
+		return int64(n)
+	case uintptr:
+		return int64(n)
+	case uint8:
+		return int64(n)
+	case uint16:
+		return int64(n)
+	case uint32:
+		return int64(n)
+	case uint64:
+		return int64(n)
+	case *big.Int:
+		return n.Int64()
+	default:
+		return n.(int64)
+	}
 }

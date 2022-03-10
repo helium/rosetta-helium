@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
+	rocksdb "github.com/linxGnu/grocksdb"
 	"go.uber.org/zap"
 )
 
@@ -451,6 +452,15 @@ var (
 
 	// LBS is the LastBlessedBlock height as an int64
 	LBS = readLBSfile()
+
+	// Optional RocksDB vars for node db
+	NodeBalancesDB                  *rocksdb.DB
+	NodeBlocksDB                    *rocksdb.DB
+	NodeTransactionsDB              *rocksdb.DB
+	NodeBalancesDBEntriesHandle     *rocksdb.ColumnFamilyHandle
+	NodeBalancesDBDefaultHandle     *rocksdb.ColumnFamilyHandle
+	NodeBlockchainDBHeightsHandle   *rocksdb.ColumnFamilyHandle
+	NodeTransactionsDBDefaultHandle *rocksdb.ColumnFamilyHandle
 )
 
 type Block struct {

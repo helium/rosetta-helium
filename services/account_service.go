@@ -17,10 +17,12 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
 	"github.com/helium/rosetta-helium/helium"
+	"go.uber.org/zap"
 )
 
 // AccountAPIService implements the server.AccountAPIServicer interface.
@@ -45,6 +47,8 @@ func (s *AccountAPIService) AccountBalance(
 		Address: request.AccountIdentifier.Address,
 	}
 
+	zap.S().Info(request.AccountIdentifier.Address + " " + fmt.Sprint(*request.BlockIdentifier.Index))
+
 	if request.BlockIdentifier != nil {
 		if request.BlockIdentifier.Index == nil {
 			return nil, helium.WrapErr(
@@ -55,9 +59,11 @@ func (s *AccountAPIService) AccountBalance(
 		balanceRequest.Height = *request.BlockIdentifier.Index
 	}
 
-	accountBalances, aErr := helium.GetBalance(balanceRequest)
-	if aErr != nil {
-		if aErr.Code == 1 {
+	if helium.NodeBalancesDB != nil {
+		var accountBalances []*types.Amount
+		accountEntry, aeErr := helium.RocksDBAccountGet(request.AccountIdentifier.Address, balanceRequest.Height)
+		if aeErr != nil {
+			zap.S().Info("no balance found for " + balanceRequest.Address + " at height " + fmt.Sprint(balanceRequest.Height) + ". Returning balanaces of 0.")
 			accountBalances = []*types.Amount{
 				{
 					Value:    "0",
@@ -69,41 +75,81 @@ func (s *AccountAPIService) AccountBalance(
 				},
 			}
 		} else {
-			return nil, aErr
-		}
-	}
-
-	var blockId types.BlockIdentifier
-
-	if request.BlockIdentifier == nil {
-		currentHeight, chErr := helium.GetCurrentHeight()
-		if chErr != nil {
-			return nil, chErr
-		}
-
-		currentBlock, cErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
-			Index: currentHeight,
-		})
-		if cErr != nil {
-			return nil, cErr
+			accountBalances = []*types.Amount{
+				{
+					Value:    fmt.Sprint(accountEntry.Entry.Amount),
+					Currency: helium.HNT,
+				},
+				{
+					Value:    fmt.Sprint(accountEntry.SecEntry.Amount),
+					Currency: helium.HST,
+				},
+			}
 		}
 
-		blockId = *currentBlock
+		blockHash, bhErr := helium.RocksDBBlockHashGet(*request.BlockIdentifier.Index)
+		if bhErr != nil {
+			return nil, helium.WrapErr(helium.ErrFailed, bhErr)
+		}
+
+		blockIdentifier := &types.BlockIdentifier{
+			Index: *request.BlockIdentifier.Index,
+			Hash:  *blockHash,
+		}
+
+		return &types.AccountBalanceResponse{
+			BlockIdentifier: blockIdentifier,
+			Balances:        accountBalances,
+		}, nil
 	} else {
-		requestedBlock, rErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
-			Index: request.BlockIdentifier.Index,
-		})
-		if rErr != nil {
-			return nil, rErr
+		zap.S().Info("Old path")
+		accountBalances, aErr := helium.GetBalance(balanceRequest)
+		if aErr != nil {
+			zap.S().Info("no balance found for " + balanceRequest.Address + " at height " + fmt.Sprint(balanceRequest.Height) + ". Returning balanaces of 0.")
+			accountBalances = []*types.Amount{
+				{
+					Value:    "0",
+					Currency: helium.HNT,
+				},
+				{
+					Value:    "0",
+					Currency: helium.HST,
+				},
+			}
 		}
 
-		blockId = *requestedBlock
-	}
+		var blockId types.BlockIdentifier
 
-	return &types.AccountBalanceResponse{
-		BlockIdentifier: &blockId,
-		Balances:        accountBalances,
-	}, nil
+		if request.BlockIdentifier == nil {
+			currentHeight, chErr := helium.GetCurrentHeight()
+			if chErr != nil {
+				return nil, chErr
+			}
+
+			currentBlock, cErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
+				Index: currentHeight,
+			})
+			if cErr != nil {
+				return nil, cErr
+			}
+
+			blockId = *currentBlock
+		} else {
+			requestedBlock, rErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
+				Index: request.BlockIdentifier.Index,
+			})
+			if rErr != nil {
+				return nil, rErr
+			}
+
+			blockId = *requestedBlock
+		}
+
+		return &types.AccountBalanceResponse{
+			BlockIdentifier: &blockId,
+			Balances:        accountBalances,
+		}, nil
+	}
 }
 
 // AccountCoins implements the /account/coins endpoint.
