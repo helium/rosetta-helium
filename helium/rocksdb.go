@@ -48,7 +48,7 @@ func extractEntryFromAccountTuple(account interface{}, position int64) (*Entry, 
 }
 
 func addressToBinary(address string) ([]byte, error) {
-	addressBinary, _, err := base58.CheckDecode("14XASpMbTophdTzmEwc2hTTyv78YmWgu2ckgUmEZeXX1poXGuHZ")
+	addressBinary, _, err := base58.CheckDecode(address)
 	if err != nil {
 		return nil, err
 	}
