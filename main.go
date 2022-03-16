@@ -49,7 +49,6 @@ type HeliumRocksDB struct {
 	TransactionsDB        *rocksdb.DB
 	BlockchainDB          *rocksdb.DB
 	EntriesCF             *rocksdb.ColumnFamilyHandle
-	BalancesDefaultCF     *rocksdb.ColumnFamilyHandle
 	HeightsCF             *rocksdb.ColumnFamilyHandle
 	TransactionsDefaultCF *rocksdb.ColumnFamilyHandle
 }
@@ -206,7 +205,6 @@ func openRocksDB(dataDir string) (heliumDB *HeliumRocksDB, err error) {
 		TransactionsDB:        dbTxn,
 		BlockchainDB:          dbBlock,
 		EntriesCF:             balancesCfHandles[1],
-		BalancesDefaultCF:     balancesCfHandles[0],
 		HeightsCF:             blockchainCfHandles[1],
 		TransactionsDefaultCF: txnCfHandles[0],
 	}, nil
@@ -286,9 +284,8 @@ func main() {
 				zap.S().Info("Loaded rocksdb directly at dir '" + blockchainNodeDataDir + "'")
 				helium.NodeBalancesDB = heliumDB.BalancesDB
 				helium.NodeBlocksDB = heliumDB.BlockchainDB
-				helium.NodeTransactionsDB = heliumDB.BlockchainDB
+				helium.NodeTransactionsDB = heliumDB.TransactionsDB
 				helium.NodeBalancesDBEntriesHandle = heliumDB.EntriesCF
-				helium.NodeBalancesDBDefaultHandle = heliumDB.BalancesDefaultCF
 				helium.NodeBlockchainDBHeightsHandle = heliumDB.HeightsCF
 				helium.NodeTransactionsDBDefaultHandle = heliumDB.TransactionsDefaultCF
 				break

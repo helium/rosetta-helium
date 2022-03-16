@@ -72,30 +72,8 @@ type GetGatewayOwnerResponse struct {
 
 func GetCurrentHeight() (*int64, *types.Error) {
 	var result int64
-
-	if NodeBalancesDB != nil {
-		balancesHeight, bErr := RocksDBBalancesHeightGet()
-		if bErr != nil {
-			return nil, WrapErr(ErrUnclearIntent, bErr)
-		}
-
-		transactionHeight, tErr := RocksDBTransactionsHeightGet()
-		if tErr != nil {
-			return nil, WrapErr(ErrUnclearIntent, tErr)
-		}
-
-		zap.S().Info("balance height: " + fmt.Sprint(*balancesHeight) + " transaction height: " + fmt.Sprint(*transactionHeight))
-
-		if *balancesHeight > *transactionHeight {
-			result = *transactionHeight
-		} else {
-			result = *balancesHeight
-		}
-
-	} else {
-		if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
-			return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
-		}
+	if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
+		return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
 	}
 
 	return &result, nil
@@ -176,23 +154,37 @@ func GetBlockIdentifier(blockIdentifier *types.PartialBlockIdentifier) (*types.B
 		}
 	}
 
-	callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("block_get", req))
-	jsonResult, _ := json.Marshal(callResult)
-	json.Unmarshal(jsonResult, &result)
+	if NodeBlocksDB != nil {
+		blockHash, bhErr := RocksDBBlockHashGet(*blockIdentifier.Index)
+		if bhErr != nil {
+			return nil, WrapErr(ErrFailed, bhErr)
+		}
 
-	if err != nil {
-		return nil, WrapErr(
-			ErrFailed,
-			err,
-		)
+		identifier := &types.BlockIdentifier{
+			Index: *blockIdentifier.Index,
+			Hash:  *blockHash,
+		}
+
+		return identifier, nil
+	} else {
+		callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("block_get", req))
+		jsonResult, _ := json.Marshal(callResult)
+		json.Unmarshal(jsonResult, &result)
+
+		if err != nil {
+			return nil, WrapErr(
+				ErrFailed,
+				err,
+			)
+		}
+
+		identifier := &types.BlockIdentifier{
+			Index: result.Height,
+			Hash:  result.Hash,
+		}
+
+		return identifier, nil
 	}
-
-	identifier := &types.BlockIdentifier{
-		Index: result.Height,
-		Hash:  result.Hash,
-	}
-
-	return identifier, nil
 }
 
 func GetBlockMeta(blockIdentifier *types.PartialBlockIdentifier) (*Block, *types.Error) {

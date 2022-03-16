@@ -53,6 +53,20 @@ func (s *NetworkAPIService) NetworkStatus(
 	ctx context.Context,
 	request *types.NetworkRequest,
 ) (*types.NetworkStatusResponse, *types.Error) {
+
+	// Update all secondary rocksdb references during network status updates
+	if tErr := helium.NodeBalancesDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
+	if tErr := helium.NodeBlocksDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
+	if tErr := helium.NodeTransactionsDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
 	currentHeight, chErr := helium.GetCurrentHeight()
 	if chErr != nil {
 		return nil, chErr

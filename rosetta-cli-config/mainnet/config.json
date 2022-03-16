@@ -9,7 +9,7 @@
   "tip_delay": 1200,
   "max_retries": 10,
   "data": {
-    "start_index": 1259282,
+    "start_index": 1267922,
     "historical_balance_enabled": true,
     "end_conditions": {
       "reconciliation_coverage": {

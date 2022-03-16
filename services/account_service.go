@@ -47,8 +47,6 @@ func (s *AccountAPIService) AccountBalance(
 		Address: request.AccountIdentifier.Address,
 	}
 
-	zap.S().Info(request.AccountIdentifier.Address + " " + fmt.Sprint(*request.BlockIdentifier.Index))
-
 	if request.BlockIdentifier != nil {
 		if request.BlockIdentifier.Index == nil {
 			return nil, helium.WrapErr(
@@ -59,9 +57,36 @@ func (s *AccountAPIService) AccountBalance(
 		balanceRequest.Height = *request.BlockIdentifier.Index
 	}
 
+	var blockId types.BlockIdentifier
+
+	if request.BlockIdentifier == nil {
+		currentHeight, chErr := helium.GetCurrentHeight()
+		if chErr != nil {
+			return nil, chErr
+		}
+
+		currentBlock, cErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
+			Index: currentHeight,
+		})
+		if cErr != nil {
+			return nil, cErr
+		}
+
+		blockId = *currentBlock
+	} else {
+		requestedBlock, rErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
+			Index: request.BlockIdentifier.Index,
+		})
+		if rErr != nil {
+			return nil, rErr
+		}
+
+		blockId = *requestedBlock
+	}
+
 	if helium.NodeBalancesDB != nil {
 		var accountBalances []*types.Amount
-		accountEntry, aeErr := helium.RocksDBAccountGet(request.AccountIdentifier.Address, balanceRequest.Height)
+		accountEntry, aeErr := helium.RocksDBAccountGet(request.AccountIdentifier.Address, blockId.Index)
 		if aeErr != nil {
 			zap.S().Info("no balance found for " + balanceRequest.Address + " at height " + fmt.Sprint(balanceRequest.Height) + ". Returning balanaces of 0.")
 			accountBalances = []*types.Amount{
@@ -87,13 +112,13 @@ func (s *AccountAPIService) AccountBalance(
 			}
 		}
 
-		blockHash, bhErr := helium.RocksDBBlockHashGet(*request.BlockIdentifier.Index)
+		blockHash, bhErr := helium.RocksDBBlockHashGet(blockId.Index)
 		if bhErr != nil {
 			return nil, helium.WrapErr(helium.ErrFailed, bhErr)
 		}
 
 		blockIdentifier := &types.BlockIdentifier{
-			Index: *request.BlockIdentifier.Index,
+			Index: blockId.Index,
 			Hash:  *blockHash,
 		}
 
@@ -116,33 +141,6 @@ func (s *AccountAPIService) AccountBalance(
 					Currency: helium.HST,
 				},
 			}
-		}
-
-		var blockId types.BlockIdentifier
-
-		if request.BlockIdentifier == nil {
-			currentHeight, chErr := helium.GetCurrentHeight()
-			if chErr != nil {
-				return nil, chErr
-			}
-
-			currentBlock, cErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
-				Index: currentHeight,
-			})
-			if cErr != nil {
-				return nil, cErr
-			}
-
-			blockId = *currentBlock
-		} else {
-			requestedBlock, rErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
-				Index: request.BlockIdentifier.Index,
-			})
-			if rErr != nil {
-				return nil, rErr
-			}
-
-			blockId = *requestedBlock
 		}
 
 		return &types.AccountBalanceResponse{
