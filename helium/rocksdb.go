@@ -12,6 +12,7 @@ import (
 	"github.com/helium/rosetta-helium/utils"
 	rocksdb "github.com/linxGnu/grocksdb"
 	"github.com/okeuday/erlang_go/v2/erlang"
+	"go.uber.org/zap"
 )
 
 type Entry struct {
@@ -84,8 +85,29 @@ func RocksDBBlockHashGet(height int64) (*string, error) {
 
 func RocksDBTransactionsHeightGet() (*int64, error) {
 	ro := rocksdb.NewDefaultReadOptions()
+	ro.SetFillCache(false)
+	ro.SetTotalOrderSeek(true)
 
 	heightBin, hErr := NodeTransactionsDB.GetCF(ro, NodeTransactionsDBDefaultHandle, heightKeyBinary)
+	if hErr != nil {
+		return nil, hErr
+	}
+
+	if heightBin.Data() == nil {
+		return nil, hErr
+	}
+
+	height := int64(binary.LittleEndian.Uint64(heightBin.Data()))
+
+	return &height, nil
+}
+
+func RocksDBBalancesHeightGet() (*int64, error) {
+	ro := rocksdb.NewDefaultReadOptions()
+	ro.SetFillCache(false)
+	ro.SetTotalOrderSeek(true)
+
+	heightBin, hErr := NodeBalancesDB.GetCF(ro, NodeBalancesDBDefaultHandle, heightKeyBinary)
 	if hErr != nil {
 		return nil, hErr
 	}
@@ -108,6 +130,24 @@ func RocksDBAccountGet(address string, height int64) (*AccountEntry, error) {
 
 	key := append(addressBin, heightBin...)
 
+	balancesHeight, _ := RocksDBBalancesHeightGet()
+	zap.S().Info("AccountGet current balances height: " + fmt.Sprint(*balancesHeight))
+
+	// txnsHeight, _ := RocksDBTransactionsHeightGet()
+	// zap.S().Info("AccountGet current txns height: " + fmt.Sprint(*txnsHeight))
+	zap.S().Info("AccountGet requested height: " + fmt.Sprint(height))
+
+	if *balancesHeight < height {
+		zap.S().Info("BALANCES IS NOT READY. RETRY.")
+		if tErr := NodeBalancesDB.TryCatchUpWithPrimary(); tErr != nil {
+			return nil, tErr
+		}
+		if tErr := NodeTransactionsDB.TryCatchUpWithPrimary(); tErr != nil {
+			return nil, tErr
+		}
+		return nil, errors.New("dbcatchup")
+	}
+
 	// zap.S().Info("key searched: " + fmt.Sprint(key))
 
 	readOptions := rocksdb.NewDefaultReadOptions()
@@ -118,7 +158,7 @@ func RocksDBAccountGet(address string, height int64) (*AccountEntry, error) {
 	iterator.SeekForPrev(key)
 
 	if iterator.ValidForPrefix(addressBin) {
-		// zap.S().Info("key retrieved: " + fmt.Sprint(int64(binary.BigEndian.Uint64(iterator.Key().Data()[33:41]))))
+		zap.S().Info("key retrieved: " + fmt.Sprint(int64(binary.BigEndian.Uint64(iterator.Key().Data()[33:41]))))
 
 		accountEntryBin := iterator.Value()
 		accountEntryTuple, bErr := erlang.BinaryToTerm(accountEntryBin.Data())

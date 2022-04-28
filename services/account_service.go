@@ -85,9 +85,29 @@ func (s *AccountAPIService) AccountBalance(
 	}
 
 	if helium.NodeBalancesDB != nil {
+		// zap.S().Info("/account/balance request: " + fmt.Sprint(request.AccountIdentifier.Address) + " at block " + fmt.Sprint(*request.BlockIdentifier.Index))
+		// zap.S().Info("SYNCED HEIGHT: " + fmt.Sprint(helium.SyncedRocksDBHeight))
+		// zap.S().Info("SHOULD I SYNC? " + fmt.Sprint((*request.BlockIdentifier.Index > helium.SyncedRocksDBHeight)))
+
+		// if (request.BlockIdentifier.Index == nil) || (*request.BlockIdentifier.Index > helium.SyncedRocksDBHeight) {
+		// 	zap.S().Info("DEBUG Block Index Requested: " + fmt.Sprint(*request.BlockIdentifier.Index))
+		// 	zap.S().Info("DEBUG Inadequate height: " + fmt.Sprint(helium.SyncedRocksDBHeight))
+
+		// 	// Update all secondary rocksdb references if there are no block identifiers
+		// 	if tErr := helium.NodeBalancesDB.TryCatchUpWithPrimary(); tErr != nil {
+		// 		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+		// 	}
+
+		// 	helium.SyncedRocksDBHeight = *request.BlockIdentifier.Index
+		// 	zap.S().Info("DEBUG db synced at: " + fmt.Sprint(helium.SyncedRocksDBHeight))
+		// }
+
 		var accountBalances []*types.Amount
 		accountEntry, aeErr := helium.RocksDBAccountGet(request.AccountIdentifier.Address, blockId.Index)
 		if aeErr != nil {
+			if aeErr.Error() == "dbcatchup" {
+				return nil, helium.ErrDBCatchup
+			}
 			zap.S().Info("no balance found for " + balanceRequest.Address + " at height " + fmt.Sprint(balanceRequest.Height) + ". Returning balanaces of 0.")
 			accountBalances = []*types.Amount{
 				{

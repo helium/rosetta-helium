@@ -35,6 +35,7 @@ var (
 		ErrSignatureInvalid,
 		ErrEnvVariableMissing,
 		ErrNodeSync,
+		ErrDBCatchup,
 	}
 
 	// ErrUnimplemented is returned when an endpoint
@@ -124,8 +125,14 @@ var (
 	}
 
 	ErrNodeSync = &types.Error{
-		Code:    12,
-		Message: "Node is not ready",
+		Code:      12,
+		Message:   "Node is not ready",
+		Retriable: true,
+	}
+	ErrDBCatchup = &types.Error{
+		Code:      13,
+		Message:   "RocksDB secondary needs to catchup",
+		Retriable: true,
 	}
 )
 

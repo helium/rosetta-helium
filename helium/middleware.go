@@ -71,12 +71,20 @@ type GetGatewayOwnerResponse struct {
 }
 
 func GetCurrentHeight() (*int64, *types.Error) {
-	var result int64
-	if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
-		return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
+	if NodeBalancesDB != nil {
+		txnHeight, tErr := RocksDBTransactionsHeightGet()
+		if tErr != nil {
+			return nil, WrapErr(ErrFailed, tErr)
+		}
+		zap.S().Info("txn height: " + fmt.Sprint(*txnHeight))
+		return txnHeight, nil
+	} else {
+		var result int64
+		if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
+			return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
+		}
+		return &result, nil
 	}
-
-	return &result, nil
 }
 
 func GetBlockTimestamp(blockIdentifier *types.PartialBlockIdentifier) (*int64, *types.Error) {

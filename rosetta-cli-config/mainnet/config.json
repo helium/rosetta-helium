@@ -7,9 +7,12 @@
   "data_directory": "rosetta-data",
   "http_timeout": 2000,
   "tip_delay": 1200,
-  "max_retries": 10,
+  "max_retries": 20,
+  "max_sync_concurrency":1,
   "data": {
-    "start_index": 1267922,
+    "active_reconciliation_concurrency":1,
+    "inactive_reconciliation_concurrency":1,
+    "start_index": 1329842,
     "historical_balance_enabled": true,
     "end_conditions": {
       "reconciliation_coverage": {

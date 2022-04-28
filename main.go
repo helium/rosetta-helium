@@ -49,6 +49,7 @@ type HeliumRocksDB struct {
 	TransactionsDB        *rocksdb.DB
 	BlockchainDB          *rocksdb.DB
 	EntriesCF             *rocksdb.ColumnFamilyHandle
+	BalancesDefaultCF     *rocksdb.ColumnFamilyHandle
 	HeightsCF             *rocksdb.ColumnFamilyHandle
 	TransactionsDefaultCF *rocksdb.ColumnFamilyHandle
 }
@@ -170,7 +171,7 @@ func openRocksDB(dataDir string) (heliumDB *HeliumRocksDB, err error) {
 	dbBal, balancesCfHandles, dbBalErr := rocksdb.OpenDbAsSecondaryColumnFamilies(
 		opts,
 		dataDir+"/balances.db",
-		"rocksdb/balances.db",
+		"./rocksdb/balances.db",
 		balancesCfNames,
 		[]*rocksdb.Options{opts, columnOpts},
 	)
@@ -181,7 +182,7 @@ func openRocksDB(dataDir string) (heliumDB *HeliumRocksDB, err error) {
 	dbBlock, blockchainCfHandles, dbBlockErr := rocksdb.OpenDbAsSecondaryColumnFamilies(
 		opts,
 		dataDir+"/blockchain.db",
-		"rocksdb/blockchain.db",
+		"./rocksdb/blockchain.db",
 		blockchainCfNames,
 		[]*rocksdb.Options{opts, opts},
 	)
@@ -192,7 +193,7 @@ func openRocksDB(dataDir string) (heliumDB *HeliumRocksDB, err error) {
 	dbTxn, txnCfHandles, dbTxnErr := rocksdb.OpenDbAsSecondaryColumnFamilies(
 		opts,
 		dataDir+"/transactions.db",
-		"rocksdb/transactions.db",
+		"./rocksdb/transactions.db",
 		transactionsCfNames,
 		[]*rocksdb.Options{opts, opts},
 	)
@@ -204,6 +205,7 @@ func openRocksDB(dataDir string) (heliumDB *HeliumRocksDB, err error) {
 		BalancesDB:            dbBal,
 		TransactionsDB:        dbTxn,
 		BlockchainDB:          dbBlock,
+		BalancesDefaultCF:     balancesCfHandles[0],
 		EntriesCF:             balancesCfHandles[1],
 		HeightsCF:             blockchainCfHandles[1],
 		TransactionsDefaultCF: txnCfHandles[0],
@@ -286,6 +288,7 @@ func main() {
 				helium.NodeBlocksDB = heliumDB.BlockchainDB
 				helium.NodeTransactionsDB = heliumDB.TransactionsDB
 				helium.NodeBalancesDBEntriesHandle = heliumDB.EntriesCF
+				helium.NodeBalancesDBDefaultHandle = heliumDB.BalancesDefaultCF
 				helium.NodeBlockchainDBHeightsHandle = heliumDB.HeightsCF
 				helium.NodeTransactionsDBDefaultHandle = heliumDB.TransactionsDefaultCF
 				break

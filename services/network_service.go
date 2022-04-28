@@ -54,7 +54,7 @@ func (s *NetworkAPIService) NetworkStatus(
 	request *types.NetworkRequest,
 ) (*types.NetworkStatusResponse, *types.Error) {
 
-	// Update all secondary rocksdb references during network status updates
+	// Update all secondary rocksdb references
 	if tErr := helium.NodeBalancesDB.TryCatchUpWithPrimary(); tErr != nil {
 		return nil, helium.WrapErr(helium.ErrFailed, tErr)
 	}

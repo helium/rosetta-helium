@@ -17,11 +17,13 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/coinbase/rosetta-sdk-go/server"
 	"github.com/coinbase/rosetta-sdk-go/types"
 	"github.com/helium/rosetta-helium/helium"
+	"go.uber.org/zap"
 )
 
 // BlockAPIService implements the server.BlockAPIServicer interface.
@@ -41,6 +43,22 @@ func (s *BlockAPIService) Block(
 	ctx context.Context,
 	request *types.BlockRequest,
 ) (*types.BlockResponse, *types.Error) {
+
+	zap.S().Info("/block request: " + fmt.Sprint(*request.BlockIdentifier.Index))
+
+	// Update all secondary rocksdb references
+	if tErr := helium.NodeBalancesDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
+	if tErr := helium.NodeBlocksDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
+	if tErr := helium.NodeTransactionsDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
 	previousBlockIndex := *request.BlockIdentifier.Index - 1
 	if previousBlockIndex == 0 {
 		previousBlockIndex = 1

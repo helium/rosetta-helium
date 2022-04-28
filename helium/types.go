@@ -333,6 +333,10 @@ var (
 	// testnet network in bytes
 	TestnetNetworkBytes = []byte{1}
 
+	// SyncedRocksDBHeight is the height of the
+	// latest iterator
+	SyncedRocksDBHeight = int64(0)
+
 	// SuccessStatus is the status of any
 	// Helium operation considered successful.
 	SuccessStatus = "SUCCESS"
