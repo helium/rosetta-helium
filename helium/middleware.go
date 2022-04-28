@@ -71,11 +71,167 @@ type GetGatewayOwnerResponse struct {
 }
 
 func GetCurrentHeight() (*int64, *types.Error) {
-	var result int64
-
-	if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
-		return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
+	if NodeBalancesDB != nil {
+		txnHeight, tErr := RocksDBTransactionsHeightGet()
+		if tErr != nil {
+			return nil, WrapErr(ErrFailed, tErr)
+		}
+		zap.S().Info("txn height: " + fmt.Sprint(*txnHeight))
+		return txnHeight, nil
+	} else {
+		var result int64
+		if err := NodeClient.CallFor(&result, "block_height", nil); err != nil {
+			return nil, WrapErr(ErrUnclearIntent, errors.New("error getting block_height"))
+		}
+		return &result, nil
 	}
+}
+
+func GetBlockTimestamp(blockIdentifier *types.PartialBlockIdentifier) (*int64, *types.Error) {
+	type request struct {
+		Height int64  `json:"height,omitempty"`
+		Hash   string `json:"hash,omitempty"`
+	}
+
+	var result Block
+	var req request
+
+	if blockIdentifier.Index != nil && blockIdentifier.Hash != nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	} else if blockIdentifier.Index == nil && blockIdentifier.Hash != nil {
+		req = request{
+			Hash: *blockIdentifier.Hash,
+		}
+	} else if blockIdentifier.Index != nil && blockIdentifier.Hash == nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	}
+
+	callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("block_get", req))
+	jsonResult, _ := json.Marshal(callResult)
+	json.Unmarshal(jsonResult, &result)
+
+	if err != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			err,
+		)
+	}
+
+	var blockTime int64
+
+	if result.Time == 0 {
+		if CurrentNetwork.Network == MainnetNetwork {
+			blockTime = 1564436673
+		} else {
+			// Assumed to be testnet
+			blockTime = 1624398097
+		}
+	} else {
+		blockTime = result.Time
+	}
+
+	blockTime = result.Time * 1000
+
+	return &blockTime, nil
+}
+
+func GetBlockIdentifier(blockIdentifier *types.PartialBlockIdentifier) (*types.BlockIdentifier, *types.Error) {
+	type request struct {
+		Height int64  `json:"height,omitempty"`
+		Hash   string `json:"hash,omitempty"`
+	}
+
+	var result Block
+	var req request
+
+	if blockIdentifier.Index != nil && blockIdentifier.Hash != nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	} else if blockIdentifier.Index == nil && blockIdentifier.Hash != nil {
+		req = request{
+			Hash: *blockIdentifier.Hash,
+		}
+	} else if blockIdentifier.Index != nil && blockIdentifier.Hash == nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	}
+
+	if NodeBlocksDB != nil {
+		blockHash, bhErr := RocksDBBlockHashGet(*blockIdentifier.Index)
+		if bhErr != nil {
+			return nil, WrapErr(ErrFailed, bhErr)
+		}
+
+		identifier := &types.BlockIdentifier{
+			Index: *blockIdentifier.Index,
+			Hash:  *blockHash,
+		}
+
+		return identifier, nil
+	} else {
+		callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("block_get", req))
+		jsonResult, _ := json.Marshal(callResult)
+		json.Unmarshal(jsonResult, &result)
+
+		if err != nil {
+			return nil, WrapErr(
+				ErrFailed,
+				err,
+			)
+		}
+
+		identifier := &types.BlockIdentifier{
+			Index: result.Height,
+			Hash:  result.Hash,
+		}
+
+		return identifier, nil
+	}
+}
+
+func GetBlockMeta(blockIdentifier *types.PartialBlockIdentifier) (*Block, *types.Error) {
+	type request struct {
+		Height int64  `json:"height,omitempty"`
+		Hash   string `json:"hash,omitempty"`
+	}
+
+	var result Block
+	var req request
+
+	if blockIdentifier.Index != nil && blockIdentifier.Hash != nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	} else if blockIdentifier.Index == nil && blockIdentifier.Hash != nil {
+		req = request{
+			Hash: *blockIdentifier.Hash,
+		}
+	} else if blockIdentifier.Index != nil && blockIdentifier.Hash == nil {
+		req = request{
+			Height: *blockIdentifier.Index,
+		}
+	}
+
+	callResult, err := utils.DecodeCallAsNumber(NodeClient.Call("block_get", req))
+	jsonResult, _ := json.Marshal(callResult)
+	json.Unmarshal(jsonResult, &result)
+
+	if err != nil {
+		return nil, WrapErr(
+			ErrFailed,
+			err,
+		)
+	}
+
+	// Must multiply time by 1000 since Helium response is
+	// in seconds not miliseconds
+	result.Time = result.Time * 1000
 
 	return &result, nil
 }
@@ -137,7 +293,12 @@ func GetBlock(blockIdentifier *types.PartialBlockIdentifier) (*types.Block, *typ
 	var blockTime int64
 
 	if result.Time == 0 {
-		blockTime = 946684800
+		if CurrentNetwork.Network == MainnetNetwork {
+			blockTime = 1564436673
+		} else {
+			// Assumed to be testnet
+			blockTime = 1624398097
+		}
 	} else {
 		blockTime = result.Time
 	}

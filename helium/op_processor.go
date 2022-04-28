@@ -207,7 +207,7 @@ func TransactionToOps(txn map[string]interface{}, status string, block *types.Bl
 		}
 		return FeeOnlyTxn(
 			TransferHotspotOp,
-			fmt.Sprint(txn["new_owner"]),
+			fmt.Sprint(txn["owner"]),
 			fmt.Sprint(txn["new_owner"]),
 			feeDetails,
 			txn,

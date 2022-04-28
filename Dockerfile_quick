@@ -1,6 +1,6 @@
 ARG UBUNTU_BUILDER=ubuntu:20.04
-ARG MAINNET_RUNNER=quay.io/team-helium/blockchain-node:blockchain-node-ubuntu18-1.1.53
-ARG TESTNET_RUNNER=quay.io/team-helium/blockchain-node:blockchain-node-testnet-ubuntu18-1.1.53
+ARG MAINNET_RUNNER=quay.io/team-helium/blockchain-node:blockchain-node-ubuntu18-1.1.57
+ARG TESTNET_RUNNER=quay.io/team-helium/blockchain-node:blockchain-node-testnet-ubuntu18-1.1.57
 ARG NETWORK=mainnet
 
 

@@ -53,12 +53,26 @@ func (s *NetworkAPIService) NetworkStatus(
 	ctx context.Context,
 	request *types.NetworkRequest,
 ) (*types.NetworkStatusResponse, *types.Error) {
+
+	// Update all secondary rocksdb references
+	if tErr := helium.NodeBalancesDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
+	if tErr := helium.NodeBlocksDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
+	if tErr := helium.NodeTransactionsDB.TryCatchUpWithPrimary(); tErr != nil {
+		return nil, helium.WrapErr(helium.ErrFailed, tErr)
+	}
+
 	currentHeight, chErr := helium.GetCurrentHeight()
 	if chErr != nil {
 		return nil, chErr
 	}
 
-	currentBlock, cbErr := helium.GetBlock(&types.PartialBlockIdentifier{
+	currentBlock, cbErr := helium.GetBlockMeta(&types.PartialBlockIdentifier{
 		Index: currentHeight,
 	})
 
@@ -66,11 +80,18 @@ func (s *NetworkAPIService) NetworkStatus(
 		return nil, cbErr
 	}
 
-	if currentBlock.BlockIdentifier.Index < *helium.LBS {
+	currentBlockID := &types.BlockIdentifier{
+		Index: currentBlock.Height,
+		Hash:  currentBlock.Hash,
+	}
+
+	currentBlockTimestamp := currentBlock.Time
+
+	if currentBlockID.Index < *helium.LBS {
 		return nil, helium.WrapErr(helium.ErrNodeSync, errors.New("node is catching up to snapshot height"))
 	}
 
-	lastBlessedBlock, lbErr := helium.GetBlock(&types.PartialBlockIdentifier{
+	lastBlessedBlock, lbErr := helium.GetBlockIdentifier(&types.PartialBlockIdentifier{
 		Index: helium.LBS,
 	})
 
@@ -83,10 +104,13 @@ func (s *NetworkAPIService) NetworkStatus(
 		return nil, pErr
 	}
 
-	syncStatus, sErr := helium.GetSyncStatus()
-	if sErr != nil {
-		return nil, sErr
-	}
+	// Removing syncStatus for now since currentBlock is
+	// retrieved from external API which is not ideal.
+	//
+	// syncStatus, sErr := helium.GetSyncStatus()
+	// if sErr != nil {
+	// 	return nil, sErr
+	// }
 
 	genesisIndex := helium.MainnetGenesisBlockIndex
 	genesisHash := helium.MainnetGenesisBlockHash
@@ -97,21 +121,15 @@ func (s *NetworkAPIService) NetworkStatus(
 	}
 
 	return &types.NetworkStatusResponse{
-		CurrentBlockIdentifier: &types.BlockIdentifier{
-			Index: currentBlock.BlockIdentifier.Index,
-			Hash:  currentBlock.BlockIdentifier.Hash,
-		},
-		CurrentBlockTimestamp: currentBlock.Timestamp,
+		CurrentBlockIdentifier: currentBlockID,
+		CurrentBlockTimestamp:  currentBlockTimestamp,
 		GenesisBlockIdentifier: &types.BlockIdentifier{
 			Index: genesisIndex,
 			Hash:  genesisHash,
 		},
-		OldestBlockIdentifier: &types.BlockIdentifier{
-			Index: lastBlessedBlock.BlockIdentifier.Index,
-			Hash:  lastBlessedBlock.BlockIdentifier.Hash,
-		},
-		Peers:      peers,
-		SyncStatus: syncStatus,
+		OldestBlockIdentifier: lastBlessedBlock,
+		Peers:                 peers,
+		// SyncStatus:            syncStatus,
 	}, nil
 }
 

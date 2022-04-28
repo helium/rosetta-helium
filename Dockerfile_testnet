@@ -83,16 +83,16 @@ WORKDIR /usr/src/
 
 # Add our code
 # TODO: git checkout specific release when ready
-RUN git clone https://github.com/syuan100/blockchain-node.git && echo ''
+RUN git clone https://github.com/syuan100/blockchain-node.git
 
 
-FROM node-builder AS node-mainnet
+FROM node-builder AS node-testnet
 
-ARG BUILD_TARGET=docker_rosetta
+ARG BUILD_TARGET=docker_rosetta_testnet
 
 WORKDIR /usr/src/blockchain-node
 
-RUN git checkout bump_snap_sy
+RUN git checkout commit-hooks-with-heights
 
 RUN ./rebar3 as ${BUILD_TARGET} tar -n blockchain_node
 
@@ -124,31 +124,15 @@ RUN apt update \
       && curl -L https://golang.org/dl/go1.17.1.linux-amd64.tar.gz | tar xzf -
 
 ENV PATH="/src/go/bin:$PATH" \
-    CGO_ENABLED=1
-
-WORKDIR /app
-RUN apt install -y git
-RUN git clone https://github.com/facebook/rocksdb.git
-
-WORKDIR /app/rocksdb
-RUN git checkout tags/v6.20.3
-RUN apt install -y --no-install-recommends \
-	build-essential make libgflags-dev \
-	zlib1g-dev libbz2-dev liblz4-dev libsnappy-dev \
-	libzstd-dev libgflags-dev
-
-RUN make shared_lib
-RUN make install
-
-WORKDIR /src
+    CGO_ENABLED=0
 
 # TODO: git clone from url instead of direct copy
 COPY . rosetta-helium
 
-WORKDIR /src/rosetta-helium
-RUN go build -o rosetta-helium
+RUN cd rosetta-helium && go build -o rosetta-helium
 
-FROM node-mainnet as rosetta-helium-final
+
+FROM node-testnet as rosetta-helium-final
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -157,24 +141,13 @@ EXPOSE 44158
 
 RUN apt update \
     && apt install -y --no-install-recommends \
-         ca-certificates git npm 
-
-WORKDIR /app
-COPY --from=rosetta-builder /app/rocksdb rocksdb
-
-WORKDIR /app/rocksdb
-RUN apt install -y --no-install-recommends \
-	build-essential make libgflags-dev \
-	zlib1g-dev libbz2-dev liblz4-dev libsnappy-dev \
-	libzstd-dev
-
-RUN make install
+         ca-certificates git npm
 
 WORKDIR /app
 
 COPY --from=rosetta-builder /src/rosetta-helium/rosetta-helium rosetta-helium
 COPY --from=rosetta-builder /src/rosetta-helium/ghost-transactions ghost-transactions
-COPY --from=rosetta-builder /src/rosetta-helium/docker/mainnet.sh start.sh
+COPY --from=rosetta-builder /src/rosetta-helium/docker/testnet.sh start.sh
 COPY --from=rosetta-builder /src/rosetta-helium/helium-constructor helium-constructor
 
 RUN cd helium-constructor \

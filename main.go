@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/helium/rosetta-helium/helium"
 	"github.com/helium/rosetta-helium/services"
@@ -35,11 +36,23 @@ import (
 	"github.com/coinbase/rosetta-sdk-go/types"
 
 	badger "github.com/dgraph-io/badger/v3"
+
+	rocksdb "github.com/linxGnu/grocksdb"
 )
 
 const (
 	serverPort = 8080
 )
+
+type HeliumRocksDB struct {
+	BalancesDB            *rocksdb.DB
+	TransactionsDB        *rocksdb.DB
+	BlockchainDB          *rocksdb.DB
+	EntriesCF             *rocksdb.ColumnFamilyHandle
+	BalancesDefaultCF     *rocksdb.ColumnFamilyHandle
+	HeightsCF             *rocksdb.ColumnFamilyHandle
+	TransactionsDefaultCF *rocksdb.ColumnFamilyHandle
+}
 
 // NewBlockchainRouter creates a Mux http.Handler from a collection
 // of server controllers.
@@ -75,7 +88,14 @@ func NewBlockchainRouter(
 }
 
 func LoadGhostTxns(network *types.NetworkIdentifier, db *badger.DB) error {
-	if werr := filepath.Walk("ghost-transactions", func(path string, info os.FileInfo, err error) error {
+	// Assume mainnet
+	networkDir := "mainnet"
+
+	if network.Network == helium.TestnetNetwork {
+		networkDir = "testnet"
+	}
+
+	if werr := filepath.Walk("ghost-transactions/"+networkDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			zap.S().Error(err.Error())
 		}
@@ -83,7 +103,7 @@ func LoadGhostTxns(network *types.NetworkIdentifier, db *badger.DB) error {
 			return nil
 		}
 
-		jsonFile, jerr := os.Open("ghost-transactions/" + info.Name())
+		jsonFile, jerr := os.Open("ghost-transactions/" + networkDir + "/" + info.Name())
 		if jerr != nil {
 			return jerr
 		}
@@ -137,27 +157,92 @@ func LoadGhostTxns(network *types.NetworkIdentifier, db *badger.DB) error {
 	return nil
 }
 
+func openRocksDB(dataDir string) (heliumDB *HeliumRocksDB, err error) {
+	opts := rocksdb.NewDefaultOptions()
+	columnOpts := rocksdb.NewDefaultOptions()
+
+	prefixExtractor := rocksdb.NewFixedPrefixTransform(33)
+	columnOpts.SetPrefixExtractor(prefixExtractor)
+
+	balancesCfNames := []string{"default", "entries"}
+	blockchainCfNames := []string{"default", "heights"}
+	transactionsCfNames := []string{"default", "transactions"}
+
+	dbBal, balancesCfHandles, dbBalErr := rocksdb.OpenDbAsSecondaryColumnFamilies(
+		opts,
+		dataDir+"/balances.db",
+		"./rocksdb/balances.db",
+		balancesCfNames,
+		[]*rocksdb.Options{opts, columnOpts},
+	)
+	if dbBalErr != nil {
+		return nil, dbBalErr
+	}
+
+	dbBlock, blockchainCfHandles, dbBlockErr := rocksdb.OpenDbAsSecondaryColumnFamilies(
+		opts,
+		dataDir+"/blockchain.db",
+		"./rocksdb/blockchain.db",
+		blockchainCfNames,
+		[]*rocksdb.Options{opts, opts},
+	)
+	if dbBlockErr != nil {
+		return nil, dbBalErr
+	}
+
+	dbTxn, txnCfHandles, dbTxnErr := rocksdb.OpenDbAsSecondaryColumnFamilies(
+		opts,
+		dataDir+"/transactions.db",
+		"./rocksdb/transactions.db",
+		transactionsCfNames,
+		[]*rocksdb.Options{opts, opts},
+	)
+	if dbTxnErr != nil {
+		return nil, dbTxnErr
+	}
+
+	return &HeliumRocksDB{
+		BalancesDB:            dbBal,
+		TransactionsDB:        dbTxn,
+		BlockchainDB:          dbBlock,
+		BalancesDefaultCF:     balancesCfHandles[0],
+		EntriesCF:             balancesCfHandles[1],
+		HeightsCF:             blockchainCfHandles[1],
+		TransactionsDefaultCF: txnCfHandles[0],
+	}, nil
+}
+
 func main() {
+	// Logging tool
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync() // flushes buffer, if any
-
 	globalLogger := zap.ReplaceGlobals(logger)
 	defer globalLogger()
 
+	// Ghost transaction DB setup
 	bdb, err := badger.Open(badger.DefaultOptions("badger"))
 	if err != nil {
 		zap.S().Fatal(err)
 	}
 	defer bdb.Close()
-
 	utils.DB = bdb
 
-	var testnet bool
-	var network *types.NetworkIdentifier
+	// CLI Flag Parsing
+	// ****************
+	//
+	// blockchain-node data dir direct connection CLI arg
+	var blockchainNodeDataDir string
+	flag.StringVar(&blockchainNodeDataDir, "data", "", "path to blockchain-node data dir")
 
+	// Testnet CLI arg
+	var testnet bool
 	flag.BoolVar(&testnet, "testnet", false, "run testnet version of rosetta-helium")
+
+	// Parse flags
 	flag.Parse()
 
+	// Network setup
+	var network *types.NetworkIdentifier
 	if !testnet {
 		zap.S().Info("Initilizing mainnet node...")
 		network = &types.NetworkIdentifier{
@@ -166,7 +251,7 @@ func main() {
 		}
 
 		if lerr := LoadGhostTxns(network, bdb); lerr != nil {
-			zap.S().Error("Cannot load ghost transactions: " + lerr.Error())
+			zap.S().Error("Cannot load mainnet ghost transactions: " + lerr.Error())
 			os.Exit(1)
 		}
 
@@ -176,9 +261,40 @@ func main() {
 			Blockchain: "Helium",
 			Network:    helium.TestnetNetwork,
 		}
+
+		if lerr := LoadGhostTxns(network, bdb); lerr != nil {
+			zap.S().Error("Cannot load testnet ghost transactions: " + lerr.Error())
+			os.Exit(1)
+		}
 	}
 
 	helium.CurrentNetwork = network
+
+	// Blockchain-node rocksdb direct connection setup
+	if blockchainNodeDataDir != "" {
+		// Set total number of retries before canceling DB open
+		retries := 10
+
+		zap.S().Info("Attempting to load rocksdb directly at dir '" + blockchainNodeDataDir + "'")
+
+		for retries > 0 {
+			heliumDB, dbOpenErr := openRocksDB(blockchainNodeDataDir)
+			if dbOpenErr != nil {
+				zap.S().Warn(dbOpenErr.Error() + ": Unable to open rocksdb at this time. Retrying - (" + fmt.Sprint(retries) + " attemps left)")
+				time.Sleep(5 * time.Second)
+			} else {
+				zap.S().Info("Loaded rocksdb directly at dir '" + blockchainNodeDataDir + "'")
+				helium.NodeBalancesDB = heliumDB.BalancesDB
+				helium.NodeBlocksDB = heliumDB.BlockchainDB
+				helium.NodeTransactionsDB = heliumDB.TransactionsDB
+				helium.NodeBalancesDBEntriesHandle = heliumDB.EntriesCF
+				helium.NodeBalancesDBDefaultHandle = heliumDB.BalancesDefaultCF
+				helium.NodeBlockchainDBHeightsHandle = heliumDB.HeightsCF
+				helium.NodeTransactionsDBDefaultHandle = heliumDB.TransactionsDefaultCF
+				break
+			}
+		}
+	}
 
 	// The asserter automatically rejects incorrectly formatted
 	// requests.

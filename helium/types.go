@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/coinbase/rosetta-sdk-go/types"
+	rocksdb "github.com/linxGnu/grocksdb"
 	"go.uber.org/zap"
 )
 
@@ -27,6 +28,10 @@ func readLBSfile() *int64 {
 	s := strings.TrimSuffix(buf.String(), "\n")
 
 	lbs, err := strconv.ParseInt(s, 10, 64)
+
+	// Increment last blessed snapshot block in order to account
+	// for previous_block query in /network/status
+	lbs = lbs + 1
 
 	if err != nil {
 		log.Fatal(err)
@@ -328,6 +333,10 @@ var (
 	// testnet network in bytes
 	TestnetNetworkBytes = []byte{1}
 
+	// SyncedRocksDBHeight is the height of the
+	// latest iterator
+	SyncedRocksDBHeight = int64(0)
+
 	// SuccessStatus is the status of any
 	// Helium operation considered successful.
 	SuccessStatus = "SUCCESS"
@@ -447,6 +456,15 @@ var (
 
 	// LBS is the LastBlessedBlock height as an int64
 	LBS = readLBSfile()
+
+	// Optional RocksDB vars for node db
+	NodeBalancesDB                  *rocksdb.DB
+	NodeBlocksDB                    *rocksdb.DB
+	NodeTransactionsDB              *rocksdb.DB
+	NodeBalancesDBEntriesHandle     *rocksdb.ColumnFamilyHandle
+	NodeBalancesDBDefaultHandle     *rocksdb.ColumnFamilyHandle
+	NodeBlockchainDBHeightsHandle   *rocksdb.ColumnFamilyHandle
+	NodeTransactionsDBDefaultHandle *rocksdb.ColumnFamilyHandle
 )
 
 type Block struct {
